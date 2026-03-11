@@ -1,10 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 const CrocodileLodge: React.FC = () => {
-  const cursorRef = useRef<HTMLDivElement>(null);
-  const ringRef = useRef<HTMLDivElement>(null);
-
   const [checkin, setCheckin] = useState<string>("");
   const [checkout, setCheckout] = useState<string>("");
   const [carouselIndex, setCarouselIndex] = useState<number>(0);
@@ -44,76 +41,6 @@ const CrocodileLodge: React.FC = () => {
     const fmt = (d: Date) => d.toISOString().split("T")[0];
     setCheckin(fmt(today));
     setCheckout(fmt(tomorrow));
-  }, []);
-
-  // Custom Cursor Logic
-  useEffect(() => {
-    let mouseX = 0,
-      mouseY = 0;
-    let ringX = 0,
-      ringY = 0;
-    let animationFrameId: number;
-
-    const onMouseMove = (e: MouseEvent) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-      if (cursorRef.current) {
-        cursorRef.current.style.left = mouseX + "px";
-        cursorRef.current.style.top = mouseY + "px";
-      }
-    };
-
-    const animateRing = () => {
-      ringX += (mouseX - ringX) * 0.12;
-      ringY += (mouseY - ringY) * 0.12;
-      if (ringRef.current) {
-        ringRef.current.style.left = ringX + "px";
-        ringRef.current.style.top = ringY + "px";
-      }
-      animationFrameId = requestAnimationFrame(animateRing);
-    };
-
-    document.addEventListener("mousemove", onMouseMove);
-    animateRing();
-
-    // Hover effects
-    const interactiveElements = document.querySelectorAll(
-      "a, button, .cal-day, .amenity-card, .villa-card",
-    );
-    const onMouseEnter = () => {
-      if (cursorRef.current) {
-        cursorRef.current.style.width = "20px";
-        cursorRef.current.style.height = "20px";
-      }
-      if (ringRef.current) {
-        ringRef.current.style.width = "60px";
-        ringRef.current.style.height = "60px";
-      }
-    };
-    const onMouseLeave = () => {
-      if (cursorRef.current) {
-        cursorRef.current.style.width = "12px";
-        cursorRef.current.style.height = "12px";
-      }
-      if (ringRef.current) {
-        ringRef.current.style.width = "40px";
-        ringRef.current.style.height = "40px";
-      }
-    };
-
-    interactiveElements.forEach((el) => {
-      el.addEventListener("mouseenter", onMouseEnter);
-      el.addEventListener("mouseleave", onMouseLeave);
-    });
-
-    return () => {
-      document.removeEventListener("mousemove", onMouseMove);
-      cancelAnimationFrame(animationFrameId);
-      interactiveElements.forEach((el) => {
-        el.removeEventListener("mouseenter", onMouseEnter);
-        el.removeEventListener("mouseleave", onMouseLeave);
-      });
-    };
   }, []);
 
   // Scroll Reveal Logic
@@ -221,31 +148,6 @@ const CrocodileLodge: React.FC = () => {
           background: var(--croc-deep);
           color: var(--croc-cream);
           overflow-x: hidden;
-          cursor: none;
-        }
-
-        /* Custom Cursor */
-        .cursor {
-          width: 12px; height: 12px;
-          background: var(--croc-gold);
-          border-radius: 50%;
-          position: fixed;
-          pointer-events: none;
-          z-index: 9999;
-          transform: translate(-50%, -50%);
-          transition: transform 0.1s ease, width 0.3s, height 0.3s;
-          mix-blend-mode: difference;
-        }
-        .cursor-ring {
-          width: 40px; height: 40px;
-          border: 1px solid var(--croc-gold);
-          border-radius: 50%;
-          position: fixed;
-          pointer-events: none;
-          z-index: 9998;
-          transform: translate(-50%, -50%);
-          transition: transform 0.15s ease, width 0.3s, height 0.3s, opacity 0.3s;
-          opacity: 0.6;
         }
 
         /* NAV */
@@ -1521,10 +1423,6 @@ const CrocodileLodge: React.FC = () => {
           nav { padding: 20px 24px; }
         }
       `}</style>
-
-      {/* Custom Cursor */}
-      <div className="cursor" ref={cursorRef}></div>
-      <div className="cursor-ring" ref={ringRef}></div>
 
       {/* NAV */}
       <nav>
