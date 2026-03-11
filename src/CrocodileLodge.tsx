@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 
 const CrocodileLodge: React.FC = () => {
   const cursorRef = useRef<HTMLDivElement>(null);
@@ -266,6 +267,10 @@ const CrocodileLodge: React.FC = () => {
           letter-spacing: 0.05em;
           color: var(--croc-cream);
           text-decoration: none;
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 0;
         }
         .nav-logo span { color: var(--croc-gold); }
 
@@ -274,7 +279,7 @@ const CrocodileLodge: React.FC = () => {
           gap: 44px;
           list-style: none;
         }
-        .nav-links a {
+        .nav-links a, .nav-links button {
           font-family: 'Josefin Sans', sans-serif;
           font-size: 0.7rem;
           font-weight: 300;
@@ -284,8 +289,12 @@ const CrocodileLodge: React.FC = () => {
           text-decoration: none;
           opacity: 0.8;
           transition: opacity 0.3s, color 0.3s;
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 0;
         }
-        .nav-links a:hover { opacity: 1; color: var(--croc-gold); }
+        .nav-links a:hover, .nav-links button:hover { opacity: 1; color: var(--croc-gold); }
 
         .nav-book {
           font-family: 'Josefin Sans', sans-serif;
@@ -1438,9 +1447,9 @@ const CrocodileLodge: React.FC = () => {
 
       {/* NAV */}
       <nav>
-        <a href="#" className="nav-logo">
+        <Link to="/" className="nav-logo">
           Croc<span>odile</span> Lodge
-        </a>
+        </Link>
         <ul className="nav-links">
           <li>
             <a href="#villas">Villas</a>
@@ -1449,7 +1458,7 @@ const CrocodileLodge: React.FC = () => {
             <a href="#amenities">Amenities</a>
           </li>
           <li>
-            <a href="#availability">Availability</a>
+            <Link to="/gallery">Gallery</Link>
           </li>
           <li>
             <a href="#about">About</a>
