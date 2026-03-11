@@ -6,6 +6,32 @@ const CrocodileLodge: React.FC = () => {
 
   const [checkin, setCheckin] = useState<string>("");
   const [checkout, setCheckout] = useState<string>("");
+  const [carouselIndex, setCarouselIndex] = useState<number>(0);
+
+  const carouselImages = [
+    { src: "/images/gate.jpg", alt: "Lodge Gate" },
+    { src: "/images/poolview.jpeg", alt: "Pool View" },
+    { src: "/images/yellow villa.jpeg", alt: "Yellow Villa" },
+  ];
+
+  // Carousel Autoplay Logic
+  useEffect(() => {
+    const carouselInterval = setInterval(() => {
+      setCarouselIndex((prev) => (prev + 1) % carouselImages.length);
+    }, 5000); // Change slide every 5 seconds
+
+    return () => clearInterval(carouselInterval);
+  }, [carouselImages.length]);
+
+  const handleCarouselPrev = () => {
+    setCarouselIndex(
+      (prev) => (prev - 1 + carouselImages.length) % carouselImages.length,
+    );
+  };
+
+  const handleCarouselNext = () => {
+    setCarouselIndex((prev) => (prev + 1) % carouselImages.length);
+  };
 
   // Set default dates on mount
   useEffect(() => {
@@ -501,6 +527,97 @@ const CrocodileLodge: React.FC = () => {
           to { opacity: 1; }
         }
 
+        /* CAROUSEL */
+        .carousel-container {
+          position: absolute;
+          right: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          opacity: 0;
+          animation: fade-in 1s ease 0.5s forwards;
+        }
+
+        .carousel-slides {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+        }
+
+        .carousel-slide {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-size: cover;
+          background-position: center;
+          opacity: 0;
+          transition: opacity 0.8s ease;
+        }
+
+        .carousel-slide.active {
+          opacity: 1;
+        }
+
+        .carousel-controls {
+          position: absolute;
+          bottom: 30px;
+          left: 50%;
+          transform: translateX(-50%);
+          display: flex;
+          gap: 12px;
+          z-index: 10;
+        }
+
+        .carousel-dot {
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          background: rgba(201,168,76,0.3);
+          cursor: pointer;
+          transition: all 0.3s;
+          border: 1px solid rgba(201,168,76,0.5);
+        }
+
+        .carousel-dot.active {
+          background: var(--croc-gold);
+          width: 28px;
+          border-radius: 5px;
+        }
+
+        .carousel-btn {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 50px;
+          height: 50px;
+          background: rgba(13,26,15,0.5);
+          border: 1px solid rgba(201,168,76,0.4);
+          color: var(--croc-gold);
+          font-size: 1.6rem;
+          cursor: pointer;
+          transition: all 0.3s;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 10;
+        }
+
+        .carousel-btn:hover {
+          background: rgba(13,26,15,0.8);
+          border-color: var(--croc-gold);
+        }
+
+        .carousel-btn.prev {
+          left: 10px;
+        }
+
+        .carousel-btn.next {
+          right: 10px;
+        }
+
         /* BOOKING SECTION */
         .booking-section {
           background: var(--croc-sand);
@@ -767,14 +884,7 @@ const CrocodileLodge: React.FC = () => {
 
         .villas-grid {
           display: grid;
-          grid-template-columns: 1.4fr 1fr;
-          gap: 30px;
-          max-width: 1200px;
-          margin: 0 auto 30px;
-        }
-        .villa-row-2 {
-          display: grid;
-          grid-template-columns: 1fr 1.4fr;
+          grid-template-columns: repeat(3, 1fr);
           gap: 30px;
           max-width: 1200px;
           margin: 0 auto;
@@ -794,11 +904,9 @@ const CrocodileLodge: React.FC = () => {
           position: relative;
           overflow: hidden;
         }
-        .villa-card:nth-child(1) .villa-img-bg { background: linear-gradient(135deg, #1a3320 0%, #0d4a2a 50%, #2d5a3d 100%); height: 440px; }
-        .villa-card:nth-child(2) .villa-img-bg { background: linear-gradient(135deg, #0d2a35 0%, #1a4a5a 50%, #2d6a7a 100%); }
-
-        .villa-row-2 .villa-card:nth-child(1) .villa-img-bg { background: linear-gradient(135deg, #3a2d1a 0%, #5a4a2a 50%, #4a3a1a 100%); }
-        .villa-row-2 .villa-card:nth-child(2) .villa-img-bg { background: linear-gradient(135deg, #1a2d1a 0%, #2d5a3d 50%, #1a4a2a 100%); height: 440px; }
+        .villa-card:nth-child(1) .villa-img-bg { background: linear-gradient(135deg, #2d5a3d 0%, #1a8a5a 50%, #0d6a3d 100%); }
+        .villa-card:nth-child(2) .villa-img-bg { background: linear-gradient(135deg, #0d3a5a 0%, #1a6a9a 50%, #2d8abd 100%); }
+        .villa-card:nth-child(3) .villa-img-bg { background: linear-gradient(135deg, #8a7a1a 0%, #d4a73a 50%, #c9963d 100%); }
 
         /* Decorative villa illustrations */
         .villa-decoration {
@@ -1388,6 +1496,44 @@ const CrocodileLodge: React.FC = () => {
           <path d="M200 115 L195 155 L215 158 L218 118 Z" fill="white" />
         </svg>
 
+        {/* Carousel */}
+        <div className="carousel-container">
+          <div className="carousel-slides">
+            {carouselImages.map((image, index) => (
+              <div
+                key={index}
+                className={`carousel-slide ${index === carouselIndex ? "active" : ""}`}
+                style={{ backgroundImage: `url('${image.src}')` }}
+                aria-label={image.alt}
+              />
+            ))}
+            <button
+              className="carousel-btn prev"
+              onClick={handleCarouselPrev}
+              aria-label="Previous slide"
+            >
+              ‹
+            </button>
+            <button
+              className="carousel-btn next"
+              onClick={handleCarouselNext}
+              aria-label="Next slide"
+            >
+              ›
+            </button>
+          </div>
+          <div className="carousel-controls">
+            {carouselImages.map((_, index) => (
+              <button
+                key={index}
+                className={`carousel-dot ${index === carouselIndex ? "active" : ""}`}
+                onClick={() => setCarouselIndex(index)}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
+        </div>
+
         <div className="hero-content">
           <div className="hero-eyebrow">Coastal Wildlife Retreat · Kenya</div>
           <h1 className="hero-title">
@@ -1565,9 +1711,7 @@ const CrocodileLodge: React.FC = () => {
       <section className="villas-section" id="villas">
         <div className="section-header reveal" style={{ marginBottom: "60px" }}>
           <div className="section-tag">Our Accommodations</div>
-          <h2 className="section-title">
-            Villas & <em>Houses</em>
-          </h2>
+          <h2 className="section-title">Crocodile Stay</h2>
         </div>
 
         <div className="villas-grid">
@@ -1576,13 +1720,12 @@ const CrocodileLodge: React.FC = () => {
               <div className="villa-decoration">🌿</div>
             </div>
             <div className="villa-overlay">
-              <div className="villa-category">Signature Villa</div>
-              <div className="villa-name">The Mangrove Suite</div>
+              <div className="villa-name">The Green Villa</div>
               <div className="villa-detail">
-                2 bedrooms · Private veranda · Garden view
+                2 bedrooms · Garden views · Lush surroundings
               </div>
               <div className="villa-price">
-                <span className="price-num">KES 18,500</span>
+                <span className="price-num">KES 6,000</span>
                 <span className="price-per">/ night</span>
               </div>
               <a href="#availability" className="villa-btn">
@@ -1598,35 +1741,13 @@ const CrocodileLodge: React.FC = () => {
               <div className="villa-decoration">🌊</div>
             </div>
             <div className="villa-overlay">
-              <div className="villa-category">Beachfront</div>
-              <div className="villa-name">The Ocean House</div>
+              <div className="villa-category">Blue Villa</div>
+              <div className="villa-name">The Blue Villa</div>
               <div className="villa-detail">
-                3 bedrooms · Direct beach access · Sea view
+                3 bedrooms · Luxury furnishings · Coastal charm
               </div>
               <div className="villa-price">
-                <span className="price-num">KES 34,000</span>
-                <span className="price-per">/ night</span>
-              </div>
-              <a href="#availability" className="villa-btn">
-                Reserve Now
-              </a>
-            </div>
-          </div>
-        </div>
-
-        <div className="villa-row-2">
-          <div className="villa-card reveal">
-            <div className="villa-img-bg">
-              <div className="villa-decoration">☀️</div>
-            </div>
-            <div className="villa-overlay">
-              <div className="villa-category">Pool Villa</div>
-              <div className="villa-name">The Palm Retreat</div>
-              <div className="villa-detail">
-                2 bedrooms · Private plunge pool · Tropical garden
-              </div>
-              <div className="villa-price">
-                <span className="price-num">KES 26,000</span>
+                <span className="price-num">KES 6,000</span>
                 <span className="price-per">/ night</span>
               </div>
               <a href="#availability" className="villa-btn">
@@ -1636,19 +1757,18 @@ const CrocodileLodge: React.FC = () => {
           </div>
           <div
             className="villa-card reveal"
-            style={{ transitionDelay: "0.1s" }}
+            style={{ transitionDelay: "0.2s" }}
           >
             <div className="villa-img-bg">
-              <div className="villa-decoration">🏡</div>
+              <div className="villa-decoration">⭐</div>
             </div>
             <div className="villa-overlay">
-              <div className="villa-category">Family Estate</div>
-              <div className="villa-name">Crocodile Family House</div>
+              <div className="villa-name">The Yellow Villa</div>
               <div className="villa-detail">
-                5 bedrooms · Full kitchen · Communal pool · Beach proximity
+                3 bedrooms · Sunlit terraces · Premium amenities
               </div>
               <div className="villa-price">
-                <span className="price-num">KES 55,000</span>
+                <span className="price-num">KES 6,000</span>
                 <span className="price-per">/ night</span>
               </div>
               <a href="#availability" className="villa-btn">
