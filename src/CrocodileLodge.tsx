@@ -8,6 +8,7 @@ const CrocodileLodge: React.FC = () => {
   const [checkin, setCheckin] = useState<string>("");
   const [checkout, setCheckout] = useState<string>("");
   const [carouselIndex, setCarouselIndex] = useState<number>(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
 
   const carouselImages = [
     { src: "/images/gate.jpg", alt: "Lodge Gate" },
@@ -309,6 +310,82 @@ const CrocodileLodge: React.FC = () => {
           transition: background 0.3s, transform 0.2s;
         }
         .nav-book:hover { background: var(--croc-amber); transform: translateY(-1px); }
+
+        /* HAMBURGER MENU */
+        .hamburger {
+          display: none;
+          flex-direction: column;
+          gap: 6px;
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 0;
+          z-index: 101;
+        }
+
+        .hamburger span {
+          width: 24px;
+          height: 2px;
+          background: var(--croc-cream);
+          transition: all 0.3s ease;
+          display: block;
+        }
+
+        .hamburger.active span:nth-child(1) {
+          transform: rotate(45deg) translate(8px, 8px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+          opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+          transform: rotate(-45deg) translate(7px, -7px);
+        }
+
+        .mobile-menu {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(13, 26, 15, 0.98);
+          z-index: 50;
+          padding-top: 100px;
+          flex-direction: column;
+          align-items: center;
+          gap: 30px;
+          backdrop-filter: blur(4px);
+        }
+
+        .mobile-menu.active {
+          display: flex;
+        }
+
+        .mobile-menu a, .mobile-menu button {
+          font-family: 'Josefin Sans', sans-serif;
+          font-size: 1rem;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: var(--croc-cream);
+          text-decoration: none;
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 0;
+          transition: color 0.3s;
+        }
+
+        .mobile-menu a:hover, .mobile-menu button:hover {
+          color: var(--croc-gold);
+        }
+
+        .mobile-menu .nav-book {
+          display: inline-block;
+          margin-top: 20px;
+          font-size: 0.75rem;
+        }
 
         /* HERO */
         .hero {
@@ -1438,6 +1515,10 @@ const CrocodileLodge: React.FC = () => {
           .footer-top { grid-template-columns: 1fr; }
           footer { padding: 60px 24px 40px; }
           .amenities-section, .villas-section, .experience-section, .testimonials-section { padding: 80px 24px; }
+          .hamburger { display: flex; }
+          .nav-links { display: none; }
+          .nav-book { display: none; }
+          nav { padding: 20px 24px; }
         }
       `}</style>
 
@@ -1470,7 +1551,42 @@ const CrocodileLodge: React.FC = () => {
         <a href="#availability" className="nav-book">
           Book Direct — Best Rate
         </a>
+        <button
+          className={`hamburger ${mobileMenuOpen ? "active" : ""}`}
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Toggle menu"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
       </nav>
+
+      {/* MOBILE MENU */}
+      <div className={`mobile-menu ${mobileMenuOpen ? "active" : ""}`}>
+        <a href="#villas" onClick={() => setMobileMenuOpen(false)}>
+          Villas
+        </a>
+        <a href="#amenities" onClick={() => setMobileMenuOpen(false)}>
+          Amenities
+        </a>
+        <Link to="/gallery" onClick={() => setMobileMenuOpen(false)}>
+          Gallery
+        </Link>
+        <a href="#about" onClick={() => setMobileMenuOpen(false)}>
+          About
+        </a>
+        <a href="#contact" onClick={() => setMobileMenuOpen(false)}>
+          Contact
+        </a>
+        <a
+          href="#availability"
+          className="nav-book"
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          Book Direct — Best Rate
+        </a>
+      </div>
 
       {/* HERO */}
       <section className="hero">
