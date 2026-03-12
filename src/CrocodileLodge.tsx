@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import VillaCard from "./components/VillaCard";
 import DetailsModal from "./components/DetailsModal";
-import type { Villa } from "./types";
+import type { Villa, Reservation } from "./types";
 import { VILLAS } from "./types";
 
 const CrocodileLodge: React.FC = () => {
@@ -13,6 +13,11 @@ const CrocodileLodge: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [selectedVilla, setSelectedVilla] = useState<Villa | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [guests, setGuests] = useState<number>(1);
+  const [accommodationType, setAccommodationType] = useState<string>('Villa');
+  const [availabilityResult, setAvailabilityResult] = useState<'available' | 'booked' | null>(null);
+  const [availableVilla, setAvailableVilla] = useState<Villa | null>(null);
+  const [isCheckingAvailability, setIsCheckingAvailability] = useState<boolean>(false);
 
   const carouselImages = [
     { src: "/images/gate.jpg", alt: "Lodge Gate" },
@@ -67,18 +72,63 @@ const CrocodileLodge: React.FC = () => {
     return () => observer.disconnect();
   }, []);
 
-  const handleCheckAvailability = () => {
-    if (!checkin) {
-      alert("Please select a check-in date from the calendar or date picker.");
+  const getNightsCount = (): number => {
+    if (!checkin || !checkout) return 0;
+    const d1 = new Date(checkin);
+    const d2 = new Date(checkout);
+    return Math.max(0, Math.ceil((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24)));
+  };
+
+  const getVillasOfType = (type: string): Villa[] =>
+    VILLAS.filter((v) => v.type === type);
+
+  const getNightlyRate = (): number => {
+    const villas = getVillasOfType(accommodationType);
+    if (!villas.length) return 0;
+    const villa = villas[0];
+    const tier = villa.pricing.find((p) => guests >= p.guestMin && guests <= p.guestMax);
+    return tier ? tier.price : villa.pricing[villa.pricing.length - 1].price;
+  };
+
+  const getTotalPrice = (): number => getNightlyRate() * getNightsCount();
+
+  const handleCheckAvailability = async () => {
+    if (!checkin || !checkout) {
+      alert("Please select check-in and check-out dates.");
       return;
     }
-    const villaNames = VILLAS.map((v) => v.name).join(", ");
-    const msg =
-      checkin && checkout
-        ? `Checking availability for ${villaNames} from ${checkin} to ${checkout}...\n\nPlease contact us at reservations@crocodilelodge.co.ke or call +254 700 000 000 to complete your booking.`
-        : `Please select both check-in and check-out dates.`;
-    alert(msg);
-    document.getElementById("villas")?.scrollIntoView({ behavior: "smooth" });
+    if (getNightsCount() <= 0) {
+      alert("Check-out date must be after check-in date.");
+      return;
+    }
+    setIsCheckingAvailability(true);
+    setAvailabilityResult(null);
+    setAvailableVilla(null);
+    document.getElementById("booking-result")?.scrollIntoView({ behavior: "smooth" });
+    try {
+      const res = await fetch("/reservations.json");
+      const reservations: Reservation[] = await res.json();
+      const villasOfType = getVillasOfType(accommodationType);
+      const available = villasOfType.find((villa) => {
+        const conflicts = reservations.filter(
+          (r) =>
+            r.villaId === villa.id &&
+            r.status !== "cancelled" &&
+            !(checkout <= r.checkInDate || checkin >= r.checkOutDate),
+        );
+        return conflicts.length === 0;
+      });
+      if (available) {
+        setAvailableVilla(available);
+        setAvailabilityResult("available");
+      } else {
+        setAvailabilityResult("booked");
+      }
+    } catch {
+      alert("Could not check availability. Please try again.");
+    } finally {
+      setIsCheckingAvailability(false);
+    }
   };
 
   const handleSelectVilla = (villa: Villa) => {
@@ -99,53 +149,6 @@ const CrocodileLodge: React.FC = () => {
     );
   };
 
-  // Calendar Helpers
-  const bookedDates = {
-    march: [3, 4, 5, 6, 14, 15, 16, 21, 22],
-    april: [2, 3, 4, 10, 11, 12, 18, 19, 25, 26, 27],
-  };
-
-  const renderCalendarDays = (
-    year: number,
-    month: number,
-    bookedArr: number[],
-  ) => {
-    const firstDay = new Date(year, month, 1).getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const today = new Date();
-
-    const blanks = Array.from({ length: firstDay }).map((_, i) => (
-      <div key={`blank-${i}`} className="cal-day empty"></div>
-    ));
-
-    const days = Array.from({ length: daysInMonth }).map((_, i) => {
-      const d = i + 1;
-      const isBooked = bookedArr.includes(d);
-      const isToday =
-        today.getDate() === d &&
-        today.getMonth() === month &&
-        today.getFullYear() === year;
-
-      const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
-      const isSelected = checkin === dateStr;
-
-      return (
-        <div
-          key={`day-${d}`}
-          className={`cal-day ${isBooked ? "booked" : "available"} ${
-            isToday ? "today" : ""
-          } ${isSelected ? "selected" : ""}`}
-          onClick={() => {
-            if (!isBooked) setCheckin(dateStr);
-          }}
-        >
-          {d}
-        </div>
-      );
-    });
-
-    return [...blanks, ...days];
-  };
 
   return (
     <>
@@ -647,7 +650,7 @@ const CrocodileLodge: React.FC = () => {
           margin: 0 auto;
           padding: 0 60px;
           display: grid;
-          grid-template-columns: 1fr 1fr 1fr auto auto;
+          grid-template-columns: 1fr 1fr 1fr 1fr auto;
           gap: 0;
           background: var(--croc-sand);
         }
@@ -712,7 +715,165 @@ const CrocodileLodge: React.FC = () => {
         }
         .booking-submit:hover { background: var(--croc-moss); }
 
-        /* AVAILABILITY CALENDAR */
+        /* BOOKING RESULT SECTION */
+        .booking-result-section {
+          background: var(--croc-cream);
+          padding: 100px 60px;
+          display: flex;
+          justify-content: center;
+        }
+
+        .booking-widget {
+          max-width: 640px;
+          width: 100%;
+          text-align: center;
+        }
+
+        .booking-widget .section-title { color: var(--croc-deep); }
+        .booking-widget .section-title em { color: var(--croc-moss); }
+        .booking-widget .section-tag { color: var(--croc-gold); }
+
+        .price-summary {
+          background: white;
+          border: 1px solid rgba(13,26,15,0.1);
+          padding: 32px 40px;
+          margin: 0 0 32px;
+          text-align: left;
+        }
+
+        .price-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 10px 0;
+          border-bottom: 1px solid rgba(13,26,15,0.07);
+          font-family: 'Josefin Sans', sans-serif;
+          font-size: 0.72rem;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: var(--croc-deep);
+        }
+
+        .price-row:last-child { border-bottom: none; }
+
+        .price-total {
+          border-top: 2px solid var(--croc-gold) !important;
+          border-bottom: none !important;
+          margin-top: 8px;
+          padding-top: 16px;
+          font-size: 0.85rem;
+          font-weight: 600;
+        }
+
+        .price-total span:last-child {
+          font-family: 'Playfair Display', serif;
+          font-size: 1.4rem;
+          color: var(--croc-moss);
+          font-weight: 700;
+        }
+
+        .booking-hint {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 1.15rem;
+          font-style: italic;
+          color: rgba(13,26,15,0.5);
+          margin: 32px 0;
+          line-height: 1.7;
+        }
+
+        .checking-avail {
+          font-family: 'Josefin Sans', sans-serif;
+          font-size: 0.72rem;
+          letter-spacing: 0.25em;
+          text-transform: uppercase;
+          color: var(--croc-gold);
+          margin: 40px 0;
+          animation: avail-pulse 1.4s ease-in-out infinite;
+        }
+
+        @keyframes avail-pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.3; }
+        }
+
+        .avail-result {
+          padding: 36px 40px;
+          margin: 8px 0 32px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 14px;
+          text-align: center;
+        }
+
+        .avail-available {
+          background: rgba(16,185,129,0.06);
+          border: 1px solid rgba(16,185,129,0.25);
+        }
+
+        .avail-booked {
+          background: rgba(239,68,68,0.06);
+          border: 1px solid rgba(239,68,68,0.2);
+        }
+
+        .avail-icon {
+          font-size: 2.2rem;
+          font-weight: 700;
+          line-height: 1;
+        }
+
+        .avail-available .avail-icon { color: #10b981; }
+        .avail-booked .avail-icon { color: #ef4444; }
+
+        .avail-text {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .avail-text strong {
+          font-family: 'Josefin Sans', sans-serif;
+          font-size: 0.78rem;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          color: var(--croc-deep);
+        }
+
+        .avail-text span {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 1.05rem;
+          color: rgba(13,26,15,0.65);
+          line-height: 1.6;
+        }
+
+        .avail-text em { font-style: italic; color: var(--croc-moss); }
+
+        .btn-reserve {
+          background: var(--croc-forest);
+          color: var(--croc-cream);
+          border: none;
+          padding: 16px 44px;
+          font-family: 'Josefin Sans', sans-serif;
+          font-size: 0.7rem;
+          font-weight: 400;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          cursor: pointer;
+          transition: background 0.3s;
+          margin-top: 8px;
+        }
+
+        .btn-reserve:hover { background: var(--croc-moss); }
+
+        .booking-footnote {
+          font-family: 'Cormorant Garamond', serif;
+          font-style: italic;
+          font-size: 0.95rem;
+          color: rgba(13,26,15,0.4);
+          margin-top: 32px;
+        }
+
+        /* AVAILABILITY CALENDAR (legacy — kept for reference) */
         .availability-section {
           background: white;
           padding: 100px 60px;
@@ -1529,6 +1690,9 @@ const CrocodileLodge: React.FC = () => {
           .hero-stats { right: 6%; gap: 30px; }
           .booking-bar { grid-template-columns: 1fr 1fr; }
           .booking-submit { grid-column: span 2; padding: 20px; }
+          .booking-result-section { padding: 80px 24px; }
+          .price-summary { padding: 24px; }
+          .avail-result { padding: 28px 24px; }
           .villas-grid, .villa-row-2 { grid-template-columns: 1fr; }
           .amenities-grid, .amenities-row2 { grid-template-columns: repeat(3, 1fr); }
           .experience-inner { grid-template-columns: 1fr; }
@@ -1698,7 +1862,7 @@ const CrocodileLodge: React.FC = () => {
           </p>
           <div className="hero-cta-group">
             <a href="#availability" className="btn-primary">
-              <span>Check Availability</span>
+              <span>Book Your Stay</span>
             </a>
             <a href="#villas" className="btn-ghost">
               Explore Villas
@@ -1735,7 +1899,7 @@ const CrocodileLodge: React.FC = () => {
             <input
               type="date"
               value={checkin}
-              onChange={(e) => setCheckin(e.target.value)}
+              onChange={(e) => { setCheckin(e.target.value); setAvailabilityResult(null); }}
             />
           </div>
           <div className="booking-field">
@@ -1743,117 +1907,134 @@ const CrocodileLodge: React.FC = () => {
             <input
               type="date"
               value={checkout}
-              onChange={(e) => setCheckout(e.target.value)}
+              onChange={(e) => { setCheckout(e.target.value); setAvailabilityResult(null); }}
             />
           </div>
           <div className="booking-field">
-            <label>Villa Type</label>
-            <select>
-              <option value="">All Villas</option>
-              <option value="blue-villa">Blue Villa</option>
-              <option value="green-villa">Green Villa</option>
-              <option value="yellow-villa">Yellow Villa</option>
+            <label>Accommodation</label>
+            <select
+              value={accommodationType}
+              onChange={(e) => { setAccommodationType(e.target.value); setAvailabilityResult(null); }}
+            >
+              <option value="Villa">Villa</option>
+              <option value="Lodge">Lodge</option>
+              <option value="Apartment">Apartment</option>
             </select>
           </div>
           <div className="booking-field">
             <label>Guests</label>
-            <input type="number" min="1" max="12" placeholder="2 guests" />
+            <input
+              type="number"
+              min="1"
+              max="12"
+              value={guests}
+              onChange={(e) => { setGuests(Number(e.target.value)); setAvailabilityResult(null); }}
+            />
           </div>
           <button className="booking-submit" onClick={handleCheckAvailability}>
-            → Check Availability
+            → Book Now
           </button>
         </div>
       </section>
 
-      {/* AVAILABILITY CALENDAR */}
-      <section className="availability-section">
-        <div className="section-header reveal">
-          <div className="section-tag">Live Availability</div>
-          <h2 className="section-title">
-            Reserve Your <em>Stay</em>
-          </h2>
-        </div>
-
-        <div className="calendar-grid">
-          {/* March 2026 */}
-          <div className="calendar-month reveal">
-            <div className="calendar-month-title">
-              <button className="cal-nav">‹</button>
-              <span style={{ fontStyle: "italic" }}>March 2026</span>
-              <button className="cal-nav">›</button>
-            </div>
-            <div className="calendar-days-header">
-              <div className="day-name">Su</div>
-              <div className="day-name">Mo</div>
-              <div className="day-name">Tu</div>
-              <div className="day-name">We</div>
-              <div className="day-name">Th</div>
-              <div className="day-name">Fr</div>
-              <div className="day-name">Sa</div>
-            </div>
-            <div className="calendar-days">
-              {renderCalendarDays(2026, 2, bookedDates.march)}
-            </div>
+      {/* BOOKING RESULT SECTION */}
+      <section className="booking-result-section" id="booking-result">
+        <div className="booking-widget reveal">
+          <div className="section-header" style={{ marginBottom: "40px" }}>
+            <div className="section-tag">Book Your Stay</div>
+            <h2 className="section-title">
+              Reserve Your <em>Escape</em>
+            </h2>
           </div>
 
-          {/* April 2026 */}
-          <div
-            className="calendar-month reveal"
-            style={{ transitionDelay: "0.1s" }}
-          >
-            <div className="calendar-month-title">
-              <button className="cal-nav">‹</button>
-              <span style={{ fontStyle: "italic" }}>April 2026</span>
-              <button className="cal-nav">›</button>
+          {/* Price Summary — shown when all fields are filled */}
+          {checkin && checkout && getNightsCount() > 0 && (
+            <div className="price-summary reveal">
+              <div className="price-row">
+                <span>Accommodation</span>
+                <span>{getVillasOfType(accommodationType)[0]?.name ?? accommodationType}</span>
+              </div>
+              <div className="price-row">
+                <span>Check-in</span>
+                <span>{checkin}</span>
+              </div>
+              <div className="price-row">
+                <span>Check-out</span>
+                <span>{checkout}</span>
+              </div>
+              <div className="price-row">
+                <span>Duration</span>
+                <span>{getNightsCount()} night{getNightsCount() !== 1 ? "s" : ""}</span>
+              </div>
+              <div className="price-row">
+                <span>Guests</span>
+                <span>{guests}</span>
+              </div>
+              <div className="price-row">
+                <span>Rate per Night</span>
+                <span>KES {getNightlyRate().toLocaleString()}</span>
+              </div>
+              <div className="price-row price-total">
+                <span>Total</span>
+                <span>KES {getTotalPrice().toLocaleString()}</span>
+              </div>
             </div>
-            <div className="calendar-days-header">
-              <div className="day-name">Su</div>
-              <div className="day-name">Mo</div>
-              <div className="day-name">Tu</div>
-              <div className="day-name">We</div>
-              <div className="day-name">Th</div>
-              <div className="day-name">Fr</div>
-              <div className="day-name">Sa</div>
-            </div>
-            <div className="calendar-days">
-              {renderCalendarDays(2026, 3, bookedDates.april)}
-            </div>
-          </div>
-        </div>
+          )}
 
-        <div className="calendar-legend reveal">
-          <div className="legend-item">
-            <div className="legend-dot available"></div> Available
-          </div>
-          <div className="legend-item">
-            <div className="legend-dot booked"></div> Booked
-          </div>
-          <div className="legend-item">
-            <div className="legend-dot selected"></div> Selected
-          </div>
-        </div>
+          {/* Default hint */}
+          {availabilityResult === null && !isCheckingAvailability && (
+            <p className="booking-hint">
+              Select your dates, accommodation type, and number of guests above, then click{" "}
+              <strong>Book Now</strong> to check availability.
+            </p>
+          )}
 
-        <div
-          style={{ textAlign: "center", marginTop: "50px" }}
-          className="reveal"
-        >
-          <p
-            style={{
-              fontFamily: "'Cormorant Garamond',serif",
-              fontStyle: "italic",
-              color: "rgba(245,239,230,0.5)",
-              marginBottom: "24px",
-            }}
-          >
-            Book directly with us for the best rate — no platform fees.
+          {/* Checking spinner */}
+          {isCheckingAvailability && (
+            <div className="checking-avail">Checking availability...</div>
+          )}
+
+          {/* Available result */}
+          {availabilityResult === "available" && availableVilla && (
+            <div className="avail-result avail-available reveal">
+              <div className="avail-icon">✓</div>
+              <div className="avail-text">
+                <strong>Available!</strong>
+                <span>
+                  {availableVilla.name} is available from{" "}
+                  <em>{checkin}</em> to <em>{checkout}</em>.
+                </span>
+              </div>
+              <button
+                className="btn-reserve"
+                onClick={() =>
+                  navigate(
+                    `/reservation?villaId=${availableVilla.id}&guestCount=${guests}&price=${getTotalPrice()}&checkIn=${checkin}&checkOut=${checkout}`,
+                  )
+                }
+              >
+                Complete Reservation →
+              </button>
+            </div>
+          )}
+
+          {/* Booked result */}
+          {availabilityResult === "booked" && (
+            <div className="avail-result avail-booked reveal">
+              <div className="avail-icon">✗</div>
+              <div className="avail-text">
+                <strong>Not Available</strong>
+                <span>
+                  No {accommodationType.toLowerCase()} is available for your selected dates.
+                  Please try different dates or another accommodation type.
+                </span>
+              </div>
+            </div>
+          )}
+
+          <p className="booking-footnote">
+            Direct bookings guaranteed best rate — no platform fees.
           </p>
-          <a
-            href="mailto:reservations@crocodilelodge.co.ke"
-            className="btn-primary"
-            style={{ display: "inline-block" }}
-          >
-            <span>📧 Request Direct Booking</span>
-          </a>
         </div>
       </section>
 
@@ -2175,7 +2356,7 @@ const CrocodileLodge: React.FC = () => {
                 <a href="#amenities">Amenities</a>
               </li>
               <li>
-                <a href="#availability">Availability</a>
+                <a href="#availability">Booking</a>
               </li>
               <li>
                 <a href="#about">Our Story</a>

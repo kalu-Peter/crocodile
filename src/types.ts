@@ -8,6 +8,7 @@ export interface PricingTier {
 export interface Villa {
   id: string;
   name: string;
+  type: 'Villa' | 'Lodge' | 'Apartment';
   maxGuests: number;
   description: string;
   isAvailable: boolean;
@@ -42,6 +43,7 @@ export const VILLAS: Villa[] = [
   {
     id: "blue-villa",
     name: "Blue Villa",
+    type: "Villa",
     maxGuests: 4,
     description:
       "A luxurious blue-themed villa perfect for small families. Features modern amenities and stunning water views.",
@@ -56,9 +58,10 @@ export const VILLAS: Villa[] = [
   {
     id: "green-villa",
     name: "Green Villa",
+    type: "Villa",
     maxGuests: 6,
     description:
-      "An spacious green-themed villa surrounded by lush gardens. Ideal for larger groups seeking comfort and nature.",
+      "A spacious green-themed villa surrounded by lush gardens. Ideal for larger groups seeking comfort and nature.",
     isAvailable: true,
     color: "#10b981",
     image: "/images/greenvilla.jpg",
@@ -70,6 +73,7 @@ export const VILLAS: Villa[] = [
   {
     id: "yellow-villa",
     name: "Yellow Villa",
+    type: "Villa",
     maxGuests: 2,
     description:
       "A cozy yellow-themed villa perfect for couples. Intimate setting with private facilities.",
@@ -77,6 +81,36 @@ export const VILLAS: Villa[] = [
     color: "#eab308",
     image: "/images/yellowvilla.jpg",
     pricing: [{ guestMin: 1, guestMax: 2, price: 70 }],
+  },
+  {
+    id: "lodge-1",
+    name: "The Lodge",
+    type: "Lodge",
+    maxGuests: 10,
+    description:
+      "A grand lodge with a rustic feel. Perfect for large groups and events.",
+    isAvailable: true,
+    color: "#84cc16",
+    image: "/images/poolview.jpeg",
+    pricing: [
+      { guestMin: 1, guestMax: 5, price: 200 },
+      { guestMin: 6, guestMax: 10, price: 300 },
+    ],
+  },
+  {
+    id: "apartment-1",
+    name: "The Apartment",
+    type: "Apartment",
+    maxGuests: 3,
+    description:
+      "A modern apartment with all the amenities. Ideal for a quick getaway.",
+    isAvailable: true,
+    color: "#f97316",
+    image: "/images/pooltable.jpg",
+    pricing: [
+      { guestMin: 1, guestMax: 2, price: 90 },
+      { guestMin: 3, guestMax: 3, price: 130 },
+    ],
   },
 ];
 
