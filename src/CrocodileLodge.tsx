@@ -156,18 +156,18 @@ const CrocodileLodge: React.FC = () => {
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Josefin+Sans:wght@200;300;400&display=swap');
 
         :root {
-          --croc-deep: #0d1a0f;
-          --croc-forest: #1a3320;
-          --croc-moss: #2d5a3d;
-          --croc-sage: #5c8a6a;
-          --croc-sand: #c8b89a;
-          --croc-cream: #f5efe6;
-          --croc-gold: #c9a84c;
-          --croc-amber: #e8c97a;
-          --croc-water: #4a8fa8;
-          --croc-sky: #a8d4e0;
-          --text-dark: #0d1a0f;
-          --text-light: #f5efe6;
+          --croc-deep: #0a0a0a;
+          --croc-forest: #141414;
+          --croc-moss: #282828;
+          --croc-sage: #505050;
+          --croc-sand: #d4d4d4;
+          --croc-cream: #f0f0f0;
+          --croc-gold: #909090;
+          --croc-amber: #e0e0e0;
+          --croc-water: #686868;
+          --croc-sky: #c0c0c0;
+          --text-dark: #0a0a0a;
+          --text-light: #f0f0f0;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -190,7 +190,7 @@ const CrocodileLodge: React.FC = () => {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          background: linear-gradient(180deg, rgba(13,26,15,0.95) 0%, transparent 100%);
+          background: linear-gradient(180deg, rgba(10,10,10,0.95) 0%, transparent 100%);
           backdrop-filter: blur(2px);
         }
 
@@ -333,9 +333,9 @@ const CrocodileLodge: React.FC = () => {
           position: absolute;
           inset: 0;
           background:
-            radial-gradient(ellipse at 70% 60%, rgba(74,143,168,0.15) 0%, transparent 60%),
-            radial-gradient(ellipse at 20% 80%, rgba(45,90,61,0.3) 0%, transparent 50%),
-            linear-gradient(160deg, #0d1a0f 0%, #1a3320 40%, #0d1a12 100%);
+            radial-gradient(ellipse at 70% 60%, rgba(200,200,200,0.06) 0%, transparent 60%),
+            radial-gradient(ellipse at 20% 80%, rgba(200,200,200,0.04) 0%, transparent 50%),
+            linear-gradient(160deg, #0a0a0a 0%, #141414 40%, #0a0a0a 100%);
         }
 
         /* Animated water ripples */
@@ -343,14 +343,14 @@ const CrocodileLodge: React.FC = () => {
           position: absolute;
           bottom: 0; left: 0; right: 0;
           height: 50%;
-          background: linear-gradient(180deg, transparent 0%, rgba(26,51,32,0.4) 100%);
+          background: linear-gradient(180deg, transparent 0%, rgba(10,10,10,0.5) 100%);
           overflow: hidden;
         }
 
         .ripple {
           position: absolute;
           border-radius: 50%;
-          border: 1px solid rgba(74,143,168,0.2);
+          border: 1px solid rgba(144,144,144,0.2);
           animation: ripple-out 6s ease-out infinite;
         }
         .ripple:nth-child(1) { width: 200px; height: 80px; bottom: 20%; left: 60%; animation-delay: 0s; }
@@ -426,7 +426,7 @@ const CrocodileLodge: React.FC = () => {
           font-size: 1.25rem;
           font-weight: 300;
           font-style: italic;
-          color: rgba(245,239,230,0.7);
+          color: rgba(240,240,240,0.7);
           line-height: 1.7;
           max-width: 480px;
           opacity: 0;
@@ -476,7 +476,7 @@ const CrocodileLodge: React.FC = () => {
           text-transform: uppercase;
           color: var(--croc-cream);
           text-decoration: none;
-          border-bottom: 1px solid rgba(245,239,230,0.3);
+          border-bottom: 1px solid rgba(240,240,240,0.3);
           padding-bottom: 3px;
           transition: border-color 0.3s, color 0.3s;
         }
@@ -504,7 +504,7 @@ const CrocodileLodge: React.FC = () => {
           font-size: 0.6rem;
           letter-spacing: 0.2em;
           text-transform: uppercase;
-          color: rgba(245,239,230,0.5);
+          color: rgba(240,240,240,0.5);
         }
 
         .scroll-hint {
@@ -524,7 +524,7 @@ const CrocodileLodge: React.FC = () => {
           font-size: 0.55rem;
           letter-spacing: 0.25em;
           text-transform: uppercase;
-          color: rgba(245,239,230,0.4);
+          color: rgba(240,240,240,0.4);
         }
         .scroll-line {
           width: 1px;
@@ -594,10 +594,10 @@ const CrocodileLodge: React.FC = () => {
           width: 10px;
           height: 10px;
           border-radius: 50%;
-          background: rgba(201,168,76,0.3);
+          background: rgba(144,144,144,0.3);
           cursor: pointer;
           transition: all 0.3s;
-          border: 1px solid rgba(201,168,76,0.5);
+          border: 1px solid rgba(144,144,144,0.5);
         }
 
         .carousel-dot.active {
@@ -612,8 +612,8 @@ const CrocodileLodge: React.FC = () => {
           transform: translateY(-50%);
           width: 50px;
           height: 50px;
-          background: rgba(13,26,15,0.5);
-          border: 1px solid rgba(201,168,76,0.4);
+          background: rgba(10,10,10,0.5);
+          border: 1px solid rgba(144,144,144,0.4);
           color: var(--croc-gold);
           font-size: 1.6rem;
           cursor: pointer;
@@ -625,7 +625,7 @@ const CrocodileLodge: React.FC = () => {
         }
 
         .carousel-btn:hover {
-          background: rgba(13,26,15,0.8);
+          background: rgba(10,10,10,0.8);
           border-color: var(--croc-gold);
         }
 
@@ -657,7 +657,7 @@ const CrocodileLodge: React.FC = () => {
 
         .booking-field {
           padding: 32px 40px;
-          border-right: 1px solid rgba(13,26,15,0.15);
+          border-right: 1px solid rgba(10,10,10,0.15);
           position: relative;
         }
 
@@ -667,7 +667,7 @@ const CrocodileLodge: React.FC = () => {
           font-size: 0.6rem;
           letter-spacing: 0.25em;
           text-transform: uppercase;
-          color: rgba(13,26,15,0.5);
+          color: rgba(10,10,10,0.5);
           margin-bottom: 8px;
         }
 
@@ -696,7 +696,7 @@ const CrocodileLodge: React.FC = () => {
           font-size: 0.65rem;
           letter-spacing: 0.15em;
           text-transform: uppercase;
-          color: rgba(13,26,15,0.5);
+          color: rgba(10,10,10,0.5);
         }
 
         .booking-submit {
@@ -735,7 +735,7 @@ const CrocodileLodge: React.FC = () => {
 
         .price-summary {
           background: white;
-          border: 1px solid rgba(13,26,15,0.1);
+          border: 1px solid rgba(10,10,10,0.1);
           padding: 32px 40px;
           margin: 0 0 32px;
           text-align: left;
@@ -746,7 +746,7 @@ const CrocodileLodge: React.FC = () => {
           justify-content: space-between;
           align-items: center;
           padding: 10px 0;
-          border-bottom: 1px solid rgba(13,26,15,0.07);
+          border-bottom: 1px solid rgba(10,10,10,0.07);
           font-family: 'Josefin Sans', sans-serif;
           font-size: 0.72rem;
           letter-spacing: 0.12em;
@@ -776,7 +776,7 @@ const CrocodileLodge: React.FC = () => {
           font-family: 'Cormorant Garamond', serif;
           font-size: 1.15rem;
           font-style: italic;
-          color: rgba(13,26,15,0.5);
+          color: rgba(10,10,10,0.5);
           margin: 32px 0;
           line-height: 1.7;
         }
@@ -807,13 +807,13 @@ const CrocodileLodge: React.FC = () => {
         }
 
         .avail-available {
-          background: rgba(16,185,129,0.06);
-          border: 1px solid rgba(16,185,129,0.25);
+          background: #0a0a0a;
+          border: 1px solid #0a0a0a;
         }
 
         .avail-booked {
-          background: rgba(239,68,68,0.06);
-          border: 1px solid rgba(239,68,68,0.2);
+          background: rgba(10,10,10,0.04);
+          border: 1px solid rgba(10,10,10,0.18);
         }
 
         .avail-icon {
@@ -822,8 +822,8 @@ const CrocodileLodge: React.FC = () => {
           line-height: 1;
         }
 
-        .avail-available .avail-icon { color: #10b981; }
-        .avail-booked .avail-icon { color: #ef4444; }
+        .avail-available .avail-icon { color: var(--croc-cream); }
+        .avail-booked .avail-icon { color: var(--croc-sage); }
 
         .avail-text {
           display: flex;
@@ -839,18 +839,23 @@ const CrocodileLodge: React.FC = () => {
           color: var(--croc-deep);
         }
 
+        .avail-available .avail-text strong { color: var(--croc-cream); }
+
         .avail-text span {
           font-family: 'Cormorant Garamond', serif;
           font-size: 1.05rem;
-          color: rgba(13,26,15,0.65);
+          color: rgba(10,10,10,0.65);
           line-height: 1.6;
         }
 
-        .avail-text em { font-style: italic; color: var(--croc-moss); }
+        .avail-available .avail-text span { color: rgba(240,240,240,0.72); }
+
+        .avail-text em { font-style: italic; color: var(--croc-sage); }
+        .avail-available .avail-text em { color: var(--croc-sky); }
 
         .btn-reserve {
-          background: var(--croc-forest);
-          color: var(--croc-cream);
+          background: var(--croc-cream);
+          color: var(--croc-deep);
           border: none;
           padding: 16px 44px;
           font-family: 'Josefin Sans', sans-serif;
@@ -859,17 +864,17 @@ const CrocodileLodge: React.FC = () => {
           letter-spacing: 0.2em;
           text-transform: uppercase;
           cursor: pointer;
-          transition: background 0.3s;
+          transition: background 0.3s, color 0.3s;
           margin-top: 8px;
         }
 
-        .btn-reserve:hover { background: var(--croc-moss); }
+        .btn-reserve:hover { background: var(--croc-sand); color: var(--croc-deep); }
 
         .booking-footnote {
           font-family: 'Cormorant Garamond', serif;
           font-style: italic;
           font-size: 0.95rem;
-          color: rgba(13,26,15,0.4);
+          color: rgba(10,10,10,0.4);
           margin-top: 32px;
         }
 
@@ -924,7 +929,7 @@ const CrocodileLodge: React.FC = () => {
 
         .calendar-month {
           background: var(--croc-sand);
-          border: 1px solid rgba(201,168,76,0.2);
+          border: 1px solid rgba(144,144,144,0.2);
           padding: 30px;
         }
 
@@ -940,7 +945,7 @@ const CrocodileLodge: React.FC = () => {
         }
         .cal-nav {
           background: none;
-          border: 1px solid rgba(201,168,76,0.3);
+          border: 1px solid rgba(144,144,144,0.3);
           color: var(--croc-deep);
           width: 30px; height: 30px;
           cursor: pointer;
@@ -950,7 +955,7 @@ const CrocodileLodge: React.FC = () => {
           align-items: center;
           justify-content: center;
         }
-        .cal-nav:hover { background: rgba(201,168,76,0.2); }
+        .cal-nav:hover { background: rgba(144,144,144,0.2); }
 
         .calendar-days-header {
           display: grid;
@@ -963,7 +968,7 @@ const CrocodileLodge: React.FC = () => {
           font-size: 0.55rem;
           letter-spacing: 0.1em;
           text-transform: uppercase;
-          color: rgba(201,168,76,0.6);
+          color: rgba(144,144,144,0.6);
           text-align: center;
           padding: 6px 0;
         }
@@ -980,22 +985,22 @@ const CrocodileLodge: React.FC = () => {
           justify-content: center;
           font-family: 'Josefin Sans', sans-serif;
           font-size: 0.75rem;
-          color: rgba(201,168,76,0.7);
+          color: rgba(144,144,144,0.7);
           cursor: pointer;
           border-radius: 2px;
           transition: all 0.2s;
           position: relative;
         }
         .cal-day:hover:not(.booked):not(.empty) {
-          background: rgba(201,168,76,0.2);
+          background: rgba(144,144,144,0.2);
           color: var(--croc-deep);
         }
         .cal-day.available { color: var(--croc-deep); }
         .cal-day.booked {
-          background: rgba(201,168,76,0.1);
+          background: rgba(144,144,144,0.1);
           cursor: not-allowed;
           text-decoration: line-through;
-          color: rgba(201,168,76,0.3);
+          color: rgba(144,144,144,0.3);
         }
         .cal-day.selected {
           background: var(--croc-deep);
@@ -1027,14 +1032,14 @@ const CrocodileLodge: React.FC = () => {
           font-size: 0.6rem;
           letter-spacing: 0.1em;
           text-transform: uppercase;
-          color: rgba(245,239,230,0.5);
+          color: rgba(240,240,240,0.5);
         }
         .legend-dot {
           width: 10px; height: 10px;
           border-radius: 2px;
         }
         .legend-dot.available { background: var(--croc-cream); }
-        .legend-dot.booked { background: rgba(245,239,230,0.1); border: 1px solid rgba(245,239,230,0.2); }
+        .legend-dot.booked { background: rgba(240,240,240,0.1); border: 1px solid rgba(240,240,240,0.2); }
         .legend-dot.selected { background: var(--croc-gold); }
 
         /* VILLAS SECTION */
@@ -1053,7 +1058,7 @@ const CrocodileLodge: React.FC = () => {
           font-family: 'Playfair Display', serif;
           font-size: 15rem;
           font-weight: 900;
-          color: rgba(245,239,230,0.02);
+          color: rgba(240,240,240,0.02);
           letter-spacing: 0.1em;
           white-space: nowrap;
           pointer-events: none;
@@ -1116,13 +1121,13 @@ const CrocodileLodge: React.FC = () => {
           align-items: center;
         }
         .status-available {
-          color: #10b981;
+          color: var(--croc-moss);
           font-family: 'Josefin Sans', sans-serif;
           font-size: 0.8rem;
           font-weight: 500;
         }
         .status-unavailable {
-          color: #ef4444;
+          color: var(--croc-sage);
           font-family: 'Josefin Sans', sans-serif;
           font-size: 0.8rem;
           font-weight: 500;
@@ -1180,9 +1185,9 @@ const CrocodileLodge: React.FC = () => {
           position: relative;
           overflow: hidden;
         }
-        .villa-card:nth-child(1) .villa-img-bg { background: linear-gradient(135deg, #2d5a3d 0%, #1a8a5a 50%, #0d6a3d 100%); }
-        .villa-card:nth-child(2) .villa-img-bg { background: linear-gradient(135deg, #0d3a5a 0%, #1a6a9a 50%, #2d8abd 100%); }
-        .villa-card:nth-child(3) .villa-img-bg { background: linear-gradient(135deg, #8a7a1a 0%, #d4a73a 50%, #c9963d 100%); }
+        .villa-card:nth-child(1) .villa-img-bg { background: linear-gradient(135deg, #111111 0%, #222222 50%, #0a0a0a 100%); }
+        .villa-card:nth-child(2) .villa-img-bg { background: linear-gradient(135deg, #1a1a1a 0%, #2e2e2e 50%, #141414 100%); }
+        .villa-card:nth-child(3) .villa-img-bg { background: linear-gradient(135deg, #262626 0%, #3a3a3a 50%, #1e1e1e 100%); }
 
         /* Decorative villa illustrations */
         .villa-decoration {
@@ -1198,7 +1203,7 @@ const CrocodileLodge: React.FC = () => {
         .villa-overlay {
           position: absolute;
           inset: 0;
-          background: linear-gradient(180deg, transparent 30%, rgba(13,26,15,0.9) 100%);
+          background: linear-gradient(180deg, transparent 30%, rgba(0,0,0,0.88) 100%);
           opacity: 0.7;
           transition: opacity 0.4s;
           display: flex;
@@ -1226,7 +1231,7 @@ const CrocodileLodge: React.FC = () => {
           font-family: 'Cormorant Garamond', serif;
           font-size: 0.95rem;
           font-style: italic;
-          color: rgba(245,239,230,0.65);
+          color: rgba(240,240,240,0.65);
           margin-bottom: 20px;
         }
         .villa-price {
@@ -1244,7 +1249,7 @@ const CrocodileLodge: React.FC = () => {
           font-family: 'Josefin Sans', sans-serif;
           font-size: 0.6rem;
           letter-spacing: 0.1em;
-          color: rgba(245,239,230,0.4);
+          color: rgba(240,240,240,0.4);
         }
         .villa-btn {
           font-family: 'Josefin Sans', sans-serif;
@@ -1268,16 +1273,27 @@ const CrocodileLodge: React.FC = () => {
           color: var(--croc-deep);
         }
 
-        .amenities-section .section-tag { color: var(--croc-moss); }
+        /* Section tag overrides for light-background sections */
+        .amenities-section .section-tag,
+        .villas-section .section-tag,
+        .testimonials-section .section-tag,
+        .experience-section .section-tag,
+        .booking-widget .section-tag { color: var(--croc-sage); }
+
         .amenities-section .section-tag::before,
-        .amenities-section .section-tag::after { background: var(--croc-moss); }
+        .amenities-section .section-tag::after,
+        .villas-section .section-tag::before,
+        .villas-section .section-tag::after,
+        .testimonials-section .section-tag::before,
+        .testimonials-section .section-tag::after { background: var(--croc-sage); opacity: 0.6; }
+
         .amenities-section .section-title { color: var(--croc-deep); }
         .amenities-section .section-title em { color: var(--croc-moss); }
 
         .amenities-intro {
           font-size: 1.2rem;
           font-style: italic;
-          color: rgba(13,26,15,0.6);
+          color: rgba(10,10,10,0.6);
           max-width: 600px;
           margin: 24px auto 70px;
           text-align: center;
@@ -1293,8 +1309,8 @@ const CrocodileLodge: React.FC = () => {
         }
 
         .amenity-card {
-          background: rgba(13,26,15,0.03);
-          border: 1px solid rgba(13,26,15,0.08);
+          background: rgba(10,10,10,0.03);
+          border: 1px solid rgba(10,10,10,0.08);
           padding: 44px 28px;
           text-align: center;
           transition: all 0.4s ease;
@@ -1312,6 +1328,8 @@ const CrocodileLodge: React.FC = () => {
         }
         .amenity-card:hover::before { transform: translateY(0); }
         .amenity-card:hover .amenity-icon { transform: scale(1.2) rotate(10deg); }
+        .amenity-card:hover .amenity-name { color: var(--croc-cream); }
+        .amenity-card:hover .amenity-desc { color: rgba(240,240,240,0.6); }
 
         .amenity-icon {
           font-size: 2.4rem;
@@ -1334,7 +1352,7 @@ const CrocodileLodge: React.FC = () => {
         .amenity-desc {
           font-size: 0.82rem;
           font-style: italic;
-          color: rgba(13,26,15,0.65);
+          color: rgba(10,10,10,0.65);
           line-height: 1.6;
           position: relative;
           z-index: 1;
@@ -1373,7 +1391,7 @@ const CrocodileLodge: React.FC = () => {
         .exp-main-img {
           width: 100%;
           height: 560px;
-          background: linear-gradient(135deg, #0d2a1a 0%, #1a4a2a 40%, #0d3a1a 100%);
+          background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 40%, #111111 100%);
           position: relative;
           overflow: hidden;
         }
@@ -1428,7 +1446,7 @@ const CrocodileLodge: React.FC = () => {
         .exp-desc {
           font-size: 1.08rem;
           font-style: italic;
-          color: rgba(13,26,15,0.65);
+          color: rgba(10,10,10,0.65);
           line-height: 1.9;
           margin-bottom: 40px;
         }
@@ -1444,12 +1462,12 @@ const CrocodileLodge: React.FC = () => {
           align-items: flex-start;
           gap: 20px;
           padding-bottom: 20px;
-          border-bottom: 1px solid rgba(245,239,230,0.07);
+          border-bottom: 1px solid rgba(240,240,240,0.07);
         }
         .exp-feature:last-child { border: none; padding: 0; }
         .exp-feature-icon {
           width: 44px; height: 44px;
-          border: 1px solid rgba(201,168,76,0.3);
+          border: 1px solid rgba(144,144,144,0.3);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -1467,7 +1485,7 @@ const CrocodileLodge: React.FC = () => {
         .exp-feature-desc {
           font-size: 0.88rem;
           font-style: italic;
-          color: rgba(245,239,230,0.5);
+          color: rgba(240,240,240,0.5);
           line-height: 1.5;
         }
 
@@ -1486,8 +1504,8 @@ const CrocodileLodge: React.FC = () => {
         }
 
         .testimonial-card {
-          background: rgba(13,26,15,0.03);
-          border: 1px solid rgba(13,26,15,0.1);
+          background: rgba(10,10,10,0.03);
+          border: 1px solid rgba(10,10,10,0.1);
           padding: 40px;
           position: relative;
         }
@@ -1506,7 +1524,7 @@ const CrocodileLodge: React.FC = () => {
         .testimonial-text {
           font-size: 1rem;
           font-style: italic;
-          color: rgba(13,26,15,0.7);
+          color: rgba(10,10,10,0.7);
           line-height: 1.8;
           margin-bottom: 28px;
           padding-top: 30px;
@@ -1526,9 +1544,9 @@ const CrocodileLodge: React.FC = () => {
           font-size: 1.2rem;
           flex-shrink: 0;
         }
-        .avatar-1 { background: linear-gradient(135deg, #2d5a3d, #4a8a5a); }
-        .avatar-2 { background: linear-gradient(135deg, #2d4a5a, #4a6a8a); }
-        .avatar-3 { background: linear-gradient(135deg, #5a3a1a, #8a5a2a); }
+        .avatar-1 { background: linear-gradient(135deg, #141414, #2e2e2e); }
+        .avatar-2 { background: linear-gradient(135deg, #2a2a2a, #484848); }
+        .avatar-3 { background: linear-gradient(135deg, #484848, #6a6a6a); }
 
         .author-name {
           font-family: 'Playfair Display', serif;
@@ -1541,7 +1559,7 @@ const CrocodileLodge: React.FC = () => {
           font-size: 0.58rem;
           letter-spacing: 0.15em;
           text-transform: uppercase;
-          color: rgba(13,26,15,0.5);
+          color: rgba(10,10,10,0.5);
           margin-top: 2px;
         }
 
@@ -1556,7 +1574,7 @@ const CrocodileLodge: React.FC = () => {
         footer {
           background: var(--croc-sand);
           padding: 100px 60px 50px;
-          border-top: 1px solid rgba(201,168,76,0.15);
+          border-top: 1px solid rgba(144,144,144,0.15);
         }
 
         .footer-top {
@@ -1578,7 +1596,7 @@ const CrocodileLodge: React.FC = () => {
         .footer-tagline {
           font-size: 0.95rem;
           font-style: italic;
-          color: rgba(13,26,15,0.65);
+          color: rgba(10,10,10,0.65);
           line-height: 1.7;
           margin-bottom: 30px;
           max-width: 280px;
@@ -1590,7 +1608,7 @@ const CrocodileLodge: React.FC = () => {
         }
         .social-link {
           width: 38px; height: 38px;
-          border: 1px solid rgba(13,26,15,0.25);
+          border: 1px solid rgba(10,10,10,0.25);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -1616,7 +1634,7 @@ const CrocodileLodge: React.FC = () => {
         .footer-col ul li a {
           font-family: 'Cormorant Garamond', serif;
           font-size: 0.95rem;
-          color: rgba(13,26,15,0.65);
+          color: rgba(10,10,10,0.65);
           text-decoration: none;
           transition: color 0.2s;
         }
@@ -1638,7 +1656,7 @@ const CrocodileLodge: React.FC = () => {
         }
         .contact-text {
           font-size: 0.88rem;
-          color: rgba(13,26,15,0.65);
+          color: rgba(10,10,10,0.65);
           line-height: 1.5;
         }
 
@@ -1646,7 +1664,7 @@ const CrocodileLodge: React.FC = () => {
           max-width: 1200px;
           margin: 0 auto;
           padding-top: 40px;
-          border-top: 1px solid rgba(13,26,15,0.15);
+          border-top: 1px solid rgba(10,10,10,0.15);
           display: flex;
           justify-content: space-between;
           align-items: center;
@@ -1655,7 +1673,7 @@ const CrocodileLodge: React.FC = () => {
           font-family: 'Josefin Sans', sans-serif;
           font-size: 0.6rem;
           letter-spacing: 0.1em;
-          color: rgba(13,26,15,0.5);
+          color: rgba(10,10,10,0.5);
         }
         .footer-legal {
           display: flex;
@@ -1665,7 +1683,7 @@ const CrocodileLodge: React.FC = () => {
           font-family: 'Josefin Sans', sans-serif;
           font-size: 0.6rem;
           letter-spacing: 0.1em;
-          color: rgba(13,26,15,0.5);
+          color: rgba(10,10,10,0.5);
           text-decoration: none;
           transition: color 0.2s;
         }
@@ -1802,7 +1820,7 @@ const CrocodileLodge: React.FC = () => {
             d="M460 65 Q450 50 440 45 Q430 40 420 48 Q410 55 420 65 Q430 70 440 68 Z"
             fill="white"
           />
-          <circle cx="445" cy="52" r="3" fill="#0d1a0f" />
+          <circle cx="445" cy="52" r="3" fill="#0a0a0a" />
           <path d="M10 120 L0 130 L5 140 L15 132 Z" fill="white" />
           <path d="M100 124 L95 145 L108 148 L112 126 Z" fill="white" />
           <path d="M150 128 L148 148 L160 150 L162 130 Z" fill="white" />
