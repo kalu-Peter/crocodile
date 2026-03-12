@@ -30,13 +30,24 @@ const VillaCard: React.FC<VillaCardProps> = ({ villa, onSelectVilla }) => {
             <span className="status-unavailable">✗ Unavailable</span>
           )}
         </div>
-        <button
-          className="btn-view-details"
-          onClick={() => onSelectVilla(villa)}
-          disabled={!villa.isAvailable}
-        >
-          View Details
-        </button>
+        <div className="villa-card-buttons">
+          <button
+            className="btn-view-details"
+            style={{ backgroundColor: villa.color }}
+            onClick={() => onSelectVilla(villa)}
+            disabled={!villa.isAvailable}
+          >
+            View Details
+          </button>
+          <button
+            className="btn-reserve-quick"
+            style={{ backgroundColor: villa.color }}
+            onClick={() => onSelectVilla(villa)}
+            disabled={!villa.isAvailable}
+          >
+            Reserve Now
+          </button>
+        </div>
       </div>
     </div>
   );

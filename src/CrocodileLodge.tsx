@@ -72,11 +72,13 @@ const CrocodileLodge: React.FC = () => {
       alert("Please select a check-in date from the calendar or date picker.");
       return;
     }
+    const villaNames = VILLAS.map((v) => v.name).join(", ");
     const msg =
       checkin && checkout
-        ? `Checking availability from ${checkin} to ${checkout}...\n\nPlease contact us at reservations@crocodilelodge.co.ke or call +254 700 000 000 to complete your booking.`
+        ? `Checking availability for ${villaNames} from ${checkin} to ${checkout}...\n\nPlease contact us at reservations@crocodilelodge.co.ke or call +254 700 000 000 to complete your booking.`
         : `Please select both check-in and check-out dates.`;
     alert(msg);
+    document.getElementById("villas")?.scrollIntoView({ behavior: "smooth" });
   };
 
   const handleSelectVilla = (villa: Villa) => {
@@ -899,6 +901,7 @@ const CrocodileLodge: React.FC = () => {
         .villas-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
+          grid-auto-rows: 1fr;
           gap: 30px;
           max-width: 1200px;
           margin: 0 auto;
@@ -912,9 +915,48 @@ const CrocodileLodge: React.FC = () => {
           border-radius: 4px;
           box-shadow: 0 4px 12px rgba(13, 26, 15, 0.15);
           transition: box-shadow 0.3s;
+          display: flex;
+          flex-direction: column;
+          height: 100%;
         }
         .villa-card:hover {
           box-shadow: 0 8px 24px rgba(13, 26, 15, 0.25);
+        }
+        .villa-card-content {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          flex-grow: 1;
+        }
+        .villa-card-buttons {
+          display: flex;
+          gap: 12px;
+          margin-top: auto;
+        }
+        .btn-view-details,
+        .btn-reserve-quick {
+          flex: 1;
+          padding: 12px 16px;
+          border: none;
+          border-radius: 4px;
+          font-family: 'Josefin Sans', sans-serif;
+          font-size: 0.8rem;
+          font-weight: 400;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: white;
+          cursor: pointer;
+          transition: opacity 0.3s, transform 0.2s;
+        }
+        .btn-view-details:hover:not(:disabled),
+        .btn-reserve-quick:hover:not(:disabled) {
+          opacity: 0.9;
+          transform: translateY(-2px);
+        }
+        .btn-view-details:disabled,
+        .btn-reserve-quick:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
         }
 
         .villa-card-image {
@@ -1669,10 +1711,9 @@ const CrocodileLodge: React.FC = () => {
             <label>Villa Type</label>
             <select>
               <option value="">All Villas</option>
-              <option value="garden">Garden Villa</option>
-              <option value="beach">Beachfront Villa</option>
-              <option value="pool">Pool Villa</option>
-              <option value="family">Family House</option>
+              <option value="blue-villa">Blue Villa</option>
+              <option value="green-villa">Green Villa</option>
+              <option value="yellow-villa">Yellow Villa</option>
             </select>
           </div>
           <div className="booking-field">
