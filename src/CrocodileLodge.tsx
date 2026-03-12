@@ -15,9 +15,6 @@ const CrocodileLodge: React.FC = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [guests, setGuests] = useState<number>(1);
   const [accommodationType, setAccommodationType] = useState<string>('Villa');
-  const [availabilityResult, setAvailabilityResult] = useState<'available' | 'booked' | null>(null);
-  const [availableVilla, setAvailableVilla] = useState<Villa | null>(null);
-  const [isCheckingAvailability, setIsCheckingAvailability] = useState<boolean>(false);
 
   const carouselImages = [
     { src: "/images/gate.jpg", alt: "Lodge Gate" },
@@ -90,8 +87,6 @@ const CrocodileLodge: React.FC = () => {
     return tier ? tier.price : villa.pricing[villa.pricing.length - 1].price;
   };
 
-  const getTotalPrice = (): number => getNightlyRate() * getNightsCount();
-
   const handleCheckAvailability = async () => {
     if (!checkin || !checkout) {
       alert("Please select check-in and check-out dates.");
@@ -101,10 +96,6 @@ const CrocodileLodge: React.FC = () => {
       alert("Check-out date must be after check-in date.");
       return;
     }
-    setIsCheckingAvailability(true);
-    setAvailabilityResult(null);
-    setAvailableVilla(null);
-    document.getElementById("booking-result")?.scrollIntoView({ behavior: "smooth" });
     try {
       const res = await fetch("/reservations.json");
       const reservations: Reservation[] = await res.json();
@@ -119,15 +110,15 @@ const CrocodileLodge: React.FC = () => {
         return conflicts.length === 0;
       });
       if (available) {
-        setAvailableVilla(available);
-        setAvailabilityResult("available");
+        const totalPrice = getNightlyRate() * getNightsCount();
+        navigate(
+          `/reservation?villaId=${available.id}&guestCount=${guests}&price=${totalPrice}&checkIn=${checkin}&checkOut=${checkout}`,
+        );
       } else {
-        setAvailabilityResult("booked");
+        alert(`No ${accommodationType.toLowerCase()} is available for your selected dates. Please try different dates or another accommodation type.`);
       }
     } catch {
       alert("Could not check availability. Please try again.");
-    } finally {
-      setIsCheckingAvailability(false);
     }
   };
 
@@ -1918,7 +1909,7 @@ const CrocodileLodge: React.FC = () => {
             <input
               type="date"
               value={checkin}
-              onChange={(e) => { setCheckin(e.target.value); setAvailabilityResult(null); }}
+              onChange={(e) => setCheckin(e.target.value)}
             />
           </div>
           <div className="booking-field">
@@ -1926,14 +1917,14 @@ const CrocodileLodge: React.FC = () => {
             <input
               type="date"
               value={checkout}
-              onChange={(e) => { setCheckout(e.target.value); setAvailabilityResult(null); }}
+              onChange={(e) => setCheckout(e.target.value)}
             />
           </div>
           <div className="booking-field">
             <label>Accommodation</label>
             <select
               value={accommodationType}
-              onChange={(e) => { setAccommodationType(e.target.value); setAvailabilityResult(null); }}
+              onChange={(e) => setAccommodationType(e.target.value)}
             >
               <option value="Villa">Villa</option>
               <option value="Lodge">Lodge</option>
@@ -1947,7 +1938,7 @@ const CrocodileLodge: React.FC = () => {
               min="1"
               max="12"
               value={guests}
-              onChange={(e) => { setGuests(Number(e.target.value)); setAvailabilityResult(null); }}
+              onChange={(e) => setGuests(Number(e.target.value))}
             />
           </div>
           <button className="booking-submit" onClick={handleCheckAvailability}>
