@@ -12,10 +12,7 @@ const VillaCard: React.FC<VillaCardProps> = ({ villa, onSelectVilla }) => {
       <div className="villa-card-image">
         <img src={villa.image} alt={villa.name} />
       </div>
-      <div
-        className="villa-card-header"
-        style={{ backgroundColor: villa.color }}
-      >
+      <div className="villa-card-header">
         <h3>{villa.name}</h3>
       </div>
       <div className="villa-card-content">
