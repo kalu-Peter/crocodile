@@ -1955,107 +1955,6 @@ const CrocodileLodge: React.FC = () => {
         </div>
       </section>
 
-      {/* BOOKING RESULT SECTION */}
-      <section className="booking-result-section" id="booking-result">
-        <div className="booking-widget reveal">
-          <div className="section-header" style={{ marginBottom: "40px" }}>
-            <div className="section-tag">Book Your Stay</div>
-            <h2 className="section-title">
-              Reserve Your <em>Escape</em>
-            </h2>
-          </div>
-
-          {/* Price Summary — shown when all fields are filled */}
-          {checkin && checkout && getNightsCount() > 0 && (
-            <div className="price-summary reveal">
-              <div className="price-row">
-                <span>Accommodation</span>
-                <span>{getVillasOfType(accommodationType)[0]?.name ?? accommodationType}</span>
-              </div>
-              <div className="price-row">
-                <span>Check-in</span>
-                <span>{checkin}</span>
-              </div>
-              <div className="price-row">
-                <span>Check-out</span>
-                <span>{checkout}</span>
-              </div>
-              <div className="price-row">
-                <span>Duration</span>
-                <span>{getNightsCount()} night{getNightsCount() !== 1 ? "s" : ""}</span>
-              </div>
-              <div className="price-row">
-                <span>Guests</span>
-                <span>{guests}</span>
-              </div>
-              <div className="price-row">
-                <span>Rate per Night</span>
-                <span>KES {getNightlyRate().toLocaleString()}</span>
-              </div>
-              <div className="price-row price-total">
-                <span>Total</span>
-                <span>KES {getTotalPrice().toLocaleString()}</span>
-              </div>
-            </div>
-          )}
-
-          {/* Default hint */}
-          {availabilityResult === null && !isCheckingAvailability && (
-            <p className="booking-hint">
-              Select your dates, accommodation type, and number of guests above, then click{" "}
-              <strong>Book Now</strong> to check availability.
-            </p>
-          )}
-
-          {/* Checking spinner */}
-          {isCheckingAvailability && (
-            <div className="checking-avail">Checking availability...</div>
-          )}
-
-          {/* Available result */}
-          {availabilityResult === "available" && availableVilla && (
-            <div className="avail-result avail-available reveal">
-              <div className="avail-icon">✓</div>
-              <div className="avail-text">
-                <strong>Available!</strong>
-                <span>
-                  {availableVilla.name} is available from{" "}
-                  <em>{checkin}</em> to <em>{checkout}</em>.
-                </span>
-              </div>
-              <button
-                className="btn-reserve"
-                onClick={() =>
-                  navigate(
-                    `/reservation?villaId=${availableVilla.id}&guestCount=${guests}&price=${getTotalPrice()}&checkIn=${checkin}&checkOut=${checkout}`,
-                  )
-                }
-              >
-                Complete Reservation →
-              </button>
-            </div>
-          )}
-
-          {/* Booked result */}
-          {availabilityResult === "booked" && (
-            <div className="avail-result avail-booked reveal">
-              <div className="avail-icon">✗</div>
-              <div className="avail-text">
-                <strong>Not Available</strong>
-                <span>
-                  No {accommodationType.toLowerCase()} is available for your selected dates.
-                  Please try different dates or another accommodation type.
-                </span>
-              </div>
-            </div>
-          )}
-
-          <p className="booking-footnote">
-            Direct bookings guaranteed best rate — no platform fees.
-          </p>
-        </div>
-      </section>
-
       {/* VILLAS */}
       <section className="villas-section" id="villas">
         <div className="section-header reveal" style={{ marginBottom: "60px" }}>
@@ -2098,7 +1997,6 @@ const CrocodileLodge: React.FC = () => {
 
         <div className="amenities-grid reveal">
           <div className="amenity-card">
-            <span className="amenity-icon">🌊</span>
             <div className="amenity-name">Swimming Pool</div>
             <div className="amenity-desc">
               Infinity-edge pool overlooking the coastal palms, heated to
@@ -2106,15 +2004,6 @@ const CrocodileLodge: React.FC = () => {
             </div>
           </div>
           <div className="amenity-card">
-            <span className="amenity-icon">🏖️</span>
-            <div className="amenity-name">Beach Proximity</div>
-            <div className="amenity-desc">
-              Fifty metres from white coral sands and the warm Indian Ocean
-              shoreline
-            </div>
-          </div>
-          <div className="amenity-card">
-            <span className="amenity-icon">🤫</span>
             <div className="amenity-name">Quiet Ambience</div>
             <div className="amenity-desc">
               Surrounded by lush wetlands — the only sounds are birdsong and the
@@ -2122,7 +2011,6 @@ const CrocodileLodge: React.FC = () => {
             </div>
           </div>
           <div className="amenity-card">
-            <span className="amenity-icon">✨</span>
             <div className="amenity-name">Immaculate Cleanliness</div>
             <div className="amenity-desc">
               Daily housekeeping with eco-friendly products and pristine linen
@@ -2130,7 +2018,6 @@ const CrocodileLodge: React.FC = () => {
             </div>
           </div>
           <div className="amenity-card">
-            <span className="amenity-icon">🏡</span>
             <div className="amenity-name">Private Villas</div>
             <div className="amenity-desc">
               Standalone villas with full privacy, your own entrance and outdoor
@@ -2144,7 +2031,6 @@ const CrocodileLodge: React.FC = () => {
           style={{ transitionDelay: "0.15s" }}
         >
           <div className="amenity-card">
-            <span className="amenity-icon">👨‍👩‍👧‍👦</span>
             <div className="amenity-name">Family Houses</div>
             <div className="amenity-desc">
               Spacious multi-room houses designed for large families and group
@@ -2152,15 +2038,6 @@ const CrocodileLodge: React.FC = () => {
             </div>
           </div>
           <div className="amenity-card">
-            <span className="amenity-icon">👤</span>
-            <div className="amenity-name">Personal Host</div>
-            <div className="amenity-desc">
-              Your dedicated host from arrival to departure — knowledgeable,
-              discreet, warm
-            </div>
-          </div>
-          <div className="amenity-card">
-            <span className="amenity-icon">🌟</span>
             <div className="amenity-name">Attentive Staff</div>
             <div className="amenity-desc">
               A trained team available around the clock for every need, big or
@@ -2168,7 +2045,6 @@ const CrocodileLodge: React.FC = () => {
             </div>
           </div>
           <div className="amenity-card">
-            <span className="amenity-icon">🍽️</span>
             <div className="amenity-name">Full Amenities</div>
             <div className="amenity-desc">
               High-speed WiFi, air conditioning, outdoor kitchen, BBQ, beach
@@ -2176,162 +2052,24 @@ const CrocodileLodge: React.FC = () => {
             </div>
           </div>
           <div className="amenity-card">
-            <span className="amenity-icon">🐊</span>
             <div className="amenity-name">Wildlife Proximity</div>
             <div className="amenity-desc">
               Wake to monitor lizards, exotic birds, and the magic of coastal
               wetland life
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* EXPERIENCE / ABOUT */}
-      <section className="experience-section" id="about">
-        <div className="experience-inner">
-          <div className="experience-visual reveal">
-            <div className="exp-main-img"></div>
-            <div className="exp-float-card">
-              <span className="exp-float-num">12+</span>
-              <span className="exp-float-label">
-                Years hosting families & travellers
-              </span>
+          <div className="amenity-card">
+            <div className="amenity-name">Laundry &amp; Cleaning Services</div>
+            <div className="amenity-desc">
+              Full laundry and daily cleaning services available throughout your
+              stay
             </div>
           </div>
-          <div
-            className="experience-text reveal"
-            style={{ transitionDelay: "0.2s" }}
-          >
-            <div
-              className="section-tag"
-              style={{ justifyContent: "flex-start" }}
-            >
-              Our Story
-            </div>
-            <h2
-              className="section-title"
-              style={{ textAlign: "left", marginBottom: "24px" }}
-            >
-              A Lodge Like
-              <br />
-              <em>No Other</em>
-            </h2>
-            <p className="exp-desc">
-              Crocodile Lodge was born from a love of the coast and a respect
-              for the wild. Tucked into the edge of a protected estuary, our
-              property offers rare access to both untouched nature and the sea —
-              without sacrificing a single comfort.
-            </p>
-
-            <div className="exp-features">
-              <div className="exp-feature">
-                <div className="exp-feature-icon">🌅</div>
-                <div>
-                  <div className="exp-feature-title">
-                    Sunrise to Sunset Bliss
-                  </div>
-                  <div className="exp-feature-desc">
-                    East-facing villas catch the morning light; evening brings
-                    spectacular coastal sunsets over the mangroves.
-                  </div>
-                </div>
-              </div>
-              <div className="exp-feature">
-                <div className="exp-feature-icon">🌿</div>
-                <div>
-                  <div className="exp-feature-title">
-                    Eco-Conscious Hospitality
-                  </div>
-                  <div className="exp-feature-desc">
-                    Solar-powered facilities, rainwater harvesting, and a
-                    commitment to leaving the ecosystem pristine.
-                  </div>
-                </div>
-              </div>
-              <div className="exp-feature">
-                <div className="exp-feature-icon">🤝</div>
-                <div>
-                  <div className="exp-feature-title">Community-Rooted</div>
-                  <div className="exp-feature-desc">
-                    Our staff are from the local community — their knowledge of
-                    the land, sea, and culture is unmatched.
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <a href="#availability" className="btn-primary">
-              <span>Plan Your Stay</span>
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* TESTIMONIALS */}
-      <section className="testimonials-section">
-        <div className="section-header reveal">
-          <div className="section-tag">Guest Voices</div>
-          <h2 className="section-title">
-            What They <em>Remember</em>
-          </h2>
-        </div>
-
-        <div className="testimonials-grid">
-          <div className="testimonial-card reveal">
-            <div className="stars">★★★★★</div>
-            <p className="testimonial-text">
-              The silence here is extraordinary. No traffic, no noise — just
-              ocean, birds, and the rustle of palms. We've stayed in many lodges
-              along the coast, but none came close to this level of peace and
-              personal attention.
-            </p>
-            <div className="testimonial-author">
-              <div className="author-avatar avatar-1">👩</div>
-              <div>
-                <div className="author-name">Amelia K.</div>
-                <div className="author-origin">Nairobi, Kenya</div>
-              </div>
-            </div>
-          </div>
-
-          <div
-            className="testimonial-card reveal"
-            style={{ transitionDelay: "0.1s" }}
-          >
-            <div className="stars">★★★★★</div>
-            <p className="testimonial-text">
-              We came as a family of seven and the Family House was absolutely
-              perfect. Spacious, spotlessly clean, and the staff made us feel
-              completely at home from the moment we arrived. The pool and beach
-              are a five-minute walk — ideal.
-            </p>
-            <div className="testimonial-author">
-              <div className="author-avatar avatar-2">👨</div>
-              <div>
-                <div className="author-name">David M.</div>
-                <div className="author-origin">London, UK</div>
-              </div>
-            </div>
-          </div>
-
-          <div
-            className="testimonial-card reveal"
-            style={{ transitionDelay: "0.2s" }}
-          >
-            <div className="stars">★★★★★</div>
-            <p className="testimonial-text">
-              Our host was extraordinary — anticipating every need before we
-              even knew we had it. The villa had everything we wanted, and
-              waking up to see a monitor lizard stroll past our porch was the
-              kind of magic that makes you book again before you've even checked
-              out.
-            </p>
-            <div className="testimonial-author">
-              <div className="author-avatar avatar-3">👩</div>
-              <div>
-                <div className="author-name">Sophie R.</div>
-                <div className="author-origin">Paris, France</div>
-              </div>
+          <div className="amenity-card">
+            <div className="amenity-name">24hr Solar Power Supply</div>
+            <div className="amenity-desc">
+              Uninterrupted solar-powered electricity around the clock — reliable,
+              clean, and eco-friendly
             </div>
           </div>
         </div>
