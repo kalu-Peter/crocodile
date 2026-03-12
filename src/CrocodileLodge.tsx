@@ -1,14 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import VillaCard from "./components/VillaCard";
+import DetailsModal from "./components/DetailsModal";
+import type { Villa } from "./types";
+import { VILLAS } from "./types";
 
 const CrocodileLodge: React.FC = () => {
+  const navigate = useNavigate();
   const [checkin, setCheckin] = useState<string>("");
   const [checkout, setCheckout] = useState<string>("");
   const [carouselIndex, setCarouselIndex] = useState<number>(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+  const [selectedVilla, setSelectedVilla] = useState<Villa | null>(null);
+  const [showModal, setShowModal] = useState<boolean>(false);
 
   const carouselImages = [
     { src: "/images/gate.jpg", alt: "Lodge Gate" },
+    { src: "/images/pooltable.jpg", alt: "Pool Table" },
     { src: "/images/poolview.jpeg", alt: "Pool View" },
     { src: "/images/yellow villa.jpeg", alt: "Yellow Villa" },
   ];
@@ -69,6 +77,24 @@ const CrocodileLodge: React.FC = () => {
         ? `Checking availability from ${checkin} to ${checkout}...\n\nPlease contact us at reservations@crocodilelodge.co.ke or call +254 700 000 000 to complete your booking.`
         : `Please select both check-in and check-out dates.`;
     alert(msg);
+  };
+
+  const handleSelectVilla = (villa: Villa) => {
+    setSelectedVilla(villa);
+    setShowModal(true);
+  };
+
+  const handleReserve = (
+    villaId: string,
+    guestCount: number,
+    price: number,
+    checkIn: string,
+    checkOut: string,
+  ) => {
+    setShowModal(false);
+    navigate(
+      `/reservation?villaId=${villaId}&guestCount=${guestCount}&price=${price}&checkIn=${checkIn}&checkOut=${checkOut}`,
+    );
   };
 
   // Calendar Helpers
@@ -882,9 +908,30 @@ const CrocodileLodge: React.FC = () => {
           position: relative;
           overflow: hidden;
           cursor: pointer;
+          background: white;
+          border-radius: 4px;
+          box-shadow: 0 4px 12px rgba(13, 26, 15, 0.15);
+          transition: box-shadow 0.3s;
         }
-        .villa-card:hover .villa-overlay { opacity: 1; }
-        .villa-card:hover .villa-img-bg { transform: scale(1.05); }
+        .villa-card:hover {
+          box-shadow: 0 8px 24px rgba(13, 26, 15, 0.25);
+        }
+
+        .villa-card-image {
+          width: 100%;
+          height: 280px;
+          overflow: hidden;
+          position: relative;
+        }
+        .villa-card-image img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.3s ease;
+        }
+        .villa-card:hover .villa-card-image img {
+          transform: scale(1.05);
+        }
 
         .villa-img-bg {
           height: 380px;
@@ -1738,69 +1785,24 @@ const CrocodileLodge: React.FC = () => {
         </div>
 
         <div className="villas-grid">
-          <div className="villa-card reveal">
-            <div className="villa-img-bg">
-              <div className="villa-decoration">🌿</div>
+          {VILLAS.map((villa, index) => (
+            <div key={villa.id} style={{ transitionDelay: `${index * 0.1}s` }}>
+              <VillaCard villa={villa} onSelectVilla={handleSelectVilla} />
             </div>
-            <div className="villa-overlay">
-              <div className="villa-name">The Green Villa</div>
-              <div className="villa-detail">
-                2 bedrooms · Garden views · Lush surroundings
-              </div>
-              <div className="villa-price">
-                <span className="price-num">KES 6,000</span>
-                <span className="price-per">/ night</span>
-              </div>
-              <a href="#availability" className="villa-btn">
-                Reserve Now
-              </a>
-            </div>
-          </div>
-          <div
-            className="villa-card reveal"
-            style={{ transitionDelay: "0.1s" }}
-          >
-            <div className="villa-img-bg">
-              <div className="villa-decoration">🌊</div>
-            </div>
-            <div className="villa-overlay">
-              <div className="villa-category">Blue Villa</div>
-              <div className="villa-name">The Blue Villa</div>
-              <div className="villa-detail">
-                3 bedrooms · Luxury furnishings · Coastal charm
-              </div>
-              <div className="villa-price">
-                <span className="price-num">KES 6,000</span>
-                <span className="price-per">/ night</span>
-              </div>
-              <a href="#availability" className="villa-btn">
-                Reserve Now
-              </a>
-            </div>
-          </div>
-          <div
-            className="villa-card reveal"
-            style={{ transitionDelay: "0.2s" }}
-          >
-            <div className="villa-img-bg">
-              <div className="villa-decoration">⭐</div>
-            </div>
-            <div className="villa-overlay">
-              <div className="villa-name">The Yellow Villa</div>
-              <div className="villa-detail">
-                3 bedrooms · Sunlit terraces · Premium amenities
-              </div>
-              <div className="villa-price">
-                <span className="price-num">KES 6,000</span>
-                <span className="price-per">/ night</span>
-              </div>
-              <a href="#availability" className="villa-btn">
-                Reserve Now
-              </a>
-            </div>
-          </div>
+          ))}
         </div>
       </section>
+
+      {/* VILLA DETAILS MODAL */}
+      {showModal && selectedVilla && (
+        <DetailsModal
+          villa={selectedVilla}
+          checkInDate={checkin}
+          checkOutDate={checkout}
+          onClose={() => setShowModal(false)}
+          onReserve={handleReserve}
+        />
+      )}
 
       {/* AMENITIES */}
       <section className="amenities-section" id="amenities">
