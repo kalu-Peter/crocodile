@@ -1317,6 +1317,7 @@ const CrocodileLodge: React.FC = () => {
           position: relative;
           overflow: hidden;
           cursor: pointer;
+          font-family: sans-serif;
         }
         .amenity-card::before {
           content: '';
@@ -1989,10 +1990,7 @@ const CrocodileLodge: React.FC = () => {
           <h2 className="section-title">
             The <em>Crocodile Lodge</em> Experience
           </h2>
-          <p className="amenities-intro">
-            Every detail curated for your comfort — from the hush of the grounds
-            to the warmth of the water.
-          </p>
+
         </div>
 
         <div className="amenities-grid reveal">
