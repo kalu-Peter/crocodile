@@ -55,7 +55,7 @@ const CrocodileLodge: React.FC = () => {
   const getVillasOfType = (type: string): Villa[] =>
     VILLAS.filter((v) => v.type === type);
 
-const handleCheckAvailability = async () => {
+  const handleCheckAvailability = async () => {
     if (!checkin || !checkout) {
       alert("Please select check-in and check-out dates.");
       return;
@@ -1646,7 +1646,7 @@ const handleCheckAvailability = async () => {
       {/* NAV */}
       <nav>
         <Link to="/" className="nav-logo">
-          Croc<span>odile</span> Lodge
+          Croc<span>odile</span> Villas
         </Link>
         <ul className="nav-links">
           <li>
@@ -1657,9 +1657,6 @@ const handleCheckAvailability = async () => {
           </li>
           <li>
             <Link to="/gallery">Gallery</Link>
-          </li>
-          <li>
-            <a href="#about">About</a>
           </li>
           <li>
             <a href="#contact">Contact</a>
@@ -1710,11 +1707,10 @@ const handleCheckAvailability = async () => {
         <div className="hero-gate-overlay"></div>
 
         <div className="hero-content">
-          <div className="hero-eyebrow">Coastal Wildlife Retreat · Kenya</div>
           <h1 className="hero-title">
             Welcome to
             <br />
-            <em>Crocodile Lodge</em>
+            <em>Crocodile Villas</em>
           </h1>
         </div>
 
@@ -1760,13 +1756,22 @@ const handleCheckAvailability = async () => {
             </div>
             <div className="booking-field">
               <label>Total Price</label>
-              <div style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.1rem", color: "var(--croc-deep)" }}>
+              <div
+                style={{
+                  fontFamily: "'Playfair Display', serif",
+                  fontSize: "1.1rem",
+                  color: "var(--croc-deep)",
+                }}
+              >
                 {getNightsCount() > 0
                   ? `Ksh ${(6000 * guests * getNightsCount()).toLocaleString()}`
                   : "—"}
               </div>
             </div>
-            <button className="booking-submit" onClick={handleCheckAvailability}>
+            <button
+              className="booking-submit"
+              onClick={handleCheckAvailability}
+            >
               → Book Now
             </button>
           </div>
@@ -1805,7 +1810,7 @@ const handleCheckAvailability = async () => {
         <div className="section-header reveal">
           <div className="section-tag">What Awaits You</div>
           <h2 className="section-title">
-            The <em>Crocodile Lodge</em> Experience
+            The <em>Crocodile Villas</em> Experience
           </h2>
         </div>
 
@@ -1992,7 +1997,7 @@ const handleCheckAvailability = async () => {
 
         <div className="footer-bottom">
           <span className="copyright">
-            © 2026 Crocodile Lodge. All rights reserved.
+            © 2026 Crocodile Villas. All rights reserved.
           </span>
           <div className="footer-legal">
             <a href="#">Privacy Policy</a>
