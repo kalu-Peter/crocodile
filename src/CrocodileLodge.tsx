@@ -82,17 +82,7 @@ const CrocodileLodge: React.FC = () => {
   const getVillasOfType = (type: string): Villa[] =>
     VILLAS.filter((v) => v.type === type);
 
-  const getNightlyRate = (): number => {
-    const villas = getVillasOfType(accommodationType);
-    if (!villas.length) return 0;
-    const villa = villas[0];
-    const tier = villa.pricing.find(
-      (p) => guests >= p.guestMin && guests <= p.guestMax,
-    );
-    return tier ? tier.price : villa.pricing[villa.pricing.length - 1].price;
-  };
-
-  const handleCheckAvailability = async () => {
+const handleCheckAvailability = async () => {
     if (!checkin || !checkout) {
       alert("Please select check-in and check-out dates.");
       return;
