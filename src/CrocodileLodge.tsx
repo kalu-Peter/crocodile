@@ -14,7 +14,7 @@ const CrocodileLodge: React.FC = () => {
   const [selectedVilla, setSelectedVilla] = useState<Villa | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [guests, setGuests] = useState<number>(1);
-  const [accommodationType, setAccommodationType] = useState<string>('Villa');
+  const [accommodationType, setAccommodationType] = useState<string>("Villa");
 
   const carouselImages = [
     { src: "/images/gate.jpg", alt: "Lodge Gate" },
@@ -73,7 +73,10 @@ const CrocodileLodge: React.FC = () => {
     if (!checkin || !checkout) return 0;
     const d1 = new Date(checkin);
     const d2 = new Date(checkout);
-    return Math.max(0, Math.ceil((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24)));
+    return Math.max(
+      0,
+      Math.ceil((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24)),
+    );
   };
 
   const getVillasOfType = (type: string): Villa[] =>
@@ -83,7 +86,9 @@ const CrocodileLodge: React.FC = () => {
     const villas = getVillasOfType(accommodationType);
     if (!villas.length) return 0;
     const villa = villas[0];
-    const tier = villa.pricing.find((p) => guests >= p.guestMin && guests <= p.guestMax);
+    const tier = villa.pricing.find(
+      (p) => guests >= p.guestMin && guests <= p.guestMax,
+    );
     return tier ? tier.price : villa.pricing[villa.pricing.length - 1].price;
   };
 
@@ -115,7 +120,9 @@ const CrocodileLodge: React.FC = () => {
           `/reservation?villaId=${available.id}&guestCount=${guests}&price=${totalPrice}&checkIn=${checkin}&checkOut=${checkout}`,
         );
       } else {
-        alert(`No ${accommodationType.toLowerCase()} is available for your selected dates. Please try different dates or another accommodation type.`);
+        alert(
+          `No ${accommodationType.toLowerCase()} is available for your selected dates. Please try different dates or another accommodation type.`,
+        );
       }
     } catch {
       alert("Could not check availability. Please try again.");
@@ -139,7 +146,6 @@ const CrocodileLodge: React.FC = () => {
       `/reservation?villaId=${villaId}&guestCount=${guestCount}&price=${price}&checkIn=${checkIn}&checkOut=${checkOut}`,
     );
   };
-
 
   return (
     <>
@@ -1079,6 +1085,10 @@ const CrocodileLodge: React.FC = () => {
         .villa-card:hover {
           box-shadow: 0 8px 24px rgba(13, 26, 15, 0.25);
         }
+        .villa-card-header h3 {
+          color: #000000;
+          font-size: 1.4rem;
+        }
         .villa-card-content {
           display: flex;
           flex-direction: column;
@@ -1880,21 +1890,6 @@ const CrocodileLodge: React.FC = () => {
           </div>
         </div>
 
-        <div className="hero-stats">
-          <div className="stat-item">
-            <span className="stat-num">8</span>
-            <span className="stat-label">Luxury Villas</span>
-          </div>
-          <div className="stat-item">
-            <span className="stat-num">50m</span>
-            <span className="stat-label">To the Beach</span>
-          </div>
-          <div className="stat-item">
-            <span className="stat-num">★4.9</span>
-            <span className="stat-label">Guest Rating</span>
-          </div>
-        </div>
-
         <div className="scroll-hint">
           <span>Scroll</span>
           <div className="scroll-line"></div>
@@ -1981,7 +1976,6 @@ const CrocodileLodge: React.FC = () => {
           <h2 className="section-title">
             The <em>Crocodile Lodge</em> Experience
           </h2>
-
         </div>
 
         <div className="amenities-grid reveal">
@@ -2041,7 +2035,7 @@ const CrocodileLodge: React.FC = () => {
             </div>
           </div>
           <div className="amenity-card">
-            <div className="amenity-name">Wildlife Proximity</div>
+            <div className="amenity-name">Wildlife Proximity Bora Bora</div>
             <div className="amenity-desc">
               Wake to monitor lizards, exotic birds, and the magic of coastal
               wetland life
@@ -2057,8 +2051,8 @@ const CrocodileLodge: React.FC = () => {
           <div className="amenity-card">
             <div className="amenity-name">24hr Solar Power Supply</div>
             <div className="amenity-desc">
-              Uninterrupted solar-powered electricity around the clock — reliable,
-              clean, and eco-friendly
+              Uninterrupted solar-powered electricity around the clock —
+              reliable, clean, and eco-friendly
             </div>
           </div>
         </div>
