@@ -9,38 +9,11 @@ const CrocodileLodge: React.FC = () => {
   const navigate = useNavigate();
   const [checkin, setCheckin] = useState<string>("");
   const [checkout, setCheckout] = useState<string>("");
-  const [carouselIndex, setCarouselIndex] = useState<number>(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [selectedVilla, setSelectedVilla] = useState<Villa | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [guests, setGuests] = useState<number>(1);
   const [accommodationType, setAccommodationType] = useState<string>("Villa");
-
-  const carouselImages = [
-    { src: "/images/gate.jpg", alt: "Lodge Gate" },
-    { src: "/images/pooltable.jpg", alt: "Pool Table" },
-    { src: "/images/poolview.jpeg", alt: "Pool View" },
-    { src: "/images/yellow villa.jpeg", alt: "Yellow Villa" },
-  ];
-
-  // Carousel Autoplay Logic
-  useEffect(() => {
-    const carouselInterval = setInterval(() => {
-      setCarouselIndex((prev) => (prev + 1) % carouselImages.length);
-    }, 5000); // Change slide every 5 seconds
-
-    return () => clearInterval(carouselInterval);
-  }, [carouselImages.length]);
-
-  const handleCarouselPrev = () => {
-    setCarouselIndex(
-      (prev) => (prev - 1 + carouselImages.length) % carouselImages.length,
-    );
-  };
-
-  const handleCarouselNext = () => {
-    setCarouselIndex((prev) => (prev + 1) % carouselImages.length);
-  };
 
   // Set default dates on mount
   useEffect(() => {
@@ -312,63 +285,36 @@ const handleCheckAvailability = async () => {
           height: 100vh;
           position: relative;
           display: flex;
+          flex-direction: column;
           align-items: center;
+          justify-content: center;
           overflow: hidden;
+          background: url('/images/gate.jpg') center center / cover no-repeat;
         }
 
-        .hero-bg {
+        .hero-gate-overlay {
           position: absolute;
           inset: 0;
-          background:
-            radial-gradient(ellipse at 70% 60%, rgba(200,200,200,0.06) 0%, transparent 60%),
-            radial-gradient(ellipse at 20% 80%, rgba(200,200,200,0.04) 0%, transparent 50%),
-            linear-gradient(160deg, #0a0a0a 0%, #141414 40%, #0a0a0a 100%);
-        }
-
-        /* Animated water ripples */
-        .water-layer {
-          position: absolute;
-          bottom: 0; left: 0; right: 0;
-          height: 50%;
-          background: linear-gradient(180deg, transparent 0%, rgba(10,10,10,0.5) 100%);
-          overflow: hidden;
-        }
-
-        .ripple {
-          position: absolute;
-          border-radius: 50%;
-          border: 1px solid rgba(144,144,144,0.2);
-          animation: ripple-out 6s ease-out infinite;
-        }
-        .ripple:nth-child(1) { width: 200px; height: 80px; bottom: 20%; left: 60%; animation-delay: 0s; }
-        .ripple:nth-child(2) { width: 300px; height: 100px; bottom: 15%; left: 65%; animation-delay: 2s; }
-        .ripple:nth-child(3) { width: 400px; height: 120px; bottom: 10%; left: 62%; animation-delay: 4s; }
-
-        @keyframes ripple-out {
-          0% { opacity: 0.6; transform: scale(0.3); }
-          100% { opacity: 0; transform: scale(1); }
-        }
-
-        /* Croc silhouette */
-        .croc-silhouette {
-          position: absolute;
-          right: 5%;
-          bottom: 28%;
-          width: 420px;
-          opacity: 0.12;
-          animation: float-croc 8s ease-in-out infinite;
-        }
-
-        @keyframes float-croc {
-          0%, 100% { transform: translateY(0) translateX(0); }
-          50% { transform: translateY(-12px) translateX(5px); }
+          background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.25) 50%, rgba(0,0,0,0.7) 100%);
         }
 
         .hero-content {
           position: relative;
           z-index: 10;
-          padding-left: 10%;
-          max-width: 800px;
+          text-align: center;
+          max-width: 900px;
+          padding: 0 40px;
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .booking-bar-hero {
+          position: relative;
+          z-index: 10;
+          width: 100%;
         }
 
         .hero-eyebrow {
@@ -381,52 +327,22 @@ const handleCheckAvailability = async () => {
           margin-bottom: 28px;
           opacity: 0;
           animation: fade-up 1s ease 0.3s forwards;
-          display: flex;
-          align-items: center;
-          gap: 20px;
-        }
-        .hero-eyebrow::before {
-          content: '';
-          display: block;
-          width: 50px;
-          height: 1px;
-          background: var(--croc-gold);
         }
 
         .hero-title {
           font-family: 'Playfair Display', serif;
-          font-size: clamp(3.5rem, 7vw, 7rem);
+          font-size: clamp(3rem, 6vw, 6rem);
           font-weight: 900;
-          line-height: 0.95;
+          line-height: 1.05;
           color: var(--croc-cream);
           opacity: 0;
           animation: fade-up 1s ease 0.5s forwards;
-          margin-bottom: 30px;
+          margin-bottom: 0;
         }
         .hero-title em {
           font-style: italic;
           color: var(--croc-gold);
           display: block;
-        }
-
-        .hero-sub {
-          font-size: 1.25rem;
-          font-weight: 300;
-          font-style: italic;
-          color: rgba(240,240,240,0.7);
-          line-height: 1.7;
-          max-width: 480px;
-          opacity: 0;
-          animation: fade-up 1s ease 0.7s forwards;
-          margin-bottom: 50px;
-        }
-
-        .hero-cta-group {
-          display: flex;
-          gap: 20px;
-          align-items: center;
-          opacity: 0;
-          animation: fade-up 1s ease 0.9s forwards;
         }
 
         .btn-primary {
@@ -1790,154 +1706,70 @@ const handleCheckAvailability = async () => {
       </div>
 
       {/* HERO */}
-      <section className="hero">
-        <div className="hero-bg"></div>
-        <div className="water-layer">
-          <div className="ripple"></div>
-          <div className="ripple"></div>
-          <div className="ripple"></div>
-        </div>
-
-        {/* Croc SVG Silhouette */}
-        <svg
-          className="croc-silhouette"
-          viewBox="0 0 500 200"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M10 120 Q30 90 80 85 Q130 80 180 95 Q200 100 220 90 Q260 70 300 80 Q350 90 380 75 Q420 58 460 65 Q490 70 500 80 L500 90 Q480 88 460 95 Q430 105 400 100 Q370 95 340 105 Q320 110 300 108 Q260 105 240 115 Q220 125 200 120 L200 130 Q180 145 160 130 L120 125 Q90 135 60 130 Q35 125 20 130 Z"
-            fill="white"
-          />
-          <path
-            d="M460 65 Q450 50 440 45 Q430 40 420 48 Q410 55 420 65 Q430 70 440 68 Z"
-            fill="white"
-          />
-          <circle cx="445" cy="52" r="3" fill="#0a0a0a" />
-          <path d="M10 120 L0 130 L5 140 L15 132 Z" fill="white" />
-          <path d="M100 124 L95 145 L108 148 L112 126 Z" fill="white" />
-          <path d="M150 128 L148 148 L160 150 L162 130 Z" fill="white" />
-          <path d="M320 107 L318 127 L330 128 L332 108 Z" fill="white" />
-          <path d="M370 98 L368 118 L380 118 L382 98 Z" fill="white" />
-          <path d="M200 115 L195 155 L215 158 L218 118 Z" fill="white" />
-        </svg>
-
-        {/* Carousel */}
-        <div className="carousel-container">
-          <div className="carousel-slides">
-            {carouselImages.map((image, index) => (
-              <div
-                key={index}
-                className={`carousel-slide ${index === carouselIndex ? "active" : ""}`}
-                style={{ backgroundImage: `url('${image.src}')` }}
-                aria-label={image.alt}
-              />
-            ))}
-            <button
-              className="carousel-btn prev"
-              onClick={handleCarouselPrev}
-              aria-label="Previous slide"
-            >
-              ‹
-            </button>
-            <button
-              className="carousel-btn next"
-              onClick={handleCarouselNext}
-              aria-label="Next slide"
-            >
-              ›
-            </button>
-          </div>
-          <div className="carousel-controls">
-            {carouselImages.map((_, index) => (
-              <button
-                key={index}
-                className={`carousel-dot ${index === carouselIndex ? "active" : ""}`}
-                onClick={() => setCarouselIndex(index)}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            ))}
-          </div>
-        </div>
+      <section className="hero" id="availability">
+        <div className="hero-gate-overlay"></div>
 
         <div className="hero-content">
           <div className="hero-eyebrow">Coastal Wildlife Retreat · Kenya</div>
           <h1 className="hero-title">
-            Where Nature
+            Welcome to
             <br />
-            <em>Holds Court</em>
+            <em>Crocodile Lodge</em>
           </h1>
-          <p className="hero-sub">
-            A sanctuary where ancient wetlands meet the Indian Ocean shoreline.
-            Villas hidden in green, moments from the water's edge.
-          </p>
-          <div className="hero-cta-group">
-            <a href="#availability" className="btn-primary">
-              <span>Book Your Stay</span>
-            </a>
-            <a href="#villas" className="btn-ghost">
-              Explore Villas
-            </a>
-          </div>
         </div>
 
-        <div className="scroll-hint">
-          <span>Scroll</span>
-          <div className="scroll-line"></div>
-        </div>
-      </section>
-
-      {/* BOOKING BAR */}
-      <section className="booking-section" id="availability">
-        <div className="booking-bar">
-          <div className="booking-field">
-            <label>Check In</label>
-            <input
-              type="date"
-              value={checkin}
-              onChange={(e) => setCheckin(e.target.value)}
-            />
-          </div>
-          <div className="booking-field">
-            <label>Check Out</label>
-            <input
-              type="date"
-              value={checkout}
-              onChange={(e) => setCheckout(e.target.value)}
-            />
-          </div>
-          <div className="booking-field">
-            <label>Accommodation</label>
-            <select
-              value={accommodationType}
-              onChange={(e) => setAccommodationType(e.target.value)}
-            >
-              <option value="Villa">Villa</option>
-              <option value="Lodge">Lodge</option>
-              <option value="Apartment">Apartment</option>
-            </select>
-          </div>
-          <div className="booking-field">
-            <label>Guests</label>
-            <input
-              type="number"
-              min="1"
-              max="12"
-              value={guests}
-              onChange={(e) => setGuests(Number(e.target.value))}
-            />
-          </div>
-          <div className="booking-field">
-            <label>Total Price</label>
-            <div style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.1rem", color: "var(--croc-deep)" }}>
-              {getNightsCount() > 0
-                ? `Ksh ${(6000 * guests * getNightsCount()).toLocaleString()}`
-                : "—"}
+        {/* BOOKING BAR */}
+        <div className="booking-bar-hero">
+          <div className="booking-bar">
+            <div className="booking-field">
+              <label>Check In</label>
+              <input
+                type="date"
+                value={checkin}
+                onChange={(e) => setCheckin(e.target.value)}
+              />
             </div>
+            <div className="booking-field">
+              <label>Check Out</label>
+              <input
+                type="date"
+                value={checkout}
+                onChange={(e) => setCheckout(e.target.value)}
+              />
+            </div>
+            <div className="booking-field">
+              <label>Accommodation</label>
+              <select
+                value={accommodationType}
+                onChange={(e) => setAccommodationType(e.target.value)}
+              >
+                <option value="Villa">Villa</option>
+                <option value="Lodge">Lodge</option>
+                <option value="Apartment">Apartment</option>
+              </select>
+            </div>
+            <div className="booking-field">
+              <label>Guests</label>
+              <input
+                type="number"
+                min="1"
+                max="12"
+                value={guests}
+                onChange={(e) => setGuests(Number(e.target.value))}
+              />
+            </div>
+            <div className="booking-field">
+              <label>Total Price</label>
+              <div style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.1rem", color: "var(--croc-deep)" }}>
+                {getNightsCount() > 0
+                  ? `Ksh ${(6000 * guests * getNightsCount()).toLocaleString()}`
+                  : "—"}
+              </div>
+            </div>
+            <button className="booking-submit" onClick={handleCheckAvailability}>
+              → Book Now
+            </button>
           </div>
-          <button className="booking-submit" onClick={handleCheckAvailability}>
-            → Book Now
-          </button>
         </div>
       </section>
 
