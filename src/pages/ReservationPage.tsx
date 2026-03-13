@@ -145,6 +145,13 @@ const ReservationPage: React.FC = () => {
   return (
     <div className="reservation-page reveal">
       <div className="reservation-container">
+        <button
+          className="btn-back-arrow"
+          onClick={() => (showPayment ? setShowPayment(false) : navigate(-1))}
+          aria-label="Go back"
+        >
+          &#8592; {showPayment ? "Back to Details" : "Back"}
+        </button>
         <h1>Complete Your Reservation</h1>
 
         <div className="reservation-summary">

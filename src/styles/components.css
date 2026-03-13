@@ -556,6 +556,31 @@
   font-style: italic;
 }
 
+.btn-back-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 1px solid rgba(201, 168, 76, 0.4);
+  color: #c9a84c;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-family: "Josefin Sans", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.3s, border-color 0.3s, transform 0.2s;
+  margin-bottom: 24px;
+}
+
+.btn-back-arrow:hover {
+  background: rgba(201, 168, 76, 0.12);
+  border-color: #c9a84c;
+  transform: translateX(-3px);
+}
+
 .btn-back-home {
   padding: 15px 40px;
   background: #c9a84c;
