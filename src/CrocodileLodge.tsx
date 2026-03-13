@@ -115,7 +115,7 @@ const CrocodileLodge: React.FC = () => {
         return conflicts.length === 0;
       });
       if (available) {
-        const totalPrice = getNightlyRate() * getNightsCount();
+        const totalPrice = 6000 * guests * getNightsCount();
         navigate(
           `/reservation?villaId=${available.id}&guestCount=${guests}&price=${totalPrice}&checkIn=${checkin}&checkOut=${checkout}`,
         );
@@ -647,7 +647,7 @@ const CrocodileLodge: React.FC = () => {
           margin: 0 auto;
           padding: 0 60px;
           display: grid;
-          grid-template-columns: 1fr 1fr 1fr 1fr auto;
+          grid-template-columns: 1fr 1fr 1fr 1fr 1fr auto;
           gap: 0;
           background: var(--croc-sand);
         }
@@ -1710,6 +1710,7 @@ const CrocodileLodge: React.FC = () => {
           .hero-stats { right: 6%; gap: 30px; }
           .booking-bar { grid-template-columns: 1fr 1fr; }
           .booking-submit { grid-column: span 2; padding: 20px; }
+          .booking-bar .booking-field:last-of-type { grid-column: span 2; }
           .booking-result-section { padding: 80px 24px; }
           .price-summary { padding: 24px; }
           .avail-result { padding: 28px 24px; }
@@ -1935,6 +1936,14 @@ const CrocodileLodge: React.FC = () => {
               value={guests}
               onChange={(e) => setGuests(Number(e.target.value))}
             />
+          </div>
+          <div className="booking-field">
+            <label>Total Price</label>
+            <div style={{ fontFamily: "'Playfair Display', serif", fontSize: "1.1rem", color: "var(--croc-deep)" }}>
+              {getNightsCount() > 0
+                ? `Ksh ${(6000 * guests * getNightsCount()).toLocaleString()}`
+                : "—"}
+            </div>
           </div>
           <button className="booking-submit" onClick={handleCheckAvailability}>
             → Book Now
