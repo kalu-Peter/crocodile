@@ -177,3 +177,37 @@ export const getVillaPrice = (villaId: string, guestCount: number): number | nul
   if (guestCount <= tier.baseGuests) return tier.basePrice;
   return tier.basePrice + (guestCount - tier.baseGuests) * tier.extraPersonFee;
 };
+
+// ─── Admin Types ───────────────────────────────────────────────────────────────
+
+export interface AdminReservation {
+  id: string;
+  property_name: string;
+  guests: number;
+  checkin: string;
+  checkout: string;
+  name: string;
+  phone: string;
+  email: string;
+  total_price: number;
+  payment_status: string;
+  confirmed: boolean;
+  cancelled: boolean;
+  created_at: string;
+}
+
+export interface BlockedDate {
+  id: number;
+  property_name: string;
+  blocked_date: string;
+  reason: string;
+  created_at: string;
+}
+
+export interface PricingRow {
+  id: number;
+  property_name: string;
+  min_guests: number;
+  max_guests: number;
+  price: number;
+}
