@@ -389,9 +389,6 @@ const Gallery: React.FC = () => {
             <Link to="/gallery">Gallery</Link>
           </li>
           <li>
-            <a href="/">About</a>
-          </li>
-          <li>
             <a href="/">Contact</a>
           </li>
         </ul>
