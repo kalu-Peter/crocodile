@@ -71,9 +71,34 @@ const ReservationPage: React.FC = () => {
     }
   };
 
-  const handlePaymentComplete = (payment: PaymentInfo) => {
-    setPaymentInfo(payment);
-    setBookingConfirmed(true);
+  const handlePaymentComplete = async (payment: PaymentInfo) => {
+    try {
+      const res = await fetch("/api/reservations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          property_name: villaName,
+          guests: Number(guestCount),
+          checkin: checkInDate,
+          checkout: checkOutDate,
+          name: formData.customerName,
+          phone: formData.phoneNumber,
+          email: formData.email,
+          total_price: Number(price),
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || "Could not save reservation. Please contact us.");
+        return;
+      }
+
+      setPaymentInfo({ ...payment, reservationId: data.reservation.id });
+      setBookingConfirmed(true);
+    } catch {
+      alert("Network error saving reservation. Please contact us directly.");
+    }
   };
 
   if (!villaId || !guestCount || !price || !checkInDate || !checkOutDate) {

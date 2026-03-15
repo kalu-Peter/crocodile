@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import VillaCard from "./components/VillaCard";
 import DetailsModal from "./components/DetailsModal";
-import type { Villa, Reservation } from "./types";
+import type { Villa } from "./types";
 import { VILLAS } from "./types";
 
 const CrocodileLodge: React.FC = () => {
@@ -65,22 +65,28 @@ const CrocodileLodge: React.FC = () => {
       return;
     }
     try {
-      const res = await fetch("/reservations.json");
-      const reservations: Reservation[] = await res.json();
       const villasOfType = getVillasOfType(accommodationType);
-      const available = villasOfType.find((villa) => {
-        const conflicts = reservations.filter(
-          (r) =>
-            r.villaId === villa.id &&
-            r.status !== "cancelled" &&
-            !(checkout <= r.checkInDate || checkin >= r.checkOutDate),
-        );
-        return conflicts.length === 0;
-      });
-      if (available) {
+      let availableVilla: Villa | null = null;
+
+      for (const villa of villasOfType) {
+        const params = new URLSearchParams({
+          property: villa.name,
+          checkin,
+          checkout,
+        });
+        const res = await fetch(`/api/availability?${params}`);
+        if (!res.ok) continue;
+        const data = await res.json();
+        if (data.available) {
+          availableVilla = villa;
+          break;
+        }
+      }
+
+      if (availableVilla) {
         const totalPrice = 6000 * guests * getNightsCount();
         navigate(
-          `/reservation?villaId=${available.id}&guestCount=${guests}&price=${totalPrice}&checkIn=${checkin}&checkOut=${checkout}`,
+          `/reservation?villaId=${availableVilla.id}&guestCount=${guests}&price=${totalPrice}&checkIn=${checkin}&checkOut=${checkout}`,
         );
       } else {
         alert(
