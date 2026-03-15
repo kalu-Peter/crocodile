@@ -39,18 +39,18 @@ const Gallery: React.FC = () => {
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Josefin+Sans:wght@200;300;400&display=swap');
 
         :root {
-          --croc-deep: #0d1a0f;
-          --croc-forest: #1a3320;
-          --croc-moss: #2d5a3d;
-          --croc-sage: #5c8a6a;
-          --croc-sand: #c8b89a;
-          --croc-cream: #f5efe6;
-          --croc-gold: #c9a84c;
-          --croc-amber: #e8c97a;
-          --croc-water: #4a8fa8;
-          --croc-sky: #a8d4e0;
-          --text-dark: #0d1a0f;
-          --text-light: #f5efe6;
+         --croc-deep: #0a0a0a;
+          --croc-forest: #141414;
+          --croc-moss: #282828;
+          --croc-sage: #505050;
+          --croc-sand: #d4d4d4;
+          --croc-cream: #f0f0f0;
+          --croc-gold: #909090;
+          --croc-amber: #e0e0e0;
+          --croc-water: #686868;
+          --croc-sky: #c0c0c0;
+          --text-dark: #0a0a0a;
+          --text-light: #f0f0f0;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -73,7 +73,7 @@ const Gallery: React.FC = () => {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          background: linear-gradient(180deg, rgba(13,26,15,0.95) 0%, transparent 100%);
+          background: linear-gradient(180deg, rgba(10,10,10,0.95) 0%, transparent 100%);
           backdrop-filter: blur(2px);
         }
 
@@ -179,7 +179,7 @@ const Gallery: React.FC = () => {
           left: 0;
           width: 100%;
           height: 100%;
-          background: rgba(13, 26, 15, 0.98);
+          background: rgba(10, 10, 10, 0.98);
           z-index: 50;
           padding-top: 100px;
           flex-direction: column;
@@ -332,7 +332,7 @@ const Gallery: React.FC = () => {
         .gallery-item-overlay {
           position: absolute;
           inset: 0;
-          background: rgba(13,26,15,0.6);
+          background: rgba(10,10,10,0.6);
           opacity: 0;
           transition: opacity 0.4s;
           display: flex;

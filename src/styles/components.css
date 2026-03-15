@@ -267,7 +267,7 @@
 /* Reservation Page Styles */
 .reservation-page {
   min-height: 100vh;
-  background: linear-gradient(180deg, #0d1a0f 0%, #1a3320 100%);
+  background: #0a0a0a;
   padding: 100px 60px;
   color: #f5efe6;
 }
