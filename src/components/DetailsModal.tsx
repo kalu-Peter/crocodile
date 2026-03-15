@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import type { Villa } from "../types";
 import { getVillaPrice } from "../types";
 
+
 interface DetailsModalProps {
   villa: Villa;
   checkInDate: string;
@@ -24,6 +25,7 @@ const DetailsModal: React.FC<DetailsModalProps> = ({
   onReserve,
 }) => {
   const [guestCount, setGuestCount] = useState<number>(1);
+  const [activeGalleryImg, setActiveGalleryImg] = useState<number>(0);
   const price = getVillaPrice(villa.id, guestCount);
 
   const handleReserve = () => {
@@ -42,14 +44,44 @@ const DetailsModal: React.FC<DetailsModalProps> = ({
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      <div className="modal-content modal-content--wide" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close" onClick={onClose}>
           ✕
         </button>
 
         <div className="modal-header" style={{ backgroundColor: villa.color }}>
           <h2>{villa.name}</h2>
+          {(villa.bedrooms || villa.bathrooms) && (
+            <p style={{ marginTop: 6, fontSize: "0.85rem", opacity: 0.85 }}>
+              {villa.bedrooms && `${villa.bedrooms} Bedroom${villa.bedrooms > 1 ? "s" : ""}`}
+              {villa.bedrooms && villa.bathrooms && " · "}
+              {villa.bathrooms && `${villa.bathrooms} Bathroom${villa.bathrooms > 1 ? "s" : ""}`}
+            </p>
+          )}
         </div>
+
+        {/* Gallery */}
+        {villa.gallery && villa.gallery.length > 0 && (
+          <div className="modal-gallery">
+            <div className="modal-gallery-main">
+              <img
+                src={villa.gallery[activeGalleryImg]}
+                alt={`${villa.name} — photo ${activeGalleryImg + 1}`}
+              />
+            </div>
+            <div className="modal-gallery-thumbs">
+              {villa.gallery.map((src, i) => (
+                <button
+                  key={i}
+                  className={`modal-gallery-thumb${i === activeGalleryImg ? " active" : ""}`}
+                  onClick={() => setActiveGalleryImg(i)}
+                >
+                  <img src={src} alt={`Thumbnail ${i + 1}`} />
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="modal-body">
           <div className="modal-section">
@@ -57,8 +89,19 @@ const DetailsModal: React.FC<DetailsModalProps> = ({
             <p>{villa.description}</p>
           </div>
 
+          {villa.amenities && villa.amenities.length > 0 && (
+            <div className="modal-section">
+              <h4>Amenities</h4>
+              <ul className="amenities-list">
+                {villa.amenities.map((item) => (
+                  <li key={item}>✓ {item}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           <div className="modal-section">
-            <h4>Villa Details</h4>
+            <h4>Details</h4>
             <ul>
               <li>
                 <strong>Maximum Guests:</strong> {villa.maxGuests}
@@ -117,7 +160,7 @@ const DetailsModal: React.FC<DetailsModalProps> = ({
               </>
             ) : (
               <div className="unavailable-message">
-                This villa is currently unavailable for the selected dates.
+                This accommodation is currently unavailable for the selected dates.
               </div>
             )}
           </div>

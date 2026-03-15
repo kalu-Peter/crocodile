@@ -1808,6 +1808,7 @@ const CrocodileLodge: React.FC = () => {
                 <option value="Villa">Villa</option>
                 <option value="Lodge">Lodge</option>
                 <option value="Apartment">Apartment</option>
+                <option value="Bungalow">Bungalow</option>
               </select>
             </div>
             <div className="booking-field">

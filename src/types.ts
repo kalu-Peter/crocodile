@@ -8,13 +8,17 @@ export interface PricingTier {
 export interface Villa {
   id: string;
   name: string;
-  type: 'Villa' | 'Lodge' | 'Apartment';
+  type: 'Villa' | 'Lodge' | 'Apartment' | 'Bungalow';
   maxGuests: number;
   description: string;
   isAvailable: boolean;
   pricing: PricingTier[];
   color: string;
   image: string;
+  gallery?: string[];
+  amenities?: string[];
+  bedrooms?: number;
+  bathrooms?: number;
 }
 
 export interface Reservation {
@@ -98,6 +102,83 @@ export const VILLAS: Villa[] = [
     pricing: [
       { guestMin: 1, guestMax: 2, price: 90 },
       { guestMin: 3, guestMax: 3, price: 130 },
+    ],
+  },
+  {
+    id: "mango-park-bungalow",
+    name: "Mango Park Bungalow",
+    type: "Bungalow",
+    maxGuests: 4,
+    bedrooms: 2,
+    bathrooms: 2,
+    description:
+      "A charming 2-bedroom bungalow nestled in the lush Mango Park grounds. Features two comfortable double bedrooms, a spacious living area, and a private garden — perfect for couples or small families seeking a serene bush retreat.",
+    isAvailable: true,
+    color: "#c2410c",
+    image: "/images/mango park/20250731_100752.jpg",
+    gallery: [
+      "/images/mango park/20250731_100752.jpg",
+      "/images/mango park/20250731_100808.jpg",
+      "/images/mango park/20250731_100905.jpg",
+      "/images/mango park/20250731_101142.jpg",
+      "/images/mango park/Maisons Diani-photos-Pierre_Rich-52.jpg",
+      "/images/mango park/Maisons Diani-photos-Pierre_Rich-55.jpg",
+      "/images/mango park/Maisons Diani-photos-Pierre_Rich-57.jpg",
+      "/images/mango park/Maisons Diani-photos-Pierre_Rich-58.jpg",
+      "/images/mango park/Maisons Diani-photos-Pierre_Rich-61_BD.jpg",
+    ],
+    amenities: [
+      "2 Double Bedrooms",
+      "2 Bathrooms",
+      "Private Garden",
+      "Fully Equipped Kitchen",
+      "Living & Dining Area",
+      "Air Conditioning",
+      "Free Wi-Fi",
+      "Daily Housekeeping",
+    ],
+    pricing: [
+      { guestMin: 1, guestMax: 2, price: 110 },
+      { guestMin: 3, guestMax: 4, price: 150 },
+    ],
+  },
+  {
+    id: "mango-park-1st-floor",
+    name: "Mango Park 1st Floor",
+    type: "Bungalow",
+    maxGuests: 4,
+    bedrooms: 2,
+    bathrooms: 2,
+    description:
+      "An elegant first-floor suite in Mango Park with sweeping garden and pool views. Offers two bright bedrooms, a breezy balcony, and refined interiors — ideal for guests who appreciate elevated comfort and panoramic surroundings.",
+    isAvailable: true,
+    color: "#15803d",
+    image: "/images/mango 1st floor/1st floor 1.jpg",
+    gallery: [
+      "/images/mango 1st floor/1st floor 1.jpg",
+      "/images/mango 1st floor/1st floor 2.jpg",
+      "/images/mango 1st floor/1st floor 3.jpg",
+      "/images/mango 1st floor/1st floor 4.jpg",
+      "/images/mango 1st floor/1st floor 5.jpg",
+      "/images/mango 1st floor/1st floor 6.jpg",
+      "/images/mango 1st floor/1st floor 7.jpg",
+      "/images/mango 1st floor/1st floor 8.jpg",
+      "/images/mango 1st floor/1st floor 9.jpg",
+      "/images/mango 1st floor/1st floor 10.jpg",
+    ],
+    amenities: [
+      "2 Double Bedrooms",
+      "2 Bathrooms",
+      "Private Balcony",
+      "Garden & Pool Views",
+      "Fully Equipped Kitchen",
+      "Air Conditioning",
+      "Free Wi-Fi",
+      "Daily Housekeeping",
+    ],
+    pricing: [
+      { guestMin: 1, guestMax: 2, price: 120 },
+      { guestMin: 3, guestMax: 4, price: 160 },
     ],
   },
 ];
