@@ -54,7 +54,7 @@ export const VILLAS: Villa[] = [
     isAvailable: true,
     color: "#3b82f6",
     image: "/images/bluevilla.jpg",
-    pricing: [{ baseGuests: 4, basePrice: 80, extraPersonFee: 10 }],
+    pricing: [{ baseGuests: 4, basePrice: 6000, extraPersonFee: 2000 }],
   },
   {
     id: "green-villa",
@@ -66,7 +66,7 @@ export const VILLAS: Villa[] = [
     isAvailable: true,
     color: "#10b981",
     image: "/images/greenvilla.jpg",
-    pricing: [{ baseGuests: 4, basePrice: 100, extraPersonFee: 15 }],
+    pricing: [{ baseGuests: 4, basePrice: 6000, extraPersonFee: 2000 }],
   },
   {
     id: "gold-lodge",
@@ -78,7 +78,7 @@ export const VILLAS: Villa[] = [
     isAvailable: true,
     color: "#eab308",
     image: "/images/yellowvilla.jpg",
-    pricing: [{ baseGuests: 12, basePrice: 300, extraPersonFee: 20 }],
+    pricing: [{ baseGuests: 12, basePrice: 6000, extraPersonFee: 2000 }],
   },
   {
     id: "apartment-1",
@@ -90,7 +90,7 @@ export const VILLAS: Villa[] = [
     isAvailable: true,
     color: "#f97316",
     image: "/images/pooltable.jpg",
-    pricing: [{ baseGuests: 2, basePrice: 90, extraPersonFee: 0 }],
+    pricing: [{ baseGuests: 2, basePrice: 6000, extraPersonFee: 0 }],
   },
   {
     id: "mango-park-bungalow",
@@ -125,7 +125,7 @@ export const VILLAS: Villa[] = [
       "Free Wi-Fi",
       "Daily Housekeeping",
     ],
-    pricing: [{ baseGuests: 4, basePrice: 110, extraPersonFee: 0 }],
+    pricing: [{ baseGuests: 4, basePrice: 6000, extraPersonFee: 0 }],
   },
   {
     id: "mango-park-1st-floor",
@@ -161,7 +161,7 @@ export const VILLAS: Villa[] = [
       "Free Wi-Fi",
       "Daily Housekeeping",
     ],
-    pricing: [{ baseGuests: 4, basePrice: 120, extraPersonFee: 0 }],
+    pricing: [{ baseGuests: 4, basePrice: 6000, extraPersonFee: 0 }],
   },
 ];
 

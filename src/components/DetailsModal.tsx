@@ -154,12 +154,12 @@ const DetailsModal: React.FC<DetailsModalProps> = ({
             {price !== null ? (
               <>
                 <h4>Price per Night</h4>
-                <div className="price-display">${price}</div>
+                <div className="price-display">Ksh {price?.toLocaleString()}</div>
                 {tier && (
                   <div className="price-breakdown">
-                    <span>Base rate (up to {tier.baseGuests} guests): ${tier.basePrice}</span>
+                    <span>Base rate (up to {tier.baseGuests} guests): Ksh {tier.basePrice.toLocaleString()}</span>
                     {tier.extraPersonFee > 0 && (
-                      <span>Extra guest: +${tier.extraPersonFee} / person</span>
+                      <span>Extra guest: +Ksh {tier.extraPersonFee.toLocaleString()} / person</span>
                     )}
                     {tier.extraPersonFee === 0 && villa.maxGuests <= tier.baseGuests && (
                       <span>Max {villa.maxGuests} guest{villa.maxGuests > 1 ? "s" : ""} — no additional guests</span>

@@ -1837,7 +1837,7 @@ const CrocodileLodge: React.FC = () => {
                   const sampleVilla = getVillasOfType(accommodationType)[0];
                   const ppn = sampleVilla ? getVillaPrice(sampleVilla.id, guests) : null;
                   if (!ppn) return "—";
-                  return `$${(ppn * nights).toLocaleString()}`;
+                  return `Ksh ${(ppn * nights).toLocaleString()}`;
                 })()}
               </div>
             </div>
