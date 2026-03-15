@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import type { Villa } from "../types";
-import { getVillaPrice } from "../types";
+import { getVillaPrice, VILLAS } from "../types";
 
 
 interface DetailsModalProps {
@@ -27,6 +27,7 @@ const DetailsModal: React.FC<DetailsModalProps> = ({
   const [guestCount, setGuestCount] = useState<number>(1);
   const [activeGalleryImg, setActiveGalleryImg] = useState<number>(0);
   const price = getVillaPrice(villa.id, guestCount);
+  const tier = VILLAS.find((v) => v.id === villa.id)?.pricing[0] ?? null;
 
   const handleReserve = () => {
     if (price === null) {
@@ -154,6 +155,17 @@ const DetailsModal: React.FC<DetailsModalProps> = ({
               <>
                 <h4>Price per Night</h4>
                 <div className="price-display">${price}</div>
+                {tier && (
+                  <div className="price-breakdown">
+                    <span>Base rate (up to {tier.baseGuests} guests): ${tier.basePrice}</span>
+                    {tier.extraPersonFee > 0 && (
+                      <span>Extra guest: +${tier.extraPersonFee} / person</span>
+                    )}
+                    {tier.extraPersonFee === 0 && villa.maxGuests <= tier.baseGuests && (
+                      <span>Max {villa.maxGuests} guest{villa.maxGuests > 1 ? "s" : ""} — no additional guests</span>
+                    )}
+                  </div>
+                )}
                 <button className="btn-reserve-now" onClick={handleReserve}>
                   Reserve Now
                 </button>

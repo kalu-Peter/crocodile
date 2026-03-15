@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import VillaCard from "./components/VillaCard";
 import DetailsModal from "./components/DetailsModal";
 import type { Villa } from "./types";
-import { VILLAS } from "./types";
+import { VILLAS, getVillaPrice } from "./types";
 
 const CrocodileLodge: React.FC = () => {
   const navigate = useNavigate();
@@ -84,7 +84,8 @@ const CrocodileLodge: React.FC = () => {
       }
 
       if (availableVilla) {
-        const totalPrice = 6000 * guests * getNightsCount();
+        const pricePerNight = getVillaPrice(availableVilla.id, guests) ?? 0;
+        const totalPrice = pricePerNight * getNightsCount();
         navigate(
           `/reservation?villaId=${availableVilla.id}&guestCount=${guests}&price=${totalPrice}&checkIn=${checkin}&checkOut=${checkout}`,
         );
@@ -1816,7 +1817,7 @@ const CrocodileLodge: React.FC = () => {
               <input
                 type="number"
                 min="1"
-                max="12"
+                max={getVillasOfType(accommodationType)[0]?.maxGuests ?? 21}
                 value={guests}
                 onChange={(e) => setGuests(Number(e.target.value))}
               />
@@ -1830,9 +1831,14 @@ const CrocodileLodge: React.FC = () => {
                   color: "var(--croc-deep)",
                 }}
               >
-                {getNightsCount() > 0
-                  ? `Ksh ${(6000 * guests * getNightsCount()).toLocaleString()}`
-                  : "—"}
+                {(() => {
+                  const nights = getNightsCount();
+                  if (nights <= 0) return "—";
+                  const sampleVilla = getVillasOfType(accommodationType)[0];
+                  const ppn = sampleVilla ? getVillaPrice(sampleVilla.id, guests) : null;
+                  if (!ppn) return "—";
+                  return `$${(ppn * nights).toLocaleString()}`;
+                })()}
               </div>
             </div>
             <button

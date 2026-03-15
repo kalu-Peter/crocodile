@@ -1,8 +1,8 @@
 // Villa Types and Constants
 export interface PricingTier {
-  guestMin: number;
-  guestMax: number;
-  price: number;
+  baseGuests: number;     // guests included in the base price
+  basePrice: number;      // flat nightly rate for up to baseGuests
+  extraPersonFee: number; // added per person beyond baseGuests (0 = no extras)
 }
 
 export interface Villa {
@@ -54,10 +54,7 @@ export const VILLAS: Villa[] = [
     isAvailable: true,
     color: "#3b82f6",
     image: "/images/bluevilla.jpg",
-    pricing: [
-      { guestMin: 1, guestMax: 4, price: 80 },
-      { guestMin: 5, guestMax: 8, price: 120 },
-    ],
+    pricing: [{ baseGuests: 4, basePrice: 80, extraPersonFee: 10 }],
   },
   {
     id: "green-villa",
@@ -69,10 +66,7 @@ export const VILLAS: Villa[] = [
     isAvailable: true,
     color: "#10b981",
     image: "/images/greenvilla.jpg",
-    pricing: [
-      { guestMin: 1, guestMax: 4, price: 100 },
-      { guestMin: 5, guestMax: 8, price: 150 },
-    ],
+    pricing: [{ baseGuests: 4, basePrice: 100, extraPersonFee: 15 }],
   },
   {
     id: "gold-lodge",
@@ -80,29 +74,23 @@ export const VILLAS: Villa[] = [
     type: "Lodge",
     maxGuests: 21,
     description:
-      "A grand gold lodge for large groups and retreats, sleeping 14–21 guests. Features 18 single beds, 1 double bed, and 2 sofa beds across spacious communal and private spaces.",
+      "A grand gold lodge for large groups and retreats, sleeping up to 21 guests. Features 18 single beds, 1 double bed, and 2 sofa beds across spacious communal and private spaces.",
     isAvailable: true,
     color: "#eab308",
     image: "/images/yellowvilla.jpg",
-    pricing: [
-      { guestMin: 14, guestMax: 17, price: 300 },
-      { guestMin: 18, guestMax: 21, price: 400 },
-    ],
+    pricing: [{ baseGuests: 12, basePrice: 300, extraPersonFee: 20 }],
   },
   {
     id: "apartment-1",
     name: "Blue Baobab Apartment",
     type: "Apartment",
-    maxGuests: 3,
+    maxGuests: 2,
     description:
-      "A modern self-contained apartment nestled under the iconic baobab. Ideal for a quick getaway with all the amenities you need.",
+      "A modern self-contained apartment nestled under the iconic baobab. Ideal for a couple's getaway with all the amenities you need.",
     isAvailable: true,
     color: "#f97316",
     image: "/images/pooltable.jpg",
-    pricing: [
-      { guestMin: 1, guestMax: 2, price: 90 },
-      { guestMin: 3, guestMax: 3, price: 130 },
-    ],
+    pricing: [{ baseGuests: 2, basePrice: 90, extraPersonFee: 0 }],
   },
   {
     id: "mango-park-bungalow",
@@ -137,10 +125,7 @@ export const VILLAS: Villa[] = [
       "Free Wi-Fi",
       "Daily Housekeeping",
     ],
-    pricing: [
-      { guestMin: 1, guestMax: 2, price: 110 },
-      { guestMin: 3, guestMax: 4, price: 150 },
-    ],
+    pricing: [{ baseGuests: 4, basePrice: 110, extraPersonFee: 0 }],
   },
   {
     id: "mango-park-1st-floor",
@@ -176,20 +161,19 @@ export const VILLAS: Villa[] = [
       "Free Wi-Fi",
       "Daily Housekeeping",
     ],
-    pricing: [
-      { guestMin: 1, guestMax: 2, price: 120 },
-      { guestMin: 3, guestMax: 4, price: 160 },
-    ],
+    pricing: [{ baseGuests: 4, basePrice: 120, extraPersonFee: 0 }],
   },
 ];
 
-// Helper function to get price for a villa and guest count
+// Helper function to get per-night price for a villa and guest count
 export const getVillaPrice = (villaId: string, guestCount: number): number | null => {
   const villa = VILLAS.find((v) => v.id === villaId);
   if (!villa) return null;
+  if (guestCount < 1 || guestCount > villa.maxGuests) return null;
 
-  const tier = villa.pricing.find(
-    (p) => guestCount >= p.guestMin && guestCount <= p.guestMax,
-  );
-  return tier ? tier.price : null;
+  const tier = villa.pricing[0];
+  if (!tier) return null;
+
+  if (guestCount <= tier.baseGuests) return tier.basePrice;
+  return tier.basePrice + (guestCount - tier.baseGuests) * tier.extraPersonFee;
 };

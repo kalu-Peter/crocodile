@@ -215,8 +215,24 @@
   font-size: 3rem;
   font-weight: 700;
   color: #c9a84c;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
   line-height: 1;
+}
+
+.price-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 20px;
+  opacity: 0.72;
+}
+
+.price-breakdown span {
+  font-family: "Josefin Sans", sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #f5efe6;
 }
 
 .unavailable-message {
