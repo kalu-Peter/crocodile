@@ -296,7 +296,7 @@ const CrocodileLodge: React.FC = () => {
           align-items: center;
           justify-content: center;
           overflow: hidden;
-          background: url('/images/gate.jpg') center center / cover no-repeat;
+          background: url('/images/goldvilla.jpg') center center / cover no-repeat;
         }
 
         .hero-gate-overlay {
