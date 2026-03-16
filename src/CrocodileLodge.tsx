@@ -2,11 +2,14 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import VillaCard from "./components/VillaCard";
 import DetailsModal from "./components/DetailsModal";
+import CurrencySelector from "./components/CurrencySelector";
 import type { Villa } from "./types";
 import { VILLAS, getVillaPrice } from "./types";
+import { useCurrency } from "./context/CurrencyContext";
 
 const CrocodileLodge: React.FC = () => {
   const navigate = useNavigate();
+  const { formatPrice } = useCurrency();
   const [checkin, setCheckin] = useState<string>("");
   const [checkout, setCheckout] = useState<string>("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
@@ -196,6 +199,30 @@ const CrocodileLodge: React.FC = () => {
           padding: 0;
         }
         .nav-links a:hover, .nav-links button:hover { opacity: 1; color: var(--croc-gold); }
+
+        .currency-selector {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          margin-right: 8px;
+        }
+        .currency-selector .currency-icon { font-size: 0.85rem; }
+        .currency-selector select {
+          font-family: 'Josefin Sans', sans-serif;
+          font-size: 0.65rem;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          background: transparent;
+          border: 1px solid rgba(255,255,255,0.3);
+          color: rgba(255,255,255,0.85);
+          padding: 6px 10px;
+          cursor: pointer;
+          outline: none;
+          border-radius: 2px;
+          transition: border-color 0.2s, color 0.2s;
+        }
+        .currency-selector select option { background: #1a1a2e; color: #fff; }
+        .currency-selector select:hover { border-color: var(--croc-gold); color: var(--croc-gold); }
 
         .nav-book {
           font-family: 'Josefin Sans', sans-serif;
@@ -1729,6 +1756,7 @@ const CrocodileLodge: React.FC = () => {
             <a href="#contact">Contact</a>
           </li>
         </ul>
+        <CurrencySelector />
         <a href="#availability" className="nav-book">
           Book Direct — Best Rate
         </a>
@@ -1835,9 +1863,11 @@ const CrocodileLodge: React.FC = () => {
                   const nights = getNightsCount();
                   if (nights <= 0) return "—";
                   const sampleVilla = getVillasOfType(accommodationType)[0];
-                  const ppn = sampleVilla ? getVillaPrice(sampleVilla.id, guests) : null;
+                  const ppn = sampleVilla
+                    ? getVillaPrice(sampleVilla.id, guests)
+                    : null;
                   if (!ppn) return "—";
-                  return `Ksh ${(ppn * nights).toLocaleString()}`;
+                  return formatPrice(ppn * nights);
                 })()}
               </div>
             </div>

@@ -380,10 +380,10 @@ const Gallery: React.FC = () => {
         </Link>
         <ul className="nav-links">
           <li>
-            <Link to="/">Home</Link>
+            <a href="/">Villas</a>
           </li>
           <li>
-            <a href="/">Villas</a>
+            <a href="#amenities">Amenities</a>
           </li>
           <li>
             <Link to="/gallery">Gallery</Link>

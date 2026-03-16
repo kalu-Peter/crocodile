@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import type { Villa } from "../types";
 import { getVillaPrice, VILLAS } from "../types";
+import { useCurrency } from "../context/CurrencyContext";
 
 
 interface DetailsModalProps {
@@ -28,6 +29,7 @@ const DetailsModal: React.FC<DetailsModalProps> = ({
   const [activeGalleryImg, setActiveGalleryImg] = useState<number>(0);
   const price = getVillaPrice(villa.id, guestCount);
   const tier = VILLAS.find((v) => v.id === villa.id)?.pricing[0] ?? null;
+  const { formatPrice } = useCurrency();
 
   const handleReserve = () => {
     if (price === null) {
@@ -154,12 +156,12 @@ const DetailsModal: React.FC<DetailsModalProps> = ({
             {price !== null ? (
               <>
                 <h4>Price per Night</h4>
-                <div className="price-display">Ksh {price?.toLocaleString()}</div>
+                <div className="price-display">{price !== null ? formatPrice(price) : ""}</div>
                 {tier && (
                   <div className="price-breakdown">
-                    <span>Base rate (up to {tier.baseGuests} guests): Ksh {tier.basePrice.toLocaleString()}</span>
+                    <span>Base rate (up to {tier.baseGuests} guests): {formatPrice(tier.basePrice)}</span>
                     {tier.extraPersonFee > 0 && (
-                      <span>Extra guest: +Ksh {tier.extraPersonFee.toLocaleString()} / person</span>
+                      <span>Extra guest: +{formatPrice(tier.extraPersonFee)} / person</span>
                     )}
                     {tier.extraPersonFee === 0 && villa.maxGuests <= tier.baseGuests && (
                       <span>Max {villa.maxGuests} guest{villa.maxGuests > 1 ? "s" : ""} — no additional guests</span>

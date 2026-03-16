@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import PaymentComponent from "../components/PaymentComponent";
 import type { PaymentInfo } from "../types";
 import { VILLAS } from "../types";
+import { useCurrency } from "../context/CurrencyContext";
 
 const ReservationPage: React.FC = () => {
   const navigate = useNavigate();
@@ -28,6 +29,7 @@ const ReservationPage: React.FC = () => {
 
   const villaName =
     VILLAS.find((v) => v.id === villaId)?.name || "Unknown Villa";
+  const { formatPrice } = useCurrency();
 
   // Redirect if missing required params
   useEffect(() => {
@@ -146,7 +148,7 @@ const ReservationPage: React.FC = () => {
             </div>
             <div className="detail-row highlight">
               <span className="label">Total Amount Paid:</span>
-              <span className="value">KES {price}</span>
+              <span className="value">{formatPrice(Number(price))}</span>
             </div>
             <div className="detail-row">
               <span className="label">Payment Method:</span>
@@ -200,7 +202,7 @@ const ReservationPage: React.FC = () => {
             </div>
             <div className="summary-item highlight">
               <span className="label">Price per Night:</span>
-              <span className="value">KES {price}</span>
+              <span className="value">{formatPrice(Number(price))}</span>
             </div>
           </div>
         </div>

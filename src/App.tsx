@@ -5,10 +5,12 @@ import ReservationPage from "./pages/ReservationPage";
 import AdminLoginPage from "./pages/AdminLoginPage";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
 import PageTransition from "./components/PageTransition";
+import { CurrencyProvider } from "./context/CurrencyContext";
 
 function App() {
   return (
-    <Router>
+    <CurrencyProvider>
+      <Router>
       <PageTransition>
         <Routes>
           <Route path="/" element={<CrocodileLodge />} />
@@ -19,6 +21,7 @@ function App() {
         </Routes>
       </PageTransition>
     </Router>
+    </CurrencyProvider>
   );
 }
 
