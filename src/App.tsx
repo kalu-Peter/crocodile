@@ -6,6 +6,7 @@ import AdminLoginPage from "./pages/AdminLoginPage";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
 import PageTransition from "./components/PageTransition";
 import { CurrencyProvider } from "./context/CurrencyContext";
+import WhatsAppFloat from "./components/WhatsAppFloat";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/crocodile-admin/dashboard" element={<AdminDashboardPage />} />
         </Routes>
       </PageTransition>
+      <WhatsAppFloat />
     </Router>
     </CurrencyProvider>
   );
