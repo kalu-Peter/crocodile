@@ -1107,6 +1107,27 @@ const CrocodileLodge: React.FC = () => {
           color: var(--croc-deep);
           font-weight: 600;
         }
+
+        .villa-meta-chips {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+
+        .villa-chip {
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+          background: rgba(13, 26, 15, 0.07);
+          border: 1px solid rgba(13, 26, 15, 0.12);
+          border-radius: 20px;
+          padding: 5px 12px;
+          font-family: 'Josefin Sans', sans-serif;
+          font-size: 0.72rem;
+          letter-spacing: 0.06em;
+          color: rgba(13, 26, 15, 0.75);
+          font-weight: 500;
+        }
         
         .villa-description {
           font-family: 'Cormorant Garamond', serif;

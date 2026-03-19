@@ -75,6 +75,26 @@ const DetailsModal: React.FC<DetailsModalProps> = ({
                 src={villa.gallery[activeGalleryImg]}
                 alt={`${villa.name} — photo ${activeGalleryImg + 1}`}
               />
+              {/* Prev arrow */}
+              {activeGalleryImg > 0 && (
+                <button
+                  className="gallery-arrow gallery-arrow--prev"
+                  onClick={() => setActiveGalleryImg((i) => i - 1)}
+                  aria-label="Previous image"
+                >&#8249;</button>
+              )}
+              {/* Next arrow */}
+              {activeGalleryImg < villa.gallery.length - 1 && (
+                <button
+                  className="gallery-arrow gallery-arrow--next"
+                  onClick={() => setActiveGalleryImg((i) => i + 1)}
+                  aria-label="Next image"
+                >&#8250;</button>
+              )}
+              {/* Counter */}
+              <div className="gallery-counter">
+                {activeGalleryImg + 1} / {villa.gallery.length}
+              </div>
             </div>
             <div className="modal-gallery-thumbs">
               {villa.gallery.map((src, i) => (
@@ -126,7 +146,7 @@ const DetailsModal: React.FC<DetailsModalProps> = ({
                 </div>
               </div>
               {nights > 0 && (
-                <p style={{ marginTop: 10, fontSize: "0.82rem", fontFamily: "'Josefin Sans', sans-serif", letterSpacing: "0.08em", color: "rgba(212,212,212,0.5)", textTransform: "uppercase" }}>
+                <p style={{ marginTop: 10, fontSize: "0.78rem", fontFamily: "'Josefin Sans', sans-serif", letterSpacing: "0.08em", color: "rgba(255,255,255,0.4)", textTransform: "uppercase" }}>
                   {nights} night{nights !== 1 ? "s" : ""}
                 </p>
               )}
@@ -155,7 +175,7 @@ const DetailsModal: React.FC<DetailsModalProps> = ({
                 >+</button>
               </div>
               {tier && guestCount > tier.baseGuests && (
-                <p style={{ marginTop: 10, fontSize: "0.78rem", fontFamily: "'Josefin Sans', sans-serif", letterSpacing: "0.06em", color: "rgba(201,168,76,0.7)", textTransform: "uppercase" }}>
+                <p style={{ marginTop: 10, fontSize: "0.78rem", fontFamily: "'Josefin Sans', sans-serif", letterSpacing: "0.06em", color: "rgba(255,255,255,0.5)", textTransform: "uppercase" }}>
                   +{guestCount - tier.baseGuests} extra guest{guestCount - tier.baseGuests > 1 ? "s" : ""} added
                 </p>
               )}
@@ -167,7 +187,7 @@ const DetailsModal: React.FC<DetailsModalProps> = ({
             {villa.contactOnly ? (
               <>
                 <h4>Booking</h4>
-                <p style={{ marginBottom: 16, color: "rgba(212,212,212,0.7)", fontSize: "0.95rem", fontFamily: "'Cormorant Garamond', serif", lineHeight: 1.6 }}>
+                <p style={{ marginBottom: 16, color: "#ffffff", fontSize: "0.88rem", fontFamily: "'Josefin Sans', sans-serif", lineHeight: 1.7, letterSpacing: "0.02em" }}>
                   This property is booked directly with the owners. Contact us on WhatsApp to check availability and arrange your stay.
                 </p>
                 <a
