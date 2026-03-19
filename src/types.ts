@@ -19,6 +19,7 @@ export interface Villa {
   amenities?: string[];
   bedrooms?: number;
   bathrooms?: number;
+  contactOnly?: boolean; // if true, show WhatsApp contact instead of online reservation
 }
 
 export interface Reservation {
@@ -94,8 +95,9 @@ export const VILLAS: Villa[] = [
   },
   {
     id: "mango-park-bungalow",
-    name: "Mango Park Bungalow",
+    name: "Mango Villa",
     type: "Bungalow",
+    contactOnly: true,
     maxGuests: 4,
     bedrooms: 2,
     bathrooms: 2,
@@ -129,8 +131,9 @@ export const VILLAS: Villa[] = [
   },
   {
     id: "mango-park-1st-floor",
-    name: "Mango Park 1st Floor",
+    name: "Mango Villa 1st Floor",
     type: "Bungalow",
+    contactOnly: true,
     maxGuests: 4,
     bedrooms: 2,
     bathrooms: 2,
