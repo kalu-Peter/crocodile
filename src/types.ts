@@ -49,6 +49,7 @@ export const VILLAS: Villa[] = [
     id: "blue-villa",
     name: "Blue Villa",
     type: "Villa",
+    bedrooms: 3,
     maxGuests: 8,
     description:
       "A luxurious blue-themed villa sleeping up to 8 guests. Features 3 double beds and 1 sofa bed, modern amenities and stunning water views.",
@@ -61,6 +62,7 @@ export const VILLAS: Villa[] = [
     id: "green-villa",
     name: "Green Villa",
     type: "Villa",
+    bedrooms: 3,
     maxGuests: 8,
     description:
       "A spacious green-themed villa surrounded by lush gardens sleeping up to 8 guests. Features 3 double beds and 1 sofa bed, ideal for groups seeking comfort and nature.",
