@@ -23,13 +23,17 @@ export async function checkAvailability(req, res) {
     return res.status(400).json({ error: "checkout must be after checkin" });
   }
 
-  const { isAvailable, reason } = await isPropertyAvailable(
-    property,
-    checkin,
-    checkout
-  );
-
-  res.json({ available: isAvailable, reason: reason ?? null });
+  try {
+    const { isAvailable, reason } = await isPropertyAvailable(
+      property,
+      checkin,
+      checkout
+    );
+    res.json({ available: isAvailable, reason: reason ?? null });
+  } catch (err) {
+    console.error("[availability] error:", err.message);
+    res.status(500).json({ error: err.message });
+  }
 }
 
 /**

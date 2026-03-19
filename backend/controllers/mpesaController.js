@@ -124,13 +124,22 @@ export async function stkStatus(req, res) {
         CheckoutRequestID: id,
       }),
     });
-    const data = await qRes.json();
-    const code = String(data.ResultCode ?? data.errorCode ?? "");
+
+    const raw = await qRes.text();
+    let data;
+    try { data = JSON.parse(raw); } catch {
+      console.error("[mpesa] status non-JSON response:", raw.slice(0, 200));
+      return res.json({ status: "pending", message: "Awaiting payment confirmation" });
+    }
+
+    console.log("[mpesa] status response:", JSON.stringify(data));
+    const code = String(data.ResultCode ?? data.errorCode ?? data.ResponseCode ?? "");
 
     if (code === "0")    return res.json({ status: "completed" });
     if (code === "1032") return res.json({ status: "cancelled", message: "Payment was cancelled" });
     if (code === "1037") return res.json({ status: "timeout",   message: "Request timed out" });
-    return res.json({ status: "pending", message: data.ResultDesc || "Awaiting payment" });
+    if (code === "1")    return res.json({ status: "pending",   message: "Awaiting payment" });
+    return res.json({ status: "pending", message: data.ResultDesc || data.errorMessage || "Awaiting payment" });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
