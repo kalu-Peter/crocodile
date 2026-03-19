@@ -548,6 +548,47 @@
   margin-bottom: 8px;
 }
 
+/* M-Pesa waiting / failed states */
+.payment-waiting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.mpesa-spinner {
+  width: 52px;
+  height: 52px;
+  border: 4px solid rgba(201,168,76,0.2);
+  border-top-color: #c9a84c;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.waiting-msg {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #c9a84c;
+}
+
+.waiting-sub {
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+.payment-failed {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 30px 20px;
+  text-align: center;
+}
+
 /* Confirmation Page */
 .confirmation-container {
   background: rgba(245, 239, 230, 0.05);
