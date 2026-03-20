@@ -1,29 +1,16 @@
 import React, { useState } from "react";
-import { useParams, useNavigate, Link, useSearchParams } from "react-router-dom";
-import { VILLAS, getVillaPrice } from "../types";
-import { useCurrency } from "../context/CurrencyContext";
+import { useParams, Link } from "react-router-dom";
+import { VILLAS } from "../types";
 import CurrencySelector from "../components/CurrencySelector";
 
 const WA_NUMBER = "254715510119";
 
-function nightsBetween(a: string, b: string) {
-  if (!a || !b) return 0;
-  const diff = new Date(b).getTime() - new Date(a).getTime();
-  return Math.max(0, Math.round(diff / 86400000));
-}
-
 const VillaDetailsPage: React.FC = () => {
   const { villaId } = useParams<{ villaId: string }>();
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const { formatPrice } = useCurrency();
 
   const villa = VILLAS.find((v) => v.id === villaId);
 
   const [activeImg, setActiveImg] = useState(0);
-  const [guestCount, setGuestCount] = useState(1);
-  const [checkin, setCheckin] = useState(searchParams.get("checkin") ?? "");
-  const [checkout, setCheckout] = useState(searchParams.get("checkout") ?? "");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   if (!villa) {
@@ -37,32 +24,11 @@ const VillaDetailsPage: React.FC = () => {
     );
   }
 
-  const price = getVillaPrice(villa.id, guestCount);
-  const tier = villa.pricing[0] ?? null;
-  const nights = nightsBetween(checkin, checkout);
   const images = villa.gallery && villa.gallery.length > 0 ? villa.gallery : [villa.image];
 
   const waLink = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(
     `Hi, I'm interested in booking the ${villa.name}. Could you please provide availability and pricing details?`
   )}`;
-
-  const handleReserve = () => {
-    if (!checkin || !checkout) {
-      alert("Please select check-in and check-out dates.");
-      return;
-    }
-    if (nights <= 0) {
-      alert("Check-out must be after check-in.");
-      return;
-    }
-    if (price === null) {
-      alert(`Sorry, ${villa.name} is not available for ${guestCount} guests.`);
-      return;
-    }
-    navigate(
-      `/reservation?villaId=${villa.id}&guestCount=${guestCount}&price=${price}&checkIn=${checkin}&checkOut=${checkout}`
-    );
-  };
 
   return (
     <>
@@ -170,9 +136,8 @@ const VillaDetailsPage: React.FC = () => {
 
         /* ── BODY GRID ── */
         .vdp-body {
-          max-width: 1200px; margin: 0 auto;
+          max-width: 860px; margin: 0 auto;
           padding: 64px 60px 100px;
-          display: grid; grid-template-columns: 1fr 400px; gap: 64px; align-items: start;
         }
 
         /* back link */
@@ -362,9 +327,6 @@ const VillaDetailsPage: React.FC = () => {
 
         {/* BODY */}
         <div className="vdp-body">
-
-          {/* LEFT — Info */}
-          <div>
             <Link to="/" className="vdp-back">← All villas</Link>
 
             <div className="vdp-section">
@@ -442,80 +404,31 @@ const VillaDetailsPage: React.FC = () => {
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* RIGHT — Booking widget */}
-          <div className="vdp-widget">
-            <div className="vdp-widget-header">
-              <h3>Book This Villa</h3>
-              <div className="vdp-widget-sub">Direct booking — best rate</div>
-            </div>
-
-            <div className="vdp-widget-body">
-              {villa.contactOnly ? (
-                <>
-                  <p style={{ fontFamily: "'Josefin Sans', sans-serif", fontSize: "0.85rem", color: "rgba(10,10,10,0.65)", lineHeight: 1.75, letterSpacing: "0.02em" }}>
-                    This property is booked directly with the owners. Contact us on WhatsApp to check availability and arrange your stay.
-                  </p>
-                  <a
-                    className="btn-reserve-now"
-                    href={waLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ backgroundColor: "#25d366", display: "flex", alignItems: "center", gap: 10, justifyContent: "center" }}
-                  >
-                    <svg width="18" height="18" viewBox="0 0 32 32" fill="white" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M16 0C7.163 0 0 7.163 0 16c0 2.822.737 5.469 2.027 7.773L0 32l8.473-2.007A15.938 15.938 0 0 0 16 32c8.837 0 16-7.163 16-16S24.837 0 16 0zm0 29.333a13.27 13.27 0 0 1-6.77-1.853l-.485-.29-5.027 1.19 1.213-4.903-.317-.503A13.267 13.267 0 0 1 2.667 16C2.667 8.636 8.636 2.667 16 2.667S29.333 8.636 29.333 16 23.364 29.333 16 29.333zm7.27-9.87c-.397-.2-2.352-1.16-2.717-1.293-.364-.133-.63-.2-.896.2-.265.397-1.03 1.293-1.262 1.56-.232.265-.464.298-.86.1-.397-.2-1.676-.617-3.192-1.97-1.18-1.052-1.977-2.352-2.208-2.748-.232-.397-.025-.612.174-.81.179-.178.397-.464.596-.696.2-.232.265-.397.397-.663.133-.265.067-.497-.033-.696-.1-.2-.896-2.16-1.228-2.958-.323-.775-.65-.67-.896-.683l-.763-.013c-.265 0-.696.1-1.06.497-.364.397-1.393 1.36-1.393 3.317s1.427 3.847 1.626 4.113c.2.265 2.807 4.287 6.803 6.013.95.41 1.692.655 2.27.838.953.303 1.82.26 2.506.158.764-.114 2.352-.962 2.683-1.89.33-.928.33-1.724.232-1.89-.1-.165-.364-.265-.762-.464z" />
-                    </svg>
-                    Contact Us on WhatsApp
-                  </a>
-                </>
-              ) : (
-                <>
-                  <div className="vdp-dates">
-                    <div className="vdp-field">
-                      <label>Check In</label>
-                      <input type="date" value={checkin} onChange={(e) => setCheckin(e.target.value)} />
-                    </div>
-                    <div className="vdp-field">
-                      <label>Check Out</label>
-                      <input type="date" value={checkout} onChange={(e) => setCheckout(e.target.value)} />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label style={{ display: "block", fontFamily: "'Josefin Sans', sans-serif", fontSize: "0.58rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(10,10,10,0.45)", marginBottom: 10 }}>Guests</label>
-                    <div className="guest-selector">
-                      <button className="guest-step-btn" onClick={() => setGuestCount((g) => Math.max(1, g - 1))} disabled={guestCount <= 1} aria-label="Remove guest">−</button>
-                      <div className="guest-count-display">{guestCount} <span>{guestCount === 1 ? "guest" : "guests"}</span></div>
-                      <button className="guest-step-btn" onClick={() => setGuestCount((g) => Math.min(villa.maxGuests, g + 1))} disabled={guestCount >= villa.maxGuests} aria-label="Add guest">+</button>
-                    </div>
-                  </div>
-
-                  <div className="price-section">
-                    <h4>Price per night</h4>
-                    <div className="price-display">{price !== null ? formatPrice(price) : "—"}</div>
-                    {nights > 0 && price !== null && (
-                      <div className="price-per-night-label">
-                        {formatPrice(price * nights)} total for {nights} night{nights !== 1 ? "s" : ""}
-                      </div>
-                    )}
-                    {tier && (
-                      <div className="price-breakdown">
-                        <span>Base rate (up to {tier.baseGuests} guests): {formatPrice(tier.basePrice)}</span>
-                        {tier.extraPersonFee > 0 && (
-                          <span>Extra guest: +{formatPrice(tier.extraPersonFee)} / person / night</span>
-                        )}
-                        {tier.extraPersonFee === 0 && (
-                          <span>Max {villa.maxGuests} guest{villa.maxGuests > 1 ? "s" : ""} — no extra charges</span>
-                        )}
-                      </div>
-                    )}
-                    <button className="btn-reserve-now" onClick={handleReserve}>Reserve Now</button>
-                  </div>
-                </>
-              )}
-            </div>
+          {/* Reserve / WhatsApp button */}
+          <div style={{ marginTop: 36 }}>
+            {villa.contactOnly ? (
+              <a
+                className="btn-reserve-now"
+                href={waLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ backgroundColor: "#25d366", display: "flex", alignItems: "center", gap: 10, justifyContent: "center" }}
+              >
+                <svg width="18" height="18" viewBox="0 0 32 32" fill="white" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M16 0C7.163 0 0 7.163 0 16c0 2.822.737 5.469 2.027 7.773L0 32l8.473-2.007A15.938 15.938 0 0 0 16 32c8.837 0 16-7.163 16-16S24.837 0 16 0zm0 29.333a13.27 13.27 0 0 1-6.77-1.853l-.485-.29-5.027 1.19 1.213-4.903-.317-.503A13.267 13.267 0 0 1 2.667 16C2.667 8.636 8.636 2.667 16 2.667S29.333 8.636 29.333 16 23.364 29.333 16 29.333zm7.27-9.87c-.397-.2-2.352-1.16-2.717-1.293-.364-.133-.63-.2-.896.2-.265.397-1.03 1.293-1.262 1.56-.232.265-.464.298-.86.1-.397-.2-1.676-.617-3.192-1.97-1.18-1.052-1.977-2.352-2.208-2.748-.232-.397-.025-.612.174-.81.179-.178.397-.464.596-.696.2-.232.265-.397.397-.663.133-.265.067-.497-.033-.696-.1-.2-.896-2.16-1.228-2.958-.323-.775-.65-.67-.896-.683l-.763-.013c-.265 0-.696.1-1.06.497-.364.397-1.393 1.36-1.393 3.317s1.427 3.847 1.626 4.113c.2.265 2.807 4.287 6.803 6.013.95.41 1.692.655 2.27.838.953.303 1.82.26 2.506.158.764-.114 2.352-.962 2.683-1.89.33-.928.33-1.724.232-1.89-.1-.165-.364-.265-.762-.464z" />
+                </svg>
+                Contact Us on WhatsApp
+              </a>
+            ) : (
+              <Link
+                to={`/reservation?villaId=${villa.id}`}
+                className="btn-reserve-now"
+                style={{ display: "block", textAlign: "center", textDecoration: "none" }}
+              >
+                Reserve Now
+              </Link>
+            )}
           </div>
 
         </div>
