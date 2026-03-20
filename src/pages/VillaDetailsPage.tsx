@@ -28,10 +28,10 @@ const VillaDetailsPage: React.FC = () => {
 
   if (!villa) {
     return (
-      <div style={{ minHeight: "100vh", background: "#0a0a0a", color: "#f0f0f0", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ minHeight: "100vh", background: "#ffffff", color: "#0a0a0a", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <div style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: 20 }}>
           <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: "2rem" }}>Villa not found</h2>
-          <Link to="/" style={{ color: "#c9a84c", fontFamily: "'Josefin Sans', sans-serif", fontSize: "0.8rem", letterSpacing: "0.15em", textTransform: "uppercase" }}>← Back to Home</Link>
+          <Link to="/" style={{ color: "#b8913e", fontFamily: "'Josefin Sans', sans-serif", fontSize: "0.8rem", letterSpacing: "0.15em", textTransform: "uppercase" }}>← Back to Home</Link>
         </div>
       </div>
     );
@@ -82,7 +82,7 @@ const VillaDetailsPage: React.FC = () => {
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
-        body { font-family: 'Cormorant Garamond', serif; background: var(--croc-deep); color: var(--croc-cream); overflow-x: hidden; }
+        body { font-family: 'Cormorant Garamond', serif; background: #ffffff; color: #0a0a0a; overflow-x: hidden; }
 
         nav {
           position: fixed; top: 0; left: 0; right: 0; z-index: 100;
@@ -92,21 +92,21 @@ const VillaDetailsPage: React.FC = () => {
         }
         .nav-logo {
           font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700;
-          letter-spacing: 0.05em; color: var(--croc-cream); text-decoration: none;
+          letter-spacing: 0.05em; color: #f0f0f0; text-decoration: none;
           background: none; border: none; cursor: pointer; padding: 0;
         }
-        .nav-logo span { color: var(--croc-gold); }
+        .nav-logo span { color: #909090; }
         .nav-links { display: flex; gap: 44px; list-style: none; }
         .nav-links a, .nav-links button {
           font-family: 'Josefin Sans', sans-serif; font-size: 0.7rem; font-weight: 300;
-          letter-spacing: 0.2em; text-transform: uppercase; color: var(--croc-cream);
+          letter-spacing: 0.2em; text-transform: uppercase; color: #f0f0f0;
           text-decoration: none; opacity: 0.8; transition: opacity 0.3s, color 0.3s;
           background: none; border: none; cursor: pointer; padding: 0;
         }
-        .nav-links a:hover, .nav-links button:hover { opacity: 1; color: var(--croc-gold); }
+        .nav-links a:hover, .nav-links button:hover { opacity: 1; color: #909090; }
 
         .hamburger { display: none; flex-direction: column; gap: 6px; background: none; border: none; cursor: pointer; padding: 0; z-index: 101; }
-        .hamburger span { width: 24px; height: 2px; background: var(--croc-cream); transition: all 0.3s ease; display: block; }
+        .hamburger span { width: 24px; height: 2px; background: #f0f0f0; transition: all 0.3s ease; display: block; }
         .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(8px, 8px); }
         .hamburger.active span:nth-child(2) { opacity: 0; }
         .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(7px, -7px); }
@@ -119,13 +119,13 @@ const VillaDetailsPage: React.FC = () => {
         .mobile-menu.active { display: flex; }
         .mobile-menu a, .mobile-menu button {
           font-family: 'Josefin Sans', sans-serif; font-size: 1rem; letter-spacing: 0.2em;
-          text-transform: uppercase; color: var(--croc-cream); text-decoration: none;
+          text-transform: uppercase; color: #f0f0f0; text-decoration: none;
           background: none; border: none; cursor: pointer; padding: 0; transition: color 0.3s;
         }
-        .mobile-menu a:hover, .mobile-menu button:hover { color: var(--croc-gold); }
+        .mobile-menu a:hover, .mobile-menu button:hover { color: #909090; }
 
         /* ── VILLA DETAILS PAGE ── */
-        .vdp-page { min-height: 100vh; background: #0a0a0a; padding-top: 90px; }
+        .vdp-page { min-height: 100vh; background: #ffffff; padding-top: 90px; }
 
         .vdp-hero {
           width: 100%; height: 62vh; position: relative; overflow: hidden;
@@ -133,7 +133,7 @@ const VillaDetailsPage: React.FC = () => {
         .vdp-hero img { width: 100%; height: 100%; object-fit: cover; }
         .vdp-hero-overlay {
           position: absolute; inset: 0;
-          background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.75) 100%);
+          background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.72) 100%);
         }
         .vdp-hero-content {
           position: absolute; bottom: 44px; left: 60px; right: 60px;
@@ -144,7 +144,7 @@ const VillaDetailsPage: React.FC = () => {
         }
         .vdp-title {
           font-family: 'Playfair Display', serif; font-size: clamp(2rem, 5vw, 3.8rem);
-          font-weight: 900; color: #f0f0f0; line-height: 1.05; margin-bottom: 14px;
+          font-weight: 900; color: #ffffff; line-height: 1.05; margin-bottom: 14px;
         }
         .vdp-meta {
           display: flex; gap: 22px; flex-wrap: wrap;
@@ -153,20 +153,20 @@ const VillaDetailsPage: React.FC = () => {
         }
 
         /* ── GALLERY ── */
-        .vdp-gallery { background: #050505; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .vdp-gallery { background: #f2f2f2; border-bottom: 1px solid rgba(0,0,0,0.08); }
         .vdp-gallery-main { width: 100%; height: 500px; position: relative; overflow: hidden; }
         .vdp-gallery-main img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s; display: block; }
         .vdp-thumbs {
           display: flex; gap: 6px; padding: 10px 60px; overflow-x: auto;
-          background: #050505; scrollbar-width: thin; scrollbar-color: #333 #050505;
+          background: #f2f2f2; scrollbar-width: thin; scrollbar-color: #ccc #f2f2f2;
         }
         .vdp-thumb {
           flex-shrink: 0; width: 84px; height: 60px; border: 2px solid transparent;
           border-radius: 3px; overflow: hidden; cursor: pointer; padding: 0;
-          background: none; opacity: 0.4; transition: opacity 0.2s, border-color 0.2s;
+          background: none; opacity: 0.5; transition: opacity 0.2s, border-color 0.2s;
         }
         .vdp-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        .vdp-thumb:hover, .vdp-thumb.active { opacity: 1; border-color: #c9a84c; }
+        .vdp-thumb:hover, .vdp-thumb.active { opacity: 1; border-color: #b8913e; }
 
         /* ── BODY GRID ── */
         .vdp-body {
@@ -180,56 +180,117 @@ const VillaDetailsPage: React.FC = () => {
           display: inline-flex; align-items: center; gap: 8px; margin-bottom: 32px;
           font-family: 'Josefin Sans', sans-serif; font-size: 0.62rem;
           letter-spacing: 0.18em; text-transform: uppercase;
-          color: rgba(255,255,255,0.45); text-decoration: none;
+          color: rgba(10,10,10,0.4); text-decoration: none;
           transition: color 0.2s;
         }
-        .vdp-back:hover { color: #c9a84c; }
+        .vdp-back:hover { color: #b8913e; }
 
         .vdp-section { margin-bottom: 44px; }
-        .vdp-section-label {
-          font-family: 'Josefin Sans', sans-serif; font-size: 0.6rem;
-          letter-spacing: 0.28em; text-transform: uppercase; color: #c9a84c;
-          margin-bottom: 16px; display: flex; align-items: center; gap: 14px;
+
+        .vdp-info-header { margin-bottom: 20px; }
+        .vdp-info-name {
+          font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700;
+          color: #0a0a0a; margin-bottom: 10px; line-height: 1.15;
         }
-        .vdp-section-label::after {
-          content: ''; flex: 1; height: 1px; background: rgba(201,168,76,0.18);
+        .vdp-info-stats {
+          display: flex; align-items: center; gap: 0;
+          font-family: 'Josefin Sans', sans-serif; font-size: 0.72rem;
+          letter-spacing: 0.1em; text-transform: uppercase; color: rgba(10,10,10,0.5);
+          flex-wrap: wrap;
         }
+        .vdp-info-stat { display: flex; align-items: center; gap: 6px; }
+        .vdp-info-dot {
+          width: 4px; height: 4px; border-radius: 50%;
+          background: rgba(10,10,10,0.25); margin: 0 12px;
+        }
+
         .vdp-description {
           font-family: 'Cormorant Garamond', serif; font-size: 1.12rem;
-          color: rgba(240,240,240,0.78); line-height: 1.9;
+          color: rgba(10,10,10,0.72); line-height: 1.9; margin-bottom: 32px;
         }
+
+        /* amenities grid */
+        .vdp-amenities { border-top: 1px solid rgba(0,0,0,0.08); padding-top: 28px; }
+        .vdp-amenities-group { margin-bottom: 22px; }
+        .vdp-amenities-group-title {
+          font-family: 'Josefin Sans', sans-serif; font-size: 0.58rem;
+          letter-spacing: 0.22em; text-transform: uppercase; color: rgba(10,10,10,0.4);
+          margin-bottom: 12px;
+        }
+        .vdp-amenities-items {
+          display: flex; flex-wrap: wrap; gap: 10px;
+        }
+        .vdp-amenity-chip {
+          display: flex; align-items: center; gap: 8px;
+          background: #f5f5f5; border: 1px solid rgba(0,0,0,0.08); border-radius: 6px;
+          padding: 8px 14px;
+          font-family: 'Josefin Sans', sans-serif; font-size: 0.72rem;
+          letter-spacing: 0.04em; color: #0a0a0a;
+        }
+        .vdp-amenity-chip svg { flex-shrink: 0; color: #b8913e; }
 
         /* ── BOOKING WIDGET ── */
         .vdp-widget {
           position: sticky; top: 110px;
-          background: #111; border: 1px solid rgba(201,168,76,0.2); border-radius: 10px; overflow: hidden;
+          background: #ffffff; border: 1px solid rgba(0,0,0,0.1);
+          border-radius: 10px; overflow: hidden;
+          box-shadow: 0 4px 30px rgba(0,0,0,0.08);
         }
         .vdp-widget-header {
-          padding: 26px 28px 22px; border-bottom: 1px solid rgba(255,255,255,0.06);
+          padding: 26px 28px 22px; border-bottom: 1px solid rgba(0,0,0,0.08);
+          background: #fafafa;
         }
         .vdp-widget-header h3 {
           font-family: 'Playfair Display', serif; font-size: 1.45rem; font-weight: 700;
-          color: #f0f0f0; margin-bottom: 4px;
+          color: #0a0a0a; margin-bottom: 4px;
         }
         .vdp-widget-sub {
           font-family: 'Josefin Sans', sans-serif; font-size: 0.62rem;
-          letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.3);
+          letter-spacing: 0.14em; text-transform: uppercase; color: rgba(10,10,10,0.35);
         }
         .vdp-widget-body {
           padding: 26px 28px 30px; display: flex; flex-direction: column; gap: 20px;
         }
         .vdp-field label {
           display: block; font-family: 'Josefin Sans', sans-serif; font-size: 0.58rem;
-          letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.38); margin-bottom: 8px;
+          letter-spacing: 0.2em; text-transform: uppercase; color: rgba(10,10,10,0.45); margin-bottom: 8px;
         }
         .vdp-field input {
           width: 100%; padding: 11px 14px;
-          background: rgba(255,255,255,0.04); border: 1px solid rgba(201,168,76,0.2);
+          background: #f9f9f9; border: 1px solid rgba(0,0,0,0.15);
           border-radius: 5px; font-family: 'Cormorant Garamond', serif; font-size: 1rem;
-          color: #f0f0f0; outline: none; transition: border-color 0.2s;
+          color: #0a0a0a; outline: none; transition: border-color 0.2s;
         }
-        .vdp-field input:focus { border-color: #c9a84c; background: rgba(255,255,255,0.07); }
+        .vdp-field input:focus { border-color: #b8913e; background: #ffffff; }
         .vdp-dates { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+        /* guest selector override for light bg */
+        .vdp-page .guest-selector {
+          border: 1px solid rgba(0,0,0,0.18); background: #f9f9f9;
+        }
+        .vdp-page .guest-step-btn { color: #b8913e; }
+        .vdp-page .guest-step-btn:disabled { color: #bbb; }
+        .vdp-page .guest-count-display {
+          color: #0a0a0a;
+          border-left: 1px solid rgba(0,0,0,0.12);
+          border-right: 1px solid rgba(0,0,0,0.12);
+        }
+        .vdp-page .guest-count-display span { color: rgba(10,10,10,0.4); }
+
+        /* price section override for light bg */
+        .vdp-page .price-section {
+          background: #f5f5f5;
+          border: 1px solid rgba(0,0,0,0.1);
+        }
+        .vdp-page .price-section h4 { color: #b8913e !important; }
+        .vdp-page .price-display { color: #b8913e; }
+        .vdp-page .price-per-night-label { color: rgba(10,10,10,0.45); }
+        .vdp-page .price-breakdown {
+          background: rgba(0,0,0,0.03);
+          border: 1px solid rgba(0,0,0,0.07);
+        }
+        .vdp-page .price-breakdown span { color: rgba(10,10,10,0.6); }
+        .vdp-page .unavailable-message { color: rgba(10,10,10,0.55); }
       `}</style>
 
       {/* NAV */}
@@ -307,20 +368,80 @@ const VillaDetailsPage: React.FC = () => {
             <Link to="/" className="vdp-back">← All villas</Link>
 
             <div className="vdp-section">
-              <div className="vdp-section-label">About this property</div>
-              <p className="vdp-description">{villa.description}</p>
-            </div>
-
-            {villa.amenities && villa.amenities.length > 0 && (
-              <div className="vdp-section">
-                <div className="vdp-section-label">Amenities</div>
-                <ul className="amenities-list">
-                  {villa.amenities.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
+              {/* Name + stats header */}
+              <div className="vdp-info-header">
+                <h2 className="vdp-info-name">{villa.name}</h2>
+                <div className="vdp-info-stats">
+                  {villa.bedrooms && (
+                    <span className="vdp-info-stat">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M2 9V5a1 1 0 0 1 1-1h18a1 1 0 0 1 1 1v4"/><path d="M2 9h20v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V9z"/><path d="M10 9V5"/><path d="M2 14h20"/>
+                      </svg>
+                      {villa.bedrooms} Bed{villa.bedrooms > 1 ? "s" : ""}
+                    </span>
+                  )}
+                  {villa.bedrooms && <span className="vdp-info-dot" />}
+                  <span className="vdp-info-stat">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="9" cy="7" r="4"/><path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><path d="M21 21v-2a4 4 0 0 0-3-3.85"/>
+                    </svg>
+                    Up to {villa.maxGuests} guests
+                  </span>
+                </div>
               </div>
-            )}
+
+              {/* Description */}
+              <p className="vdp-description">{villa.description}</p>
+
+              {/* Amenities */}
+              <div className="vdp-amenities">
+                <div className="vdp-amenities-group">
+                  <div className="vdp-amenities-group-title">Pool</div>
+                  <div className="vdp-amenities-items">
+                    <div className="vdp-amenity-chip">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12h2a2 2 0 0 1 2 2 2 2 0 0 0 2 2 2 2 0 0 0 2-2 2 2 0 0 1 2-2 2 2 0 0 1 2 2 2 2 0 0 0 2 2 2 2 0 0 0 2-2 2 2 0 0 1 2-2h2"/><path d="M2 6h2a2 2 0 0 1 2 2 2 2 0 0 0 2 2 2 2 0 0 0 2-2 2 2 0 0 1 2-2 2 2 0 0 1 2 2 2 2 0 0 0 2 2 2 2 0 0 0 2-2 2 2 0 0 1 2-2h2"/><path d="M4 20h16"/></svg>
+                      Swimming pool
+                    </div>
+                  </div>
+                </div>
+
+                <div className="vdp-amenities-group">
+                  <div className="vdp-amenities-group-title">Kitchen &amp; dining</div>
+                  <div className="vdp-amenities-items">
+                    <div className="vdp-amenity-chip">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2v20"/><path d="M18 8a4 4 0 0 0-4-4H6v8h8a4 4 0 0 0 4-4z"/></svg>
+                      Kitchen
+                    </div>
+                  </div>
+                </div>
+
+                <div className="vdp-amenities-group">
+                  <div className="vdp-amenities-group-title">General</div>
+                  <div className="vdp-amenities-items">
+                    <div className="vdp-amenity-chip">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M9 14 4 9l5-5"/><path d="m15 14 5-5-5-5"/><path d="M4 20h16"/></svg>
+                      Air conditioning
+                    </div>
+                    <div className="vdp-amenity-chip">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h3a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H3"/><path d="M21 6h-3a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h3"/><path d="M9 8h6"/><path d="M9 12h6"/><path d="M9 16h6"/></svg>
+                      Washing machine
+                    </div>
+                    <div className="vdp-amenity-chip">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                      Internet
+                    </div>
+                    <div className="vdp-amenity-chip">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="currentColor"/></svg>
+                      Wireless
+                    </div>
+                    <div className="vdp-amenity-chip">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="15" rx="2"/><path d="M17 2H7l-1 5h12z"/></svg>
+                      TV
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* RIGHT — Booking widget */}
@@ -333,7 +454,7 @@ const VillaDetailsPage: React.FC = () => {
             <div className="vdp-widget-body">
               {villa.contactOnly ? (
                 <>
-                  <p style={{ fontFamily: "'Josefin Sans', sans-serif", fontSize: "0.85rem", color: "rgba(255,255,255,0.6)", lineHeight: 1.75, letterSpacing: "0.02em" }}>
+                  <p style={{ fontFamily: "'Josefin Sans', sans-serif", fontSize: "0.85rem", color: "rgba(10,10,10,0.65)", lineHeight: 1.75, letterSpacing: "0.02em" }}>
                     This property is booked directly with the owners. Contact us on WhatsApp to check availability and arrange your stay.
                   </p>
                   <a
@@ -363,7 +484,7 @@ const VillaDetailsPage: React.FC = () => {
                   </div>
 
                   <div>
-                    <label style={{ display: "block", fontFamily: "'Josefin Sans', sans-serif", fontSize: "0.58rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(255,255,255,0.38)", marginBottom: 10 }}>Guests</label>
+                    <label style={{ display: "block", fontFamily: "'Josefin Sans', sans-serif", fontSize: "0.58rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(10,10,10,0.45)", marginBottom: 10 }}>Guests</label>
                     <div className="guest-selector">
                       <button className="guest-step-btn" onClick={() => setGuestCount((g) => Math.max(1, g - 1))} disabled={guestCount <= 1} aria-label="Remove guest">−</button>
                       <div className="guest-count-display">{guestCount} <span>{guestCount === 1 ? "guest" : "guests"}</span></div>
