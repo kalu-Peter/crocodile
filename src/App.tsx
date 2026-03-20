@@ -4,6 +4,7 @@ import Gallery from "./Gallery";
 import ReservationPage from "./pages/ReservationPage";
 import AdminLoginPage from "./pages/AdminLoginPage";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
+import VillaDetailsPage from "./pages/VillaDetailsPage";
 import PageTransition from "./components/PageTransition";
 import { CurrencyProvider } from "./context/CurrencyContext";
 import WhatsAppFloat from "./components/WhatsAppFloat";
@@ -16,6 +17,7 @@ function App() {
         <Routes>
           <Route path="/" element={<CrocodileLodge />} />
           <Route path="/gallery" element={<Gallery />} />
+          <Route path="/villa/:villaId" element={<VillaDetailsPage />} />
           <Route path="/reservation" element={<ReservationPage />} />
           <Route path="/crocodile-admin" element={<AdminLoginPage />} />
           <Route path="/crocodile-admin/dashboard" element={<AdminDashboardPage />} />

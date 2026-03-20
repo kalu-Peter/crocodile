@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import VillaCard from "./components/VillaCard";
-import DetailsModal from "./components/DetailsModal";
 import CurrencySelector from "./components/CurrencySelector";
 import type { Villa } from "./types";
 import { VILLAS, getVillaPrice } from "./types";
@@ -13,8 +12,6 @@ const CrocodileLodge: React.FC = () => {
   const [checkin, setCheckin] = useState<string>("");
   const [checkout, setCheckout] = useState<string>("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
-  const [selectedVilla, setSelectedVilla] = useState<Villa | null>(null);
-  const [showModal, setShowModal] = useState<boolean>(false);
   const [guests, setGuests] = useState<number>(1);
   const [accommodationType, setAccommodationType] = useState<string>("Villa");
 
@@ -103,21 +100,7 @@ const CrocodileLodge: React.FC = () => {
   };
 
   const handleSelectVilla = (villa: Villa) => {
-    setSelectedVilla(villa);
-    setShowModal(true);
-  };
-
-  const handleReserve = (
-    villaId: string,
-    guestCount: number,
-    price: number,
-    checkIn: string,
-    checkOut: string,
-  ) => {
-    setShowModal(false);
-    navigate(
-      `/reservation?villaId=${villaId}&guestCount=${guestCount}&price=${price}&checkIn=${checkIn}&checkOut=${checkOut}`,
-    );
+    navigate(`/villa/${villa.id}?checkin=${checkin}&checkout=${checkout}`);
   };
 
   return (
@@ -1917,17 +1900,6 @@ const CrocodileLodge: React.FC = () => {
           ))}
         </div>
       </section>
-
-      {/* VILLA DETAILS MODAL */}
-      {showModal && selectedVilla && (
-        <DetailsModal
-          villa={selectedVilla}
-          checkInDate={checkin}
-          checkOutDate={checkout}
-          onClose={() => setShowModal(false)}
-          onReserve={handleReserve}
-        />
-      )}
 
       {/* AMENITIES */}
       <section className="amenities-section" id="amenities">
