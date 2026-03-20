@@ -318,14 +318,19 @@ const CrocodileLodge: React.FC = () => {
         .hero-content {
           position: relative;
           z-index: 10;
-          text-align: center;
-          max-width: 900px;
-          padding: 0 40px;
+          width: 100%;
           flex: 1;
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
+          gap: 48px;
+        }
+
+        .hero-title-wrap {
+          text-align: center;
+          max-width: 900px;
+          padding: 0 40px;
         }
 
         .booking-bar-hero {
@@ -626,13 +631,16 @@ const CrocodileLodge: React.FC = () => {
         }
 
         .booking-bar {
-          max-width: 1200px;
+          max-width: 1100px;
           margin: 0 auto;
-          padding: 0 60px;
+          padding: 0;
           display: grid;
           grid-template-columns: 1fr 1fr 1fr 1fr 1fr auto;
           gap: 0;
           background: var(--croc-sand);
+          border-radius: 16px;
+          overflow: hidden;
+          box-shadow: 0 12px 50px rgba(0,0,0,0.35);
         }
 
         .booking-field {
@@ -692,6 +700,7 @@ const CrocodileLodge: React.FC = () => {
           cursor: pointer;
           transition: background 0.3s;
           white-space: nowrap;
+          border-radius: 0 16px 16px 0;
         }
         .booking-submit:hover { background: var(--croc-moss); }
 
@@ -1112,13 +1121,20 @@ const CrocodileLodge: React.FC = () => {
           font-weight: 500;
         }
         
-        .villa-description {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 0.95rem;
-          color: rgba(13, 26, 15, 0.65);
-          line-height: 1.5;
-          margin: 0;
-          flex-grow: 1;
+        .villa-amenity-chips {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+          margin: 4px 0 8px;
+        }
+        .villa-amenity-chip {
+          font-size: 0.75rem;
+          padding: 4px 10px;
+          border-radius: 20px;
+          background: rgba(13, 26, 15, 0.07);
+          color: rgba(13, 26, 15, 0.7);
+          font-family: 'Montserrat', sans-serif;
+          letter-spacing: 0.01em;
         }
         
         .villa-status {
@@ -1183,6 +1199,46 @@ const CrocodileLodge: React.FC = () => {
         .villa-card:hover .villa-card-image img {
           transform: scale(1.05);
         }
+        .card-img-nav {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          background: rgba(0,0,0,0.45);
+          color: #fff;
+          border: none;
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          font-size: 1.2rem;
+          line-height: 1;
+          cursor: pointer;
+          z-index: 2;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: background 0.2s;
+        }
+        .card-img-nav:hover { background: rgba(0,0,0,0.7); }
+        .card-img-prev { left: 8px; }
+        .card-img-next { right: 8px; }
+        .card-img-dots {
+          position: absolute;
+          bottom: 8px;
+          left: 50%;
+          transform: translateX(-50%);
+          display: flex;
+          gap: 5px;
+          z-index: 2;
+        }
+        .card-img-dot {
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.5);
+          cursor: pointer;
+          transition: background 0.2s;
+        }
+        .card-img-dot.active { background: #fff; }
 
         .villa-img-bg {
           height: 380px;
@@ -1579,117 +1635,80 @@ const CrocodileLodge: React.FC = () => {
         /* CONTACT/FOOTER */
         footer {
           background: var(--croc-sand);
-          padding: 100px 60px 50px;
-          border-top: 1px solid rgba(144,144,144,0.15);
+          padding: 36px 60px;
+          border-top: 1px solid rgba(144,144,144,0.2);
         }
 
-        .footer-top {
-          display: grid;
-          grid-template-columns: 2fr 1fr 1fr 1fr;
-          gap: 60px;
+        .footer-main {
           max-width: 1200px;
-          margin: 0 auto 80px;
+          margin: 0 auto;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 32px;
+          flex-wrap: wrap;
+          padding-bottom: 24px;
+          border-bottom: 1px solid rgba(10,10,10,0.1);
+          margin-bottom: 20px;
         }
 
         .footer-logo {
           font-family: 'Playfair Display', serif;
-          font-size: 1.6rem;
+          font-size: 1.2rem;
           font-weight: 900;
           color: var(--croc-deep);
-          margin-bottom: 16px;
+          white-space: nowrap;
         }
         .footer-logo span { color: var(--croc-deep); }
-        .footer-tagline {
-          font-size: 0.95rem;
-          font-style: italic;
-          color: rgba(10,10,10,0.65);
-          line-height: 1.7;
-          margin-bottom: 30px;
-          max-width: 280px;
-        }
 
-        .social-links {
-          display: flex;
-          gap: 14px;
-        }
-        .social-link {
-          width: 38px; height: 38px;
-          border: 1px solid rgba(10,10,10,0.25);
+        .footer-contact-row {
           display: flex;
           align-items: center;
-          justify-content: center;
-          font-size: 0.9rem;
-          text-decoration: none;
-          color: var(--croc-deep);
-          transition: all 0.3s;
+          gap: 28px;
+          flex-wrap: wrap;
         }
-        .social-link:hover { background: var(--croc-deep); color: var(--croc-sand); border-color: var(--croc-deep); }
-
-        .footer-col h4 {
-          font-family: 'Josefin Sans', sans-serif;
-          font-size: 0.65rem;
-          font-weight: 400;
-          letter-spacing: 0.25em;
-          text-transform: uppercase;
-          color: var(--croc-deep);
-          margin-bottom: 24px;
-        }
-
-        .footer-col ul { list-style: none; }
-        .footer-col ul li { margin-bottom: 12px; }
-        .footer-col ul li a {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 0.95rem;
-          color: rgba(10,10,10,0.65);
-          text-decoration: none;
-          transition: color 0.2s;
-        }
-        .footer-col ul li a:hover { color: var(--croc-deep); }
-
         .footer-contact-item {
           display: flex;
-          gap: 12px;
-          margin-bottom: 16px;
-          align-items: flex-start;
+          align-items: center;
+          gap: 7px;
         }
-        .contact-icon {
-          width: 20px;
-          text-align: center;
-          color: var(--croc-deep);
-          flex-shrink: 0;
-          margin-top: 2px;
-          font-size: 0.85rem;
-        }
+        .contact-icon { font-size: 0.78rem; }
         .contact-text {
-          font-size: 0.88rem;
-          color: rgba(10,10,10,0.65);
-          line-height: 1.5;
+          font-family: 'Josefin Sans', sans-serif;
+          font-size: 0.68rem;
+          letter-spacing: 0.04em;
+          color: rgba(10,10,10,0.6);
+          line-height: 1;
         }
+
+        .social-links { display: flex; gap: 10px; }
+        .social-link {
+          width: 32px; height: 32px;
+          border: 1px solid rgba(10,10,10,0.2);
+          display: flex; align-items: center; justify-content: center;
+          text-decoration: none; color: var(--croc-deep); transition: all 0.3s;
+        }
+        .social-link:hover { background: var(--croc-deep); color: var(--croc-sand); border-color: var(--croc-deep); }
 
         .footer-bottom {
           max-width: 1200px;
           margin: 0 auto;
-          padding-top: 40px;
-          border-top: 1px solid rgba(10,10,10,0.15);
           display: flex;
           justify-content: space-between;
           align-items: center;
         }
         .copyright {
           font-family: 'Josefin Sans', sans-serif;
-          font-size: 0.6rem;
+          font-size: 0.58rem;
           letter-spacing: 0.1em;
-          color: rgba(10,10,10,0.5);
+          color: rgba(10,10,10,0.4);
         }
-        .footer-legal {
-          display: flex;
-          gap: 30px;
-        }
+        .footer-legal { display: flex; gap: 24px; }
         .footer-legal a {
           font-family: 'Josefin Sans', sans-serif;
-          font-size: 0.6rem;
+          font-size: 0.58rem;
           letter-spacing: 0.1em;
-          color: rgba(10,10,10,0.5);
+          color: rgba(10,10,10,0.4);
           text-decoration: none;
           transition: color 0.2s;
         }
@@ -1722,7 +1741,7 @@ const CrocodileLodge: React.FC = () => {
           .amenities-grid, .amenities-row2 { grid-template-columns: repeat(3, 1fr); }
           .experience-inner { grid-template-columns: 1fr; }
           .testimonials-grid { grid-template-columns: 1fr 1fr; }
-          .footer-top { grid-template-columns: 1fr 1fr; gap: 40px; }
+          .footer-top { grid-template-columns: 1fr; gap: 40px; }
           .booking-field { padding: 24px 20px; }
         }
 
@@ -1761,9 +1780,6 @@ const CrocodileLodge: React.FC = () => {
           </li>
         </ul>
         <CurrencySelector />
-        <a href="#availability" className="nav-book">
-          Book Direct — Best Rate
-        </a>
         <button
           className={`hamburger ${mobileMenuOpen ? "active" : ""}`}
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -1806,81 +1822,83 @@ const CrocodileLodge: React.FC = () => {
         <div className="hero-gate-overlay"></div>
 
         <div className="hero-content">
-          <h1 className="hero-title">
-            Welcome to
-            <br />
-            <em>Crocodile Lodge</em>
-          </h1>
-        </div>
+          <div className="hero-title-wrap">
+            <h1 className="hero-title">
+              Welcome to
+              <br />
+              <em>Crocodile Lodge</em>
+            </h1>
+          </div>
 
-        {/* BOOKING BAR */}
-        <div className="booking-bar-hero">
-          <div className="booking-bar">
-            <div className="booking-field">
-              <label>Check In</label>
-              <input
-                type="date"
-                value={checkin}
-                onChange={(e) => setCheckin(e.target.value)}
-              />
-            </div>
-            <div className="booking-field">
-              <label>Check Out</label>
-              <input
-                type="date"
-                value={checkout}
-                onChange={(e) => setCheckout(e.target.value)}
-              />
-            </div>
-            <div className="booking-field">
-              <label>Accommodation</label>
-              <select
-                value={accommodationType}
-                onChange={(e) => setAccommodationType(e.target.value)}
-              >
-                <option value="Villa">Villa</option>
-                <option value="Lodge">Lodge</option>
-                <option value="Apartment">Apartment</option>
-                <option value="Bungalow">Bungalow</option>
-              </select>
-            </div>
-            <div className="booking-field">
-              <label>Guests</label>
-              <input
-                type="number"
-                min="1"
-                max={getVillasOfType(accommodationType)[0]?.maxGuests ?? 21}
-                value={guests}
-                onChange={(e) => setGuests(Number(e.target.value))}
-              />
-            </div>
-            <div className="booking-field">
-              <label>Total Price</label>
-              <div
-                style={{
-                  fontFamily: "'Playfair Display', serif",
-                  fontSize: "1.1rem",
-                  color: "var(--croc-deep)",
-                }}
-              >
-                {(() => {
-                  const nights = getNightsCount();
-                  if (nights <= 0) return "—";
-                  const sampleVilla = getVillasOfType(accommodationType)[0];
-                  const ppn = sampleVilla
-                    ? getVillaPrice(sampleVilla.id, guests)
-                    : null;
-                  if (!ppn) return "—";
-                  return formatPrice(ppn * nights);
-                })()}
+          {/* BOOKING BAR */}
+          <div className="booking-bar-hero">
+            <div className="booking-bar">
+              <div className="booking-field">
+                <label>Check In</label>
+                <input
+                  type="date"
+                  value={checkin}
+                  onChange={(e) => setCheckin(e.target.value)}
+                />
               </div>
+              <div className="booking-field">
+                <label>Check Out</label>
+                <input
+                  type="date"
+                  value={checkout}
+                  onChange={(e) => setCheckout(e.target.value)}
+                />
+              </div>
+              <div className="booking-field">
+                <label>Accommodation</label>
+                <select
+                  value={accommodationType}
+                  onChange={(e) => setAccommodationType(e.target.value)}
+                >
+                  <option value="Villa">Villa</option>
+                  <option value="Lodge">Lodge</option>
+                  <option value="Apartment">Apartment</option>
+                  <option value="Bungalow">Bungalow</option>
+                </select>
+              </div>
+              <div className="booking-field">
+                <label>Guests</label>
+                <input
+                  type="number"
+                  min="1"
+                  max={getVillasOfType(accommodationType)[0]?.maxGuests ?? 21}
+                  value={guests}
+                  onChange={(e) => setGuests(Number(e.target.value))}
+                />
+              </div>
+              <div className="booking-field">
+                <label>Total Price</label>
+                <div
+                  style={{
+                    fontFamily: "'Playfair Display', serif",
+                    fontSize: "1.1rem",
+                    color: "var(--croc-deep)",
+                  }}
+                >
+                  {(() => {
+                    const nights = getNightsCount();
+                    if (nights <= 0) return "—";
+                    const sampleVilla = getVillasOfType(accommodationType)[0];
+                    const ppn = sampleVilla
+                      ? getVillaPrice(sampleVilla.id, guests)
+                      : null;
+                    if (!ppn) return "—";
+                    return formatPrice(ppn * nights);
+                  })()}
+                </div>
+              </div>
+              <button
+                className="booking-submit"
+                onClick={handleCheckAvailability}
+              >
+                → Book Now
+              </button>
             </div>
-            <button
-              className="booking-submit"
-              onClick={handleCheckAvailability}
-            >
-              → Book Now
-            </button>
           </div>
         </div>
       </section>
@@ -1888,7 +1906,6 @@ const CrocodileLodge: React.FC = () => {
       {/* VILLAS */}
       <section className="villas-section" id="villas">
         <div className="section-header reveal" style={{ marginBottom: "60px" }}>
-          <div className="section-tag">Our Accommodations</div>
           <h2 className="section-title">Crocodile Stay</h2>
         </div>
 
@@ -1901,225 +1918,17 @@ const CrocodileLodge: React.FC = () => {
         </div>
       </section>
 
-      {/* AMENITIES */}
-      <section className="amenities-section" id="amenities">
-        <div className="section-header reveal">
-          <div className="section-tag">What Awaits You</div>
-          <h2 className="section-title">
-            The <em>Crocodile Villas</em> Experience
-          </h2>
-        </div>
-
-        <div className="amenities-grid reveal">
-          <div className="amenity-card">
-            <div className="amenity-name">Swimming Pool</div>
-            <div className="amenity-desc">
-              Infinity-edge pool overlooking the coastal palms, heated to
-              perfection year-round
-            </div>
-          </div>
-          <div className="amenity-card">
-            <div className="amenity-name">Quiet Ambience</div>
-            <div className="amenity-desc">
-              Surrounded by lush wetlands — the only sounds are birdsong and the
-              tide
-            </div>
-          </div>
-          <div className="amenity-card">
-            <div className="amenity-name">Immaculate Cleanliness</div>
-            <div className="amenity-desc">
-              Daily housekeeping with eco-friendly products and pristine linen
-              standards
-            </div>
-          </div>
-          <div className="amenity-card">
-            <div className="amenity-name">Private Villas</div>
-            <div className="amenity-desc">
-              Standalone villas with full privacy, your own entrance and outdoor
-              space
-            </div>
-          </div>
-        </div>
-
-        <div
-          className="amenities-row2 reveal"
-          style={{ transitionDelay: "0.15s" }}
-        >
-          <div className="amenity-card">
-            <div className="amenity-name">Family Houses</div>
-            <div className="amenity-desc">
-              Spacious multi-room houses designed for large families and group
-              retreats
-            </div>
-          </div>
-          <div className="amenity-card">
-            <div className="amenity-name">Attentive Staff</div>
-            <div className="amenity-desc">
-              A trained team available around the clock for every need, big or
-              small
-            </div>
-          </div>
-          <div className="amenity-card">
-            <div className="amenity-name">Full Amenities</div>
-            <div className="amenity-desc">
-              High-speed WiFi, air conditioning, outdoor kitchen, BBQ, beach
-              equipment
-            </div>
-          </div>
-          <div className="amenity-card">
-            <div className="amenity-name">Wildlife Proximity Bora Bora</div>
-            <div className="amenity-desc">
-              Wake to monitor lizards, exotic birds, and the magic of coastal
-              wetland life
-            </div>
-          </div>
-          <div className="amenity-card">
-            <div className="amenity-name">Laundry &amp; Cleaning Services</div>
-            <div className="amenity-desc">
-              Full laundry and daily cleaning services available throughout your
-              stay
-            </div>
-          </div>
-          <div className="amenity-card">
-            <div className="amenity-name">24hr Solar Power Supply</div>
-            <div className="amenity-desc">
-              Uninterrupted solar-powered electricity around the clock —
-              reliable, clean, and eco-friendly
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* FOOTER */}
       <footer id="contact">
-        <div className="footer-top">
-          <div className="footer-brand">
-            <div className="footer-logo">
-              Croc<span>odile</span> Villas
-            </div>
-            <p className="footer-tagline">
-              A coastal sanctuary where wild Kenya meets the Indian Ocean.
-              Direct bookings always welcome.
-            </p>
-            <div className="social-links">
-              <a
-                href="https://www.facebook.com/share/1CWQwy8KEX/"
-                className="social-link"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Facebook"
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  width="18"
-                  height="18"
-                >
-                  <path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.413c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z" />
-                </svg>
-              </a>
-              <a
-                href="https://www.tiktok.com/@crocodilelodgediani?_r=1&_t=ZS-94XeUr1MiH7"
-                className="social-link"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="TikTok"
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  width="18"
-                  height="18"
-                >
-                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.76a4.85 4.85 0 0 1-1.01-.07z" />
-                </svg>
-              </a>
-              <a
-                href="https://wa.me/254715510119"
-                className="social-link"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="WhatsApp"
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  width="18"
-                  height="18"
-                >
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z" />
-                </svg>
-              </a>
-              <a
-                href="mailto:crocodilelodgediani@gmail.com"
-                className="social-link"
-                aria-label="Email"
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  width="18"
-                  height="18"
-                >
-                  <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z" />
-                </svg>
-              </a>
-            </div>
+        <div className="footer-main">
+          <div className="footer-logo">
+            Croc<span>odile</span> Villas
           </div>
-
-          <div className="footer-col">
-            <h4>Explore</h4>
-            <ul>
-              <li>
-                <a href="#villas">Our Villas</a>
-              </li>
-              <li>
-                <a href="#amenities">Amenities</a>
-              </li>
-              <li>
-                <a href="#availability">Booking</a>
-              </li>
-              <li>
-                <a href="#about">Our Story</a>
-              </li>
-              <li>
-                <a href="#">Gallery</a>
-              </li>
-              <li>
-                <a href="#">Activities</a>
-              </li>
-            </ul>
-          </div>
-
-          <div className="footer-col">
-            <h4>Policies</h4>
-            <ul>
-              <li>
-                <a href="#">Booking Policy</a>
-              </li>
-              <li>
-                <a href="#">Cancellation</a>
-              </li>
-              <li>
-                <a href="#">House Rules</a>
-              </li>
-              <li>
-                <a href="#">Pet Policy</a>
-              </li>
-              <li>
-                <a href="#">Privacy</a>
-              </li>
-            </ul>
-          </div>
-
-          <div className="footer-col">
-            <h4>Contact</h4>
+          <div className="footer-contact-row">
             <div className="footer-contact-item">
               <span className="contact-icon">📍</span>
               <span className="contact-text">
-                Diani Beach Road,
-                <br />
-                Kwale County, Kenya
+                Diani Beach Road, Kwale County, Kenya
               </span>
             </div>
             <div className="footer-contact-item">
@@ -2144,10 +1953,70 @@ const CrocodileLodge: React.FC = () => {
                 </span>
               </a>
             </div>
-            <div className="footer-contact-item">
-              <span className="contact-icon">⏰</span>
-              <span className="contact-text">Reception: 6am – 10pm daily</span>
-            </div>
+          </div>
+          <div className="social-links">
+            <a
+              href="https://www.facebook.com/share/1CWQwy8KEX/"
+              className="social-link"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Facebook"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                width="18"
+                height="18"
+              >
+                <path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.413c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z" />
+              </svg>
+            </a>
+            <a
+              href="https://www.tiktok.com/@crocodilelodgediani?_r=1&_t=ZS-94XeUr1MiH7"
+              className="social-link"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="TikTok"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                width="18"
+                height="18"
+              >
+                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.76a4.85 4.85 0 0 1-1.01-.07z" />
+              </svg>
+            </a>
+            <a
+              href="https://wa.me/254715510119"
+              className="social-link"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="WhatsApp"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                width="18"
+                height="18"
+              >
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z" />
+              </svg>
+            </a>
+            <a
+              href="mailto:crocodilelodgediani@gmail.com"
+              className="social-link"
+              aria-label="Email"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                width="18"
+                height="18"
+              >
+                <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z" />
+              </svg>
+            </a>
           </div>
         </div>
 
@@ -2162,7 +2031,6 @@ const CrocodileLodge: React.FC = () => {
           </div>
         </div>
       </footer>
-
     </>
   );
 };

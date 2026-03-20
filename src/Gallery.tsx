@@ -7,67 +7,211 @@ const Gallery: React.FC = () => {
 
   const galleryData = {
     general: [
-      { src: "/images/crocodile/Maisons Diani-photos-Pierre_Rich-2.jpg", alt: "Crocodile Lodge" },
+      {
+        src: "/images/crocodile/Maisons Diani-photos-Pierre_Rich-2.jpg",
+        alt: "Crocodile Lodge",
+      },
       { src: "/images/crocodile/FB_IMG_1734527214582.jpg", alt: "Lodge View" },
       { src: "/images/crocodile/20250318_171046.jpg", alt: "Property Grounds" },
-      { src: "/images/crocodile/IMG_20241121_135225.jpg", alt: "Lodge Exterior" },
+      {
+        src: "/images/crocodile/IMG_20241121_135225.jpg",
+        alt: "Lodge Exterior",
+      },
       { src: "/images/crocodile/IMG_20241121_135032.jpg", alt: "Common Area" },
       { src: "/images/crocodile/IMG_20240717_131652.jpg", alt: "Garden View" },
-      { src: "/images/crocodile/WhatsApp Image 2026-03-09 at 13.25.32.jpeg", alt: "Poolside" },
-      { src: "/images/crocodile/WhatsApp Image 2026-03-09 at 13.25.33.jpeg", alt: "Pool Area" },
-      { src: "/images/crocodile/WhatsApp Image 2026-03-09 at 13.25.36.jpeg", alt: "Outdoor Space" },
-      { src: "/images/crocodile/WhatsApp Image 2026-03-09 at 13.25.37.jpeg", alt: "Lodge Surroundings" },
-      { src: "/images/crocodile/WhatsApp Image 2026-03-09 at 13.25.52.jpeg", alt: "Tropical Gardens" },
-      { src: "/images/crocodile/WhatsApp Image 2026-03-09 at 13.25.58.jpeg", alt: "Property View" },
-      { src: "/images/crocodile/WhatsApp Image 2026-03-09 at 13.26.32.jpeg", alt: "Grounds" },
-      { src: "/images/crocodile/WhatsApp Image 2026-03-09 at 13.26.36.jpeg", alt: "Lodge Area" },
-      { src: "/images/crocodile/WhatsApp Image 2026-03-09 at 13.26.37.jpeg", alt: "Outdoor Living" },
-      { src: "/images/crocodile/WhatsApp Image 2026-03-09 at 13.26.42.jpeg", alt: "Lodge Entrance" },
+      {
+        src: "/images/crocodile/WhatsApp Image 2026-03-09 at 13.25.32.jpeg",
+        alt: "Poolside",
+      },
+      {
+        src: "/images/crocodile/WhatsApp Image 2026-03-09 at 13.25.33.jpeg",
+        alt: "Pool Area",
+      },
+      {
+        src: "/images/crocodile/WhatsApp Image 2026-03-09 at 13.25.36.jpeg",
+        alt: "Outdoor Space",
+      },
+      {
+        src: "/images/crocodile/WhatsApp Image 2026-03-09 at 13.25.37.jpeg",
+        alt: "Lodge Surroundings",
+      },
+      {
+        src: "/images/crocodile/WhatsApp Image 2026-03-09 at 13.25.52.jpeg",
+        alt: "Tropical Gardens",
+      },
+      {
+        src: "/images/crocodile/WhatsApp Image 2026-03-09 at 13.25.58.jpeg",
+        alt: "Property View",
+      },
+      {
+        src: "/images/crocodile/WhatsApp Image 2026-03-09 at 13.26.32.jpeg",
+        alt: "Grounds",
+      },
+      {
+        src: "/images/crocodile/WhatsApp Image 2026-03-09 at 13.26.36.jpeg",
+        alt: "Lodge Area",
+      },
+      {
+        src: "/images/crocodile/WhatsApp Image 2026-03-09 at 13.26.37.jpeg",
+        alt: "Outdoor Living",
+      },
+      {
+        src: "/images/crocodile/WhatsApp Image 2026-03-09 at 13.26.42.jpeg",
+        alt: "Lodge Entrance",
+      },
       { src: "/images/gate.jpg", alt: "Main Gate" },
       { src: "/images/poolview.jpeg", alt: "Pool View" },
       { src: "/images/IMG-20250728-WA0039.jpg", alt: "General View" },
     ],
     blue: [
-      { src: "/images/crocodile/blue/Maisons Diani-photos-Pierre_Rich-45.jpg", alt: "Blue Villa" },
-      { src: "/images/crocodile/blue/Maisons Diani-photos-Pierre_Rich-37.jpg", alt: "Blue Villa Interior" },
-      { src: "/images/crocodile/blue/IMG-20250728-WA0040.jpg", alt: "Blue Villa Room" },
-      { src: "/images/crocodile/blue/IMG-20250728-WA0036.jpg", alt: "Blue Villa Bedroom" },
-      { src: "/images/crocodile/blue/IMG-20250728-WA0033.jpg", alt: "Blue Villa Living Area" },
-      { src: "/images/crocodile/blue/IMG-20250728-WA0031.jpg", alt: "Blue Villa Exterior" },
-      { src: "/images/crocodile/blue/IMG-20250728-WA0015.jpg", alt: "Blue Villa View" },
-      { src: "/images/crocodile/blue/20241121_140024.jpg", alt: "Blue Villa Space" },
-      { src: "/images/crocodile/blue/20241121_135924.jpg", alt: "Blue Villa Detail" },
-      { src: "/images/crocodile/blue/20241121_135917.jpg", alt: "Blue Villa Area" },
-      { src: "/images/crocodile/blue/20241121_135844.jpg", alt: "Blue Villa Garden" },
+      {
+        src: "/images/crocodile/blue/Maisons Diani-photos-Pierre_Rich-45.jpg",
+        alt: "Blue Villa",
+      },
+      {
+        src: "/images/crocodile/blue/Maisons Diani-photos-Pierre_Rich-37.jpg",
+        alt: "Blue Villa Interior",
+      },
+      {
+        src: "/images/crocodile/blue/IMG-20250728-WA0040.jpg",
+        alt: "Blue Villa Room",
+      },
+      {
+        src: "/images/crocodile/blue/IMG-20250728-WA0036.jpg",
+        alt: "Blue Villa Bedroom",
+      },
+      {
+        src: "/images/crocodile/blue/IMG-20250728-WA0033.jpg",
+        alt: "Blue Villa Living Area",
+      },
+      {
+        src: "/images/crocodile/blue/IMG-20250728-WA0031.jpg",
+        alt: "Blue Villa Exterior",
+      },
+      {
+        src: "/images/crocodile/blue/IMG-20250728-WA0015.jpg",
+        alt: "Blue Villa View",
+      },
+      {
+        src: "/images/crocodile/blue/20241121_140024.jpg",
+        alt: "Blue Villa Space",
+      },
+      {
+        src: "/images/crocodile/blue/20241121_135924.jpg",
+        alt: "Blue Villa Detail",
+      },
+      {
+        src: "/images/crocodile/blue/20241121_135917.jpg",
+        alt: "Blue Villa Area",
+      },
+      {
+        src: "/images/crocodile/blue/20241121_135844.jpg",
+        alt: "Blue Villa Garden",
+      },
     ],
     green: [
-      { src: "/images/crocodile/green/Maisons Diani-photos-Pierre_Rich-38.jpg", alt: "Green Villa" },
-      { src: "/images/crocodile/green/Maisons Diani-photos-Pierre_Rich-42.jpg", alt: "Green Villa Interior" },
-      { src: "/images/crocodile/green/20250803_162422.jpg", alt: "Green Villa Room" },
-      { src: "/images/crocodile/green/IMG-20250728-WA0038.jpg", alt: "Green Villa Bedroom" },
-      { src: "/images/crocodile/green/IMG-20250728-WA0037.jpg", alt: "Green Villa Living Area" },
-      { src: "/images/crocodile/green/IMG-20250728-WA0033.jpg", alt: "Green Villa Exterior" },
-      { src: "/images/crocodile/green/IMG-20250728-WA0032.jpg", alt: "Green Villa Garden" },
-      { src: "/images/crocodile/green/IMG-20250728-WA0024.jpg", alt: "Green Villa View" },
+      {
+        src: "/images/crocodile/green/Maisons Diani-photos-Pierre_Rich-38.jpg",
+        alt: "Green Villa",
+      },
+      {
+        src: "/images/crocodile/green/Maisons Diani-photos-Pierre_Rich-42.jpg",
+        alt: "Green Villa Interior",
+      },
+      {
+        src: "/images/crocodile/green/20250803_162422.jpg",
+        alt: "Green Villa Room",
+      },
+      {
+        src: "/images/crocodile/green/IMG-20250728-WA0038.jpg",
+        alt: "Green Villa Bedroom",
+      },
+      {
+        src: "/images/crocodile/green/IMG-20250728-WA0037.jpg",
+        alt: "Green Villa Living Area",
+      },
+      {
+        src: "/images/crocodile/green/IMG-20250728-WA0033.jpg",
+        alt: "Green Villa Exterior",
+      },
+      {
+        src: "/images/crocodile/green/IMG-20250728-WA0032.jpg",
+        alt: "Green Villa Garden",
+      },
+      {
+        src: "/images/crocodile/green/IMG-20250728-WA0024.jpg",
+        alt: "Green Villa View",
+      },
     ],
     gold: [
-      { src: "/images/crocodile/gold/Maisons Diani-photos-Pierre_Rich-15.jpg", alt: "Gold Lodge" },
-      { src: "/images/crocodile/gold/Maisons Diani-photos-Pierre_Rich-11.jpg", alt: "Gold Lodge Interior" },
-      { src: "/images/crocodile/gold/WhatsApp Image 2026-03-09 at 13.25.46.jpeg", alt: "Gold Lodge Space" },
-      { src: "/images/crocodile/gold/20250803_162410.jpg", alt: "Gold Lodge Room" },
-      { src: "/images/crocodile/gold/20250803_162250.jpg", alt: "Gold Lodge Bedroom" },
-      { src: "/images/crocodile/gold/20250803_162139.jpg", alt: "Gold Lodge Area" },
-      { src: "/images/crocodile/gold/20250803_162136.jpg", alt: "Gold Lodge Living" },
-      { src: "/images/crocodile/gold/20250307_142357.jpg", alt: "Gold Lodge View" },
-      { src: "/images/crocodile/gold/20250307_142209.jpg", alt: "Gold Lodge Detail" },
-      { src: "/images/crocodile/gold/20250307_142205.jpg", alt: "Gold Lodge Exterior" },
-      { src: "/images/crocodile/gold/20250307_142151.jpg", alt: "Gold Lodge Garden" },
-      { src: "/images/crocodile/gold/IMG-20250307-WA0019.jpg", alt: "Gold Lodge Amenity" },
-      { src: "/images/crocodile/gold/IMG-20250307-WA0012.jpg", alt: "Gold Lodge Feature" },
-      { src: "/images/crocodile/gold/IMG_20250226_192834.jpg", alt: "Gold Lodge Evening" },
-      { src: "/images/crocodile/gold/IMG_20250226_134129.jpg", alt: "Gold Lodge Dining" },
-      { src: "/images/crocodile/gold/IMG_20250226_134110.jpg", alt: "Gold Lodge Lounge" },
-      { src: "/images/crocodile/gold/IMG_20250226_132636.jpg", alt: "Gold Lodge Pool" },
+      {
+        src: "/images/crocodile/gold/Maisons Diani-photos-Pierre_Rich-15.jpg",
+        alt: "Gold Lodge",
+      },
+      {
+        src: "/images/crocodile/gold/Maisons Diani-photos-Pierre_Rich-11.jpg",
+        alt: "Gold Lodge Interior",
+      },
+      {
+        src: "/images/crocodile/gold/WhatsApp Image 2026-03-09 at 13.25.46.jpeg",
+        alt: "Gold Lodge Space",
+      },
+      {
+        src: "/images/crocodile/gold/20250803_162410.jpg",
+        alt: "Gold Lodge Room",
+      },
+      {
+        src: "/images/crocodile/gold/20250803_162250.jpg",
+        alt: "Gold Lodge Bedroom",
+      },
+      {
+        src: "/images/crocodile/gold/20250803_162139.jpg",
+        alt: "Gold Lodge Area",
+      },
+      {
+        src: "/images/crocodile/gold/20250803_162136.jpg",
+        alt: "Gold Lodge Living",
+      },
+      {
+        src: "/images/crocodile/gold/20250307_142357.jpg",
+        alt: "Gold Lodge View",
+      },
+      {
+        src: "/images/crocodile/gold/20250307_142209.jpg",
+        alt: "Gold Lodge Detail",
+      },
+      {
+        src: "/images/crocodile/gold/20250307_142205.jpg",
+        alt: "Gold Lodge Exterior",
+      },
+      {
+        src: "/images/crocodile/gold/20250307_142151.jpg",
+        alt: "Gold Lodge Garden",
+      },
+      {
+        src: "/images/crocodile/gold/IMG-20250307-WA0019.jpg",
+        alt: "Gold Lodge Amenity",
+      },
+      {
+        src: "/images/crocodile/gold/IMG-20250307-WA0012.jpg",
+        alt: "Gold Lodge Feature",
+      },
+      {
+        src: "/images/crocodile/gold/IMG_20250226_192834.jpg",
+        alt: "Gold Lodge Evening",
+      },
+      {
+        src: "/images/crocodile/gold/IMG_20250226_134129.jpg",
+        alt: "Gold Lodge Dining",
+      },
+      {
+        src: "/images/crocodile/gold/IMG_20250226_134110.jpg",
+        alt: "Gold Lodge Lounge",
+      },
+      {
+        src: "/images/crocodile/gold/IMG_20250226_132636.jpg",
+        alt: "Gold Lodge Pool",
+      },
     ],
   };
 
@@ -437,9 +581,6 @@ const Gallery: React.FC = () => {
             <a href="/">Contact</a>
           </li>
         </ul>
-        <a href="/" className="nav-book">
-          Book Direct — Best Rate
-        </a>
         <button
           className={`hamburger ${mobileMenuOpen ? "active" : ""}`}
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}

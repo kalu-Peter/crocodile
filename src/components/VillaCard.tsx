@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import type { Villa } from "../types";
 
 interface VillaCardProps {
@@ -27,15 +27,42 @@ const GuestIcon = () => (
 );
 
 const VillaCard: React.FC<VillaCardProps> = ({ villa, onSelectVilla }) => {
+  const images = villa.gallery && villa.gallery.length > 0 ? villa.gallery : [villa.image];
+  const [imgIndex, setImgIndex] = useState(0);
+
   const waMessage = encodeURIComponent(
     `Hi, I'm interested in booking the ${villa.name}. Could you please provide more details?`
   );
   const waLink = `https://wa.me/${WA_NUMBER}?text=${waMessage}`;
 
+  const prev = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setImgIndex((i) => (i - 1 + images.length) % images.length);
+  };
+  const next = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setImgIndex((i) => (i + 1) % images.length);
+  };
+
   return (
-    <div className="villa-card reveal">
-      <div className="villa-card-image">
-        <img src={villa.image} alt={villa.name} />
+    <div className="villa-card reveal" onClick={() => onSelectVilla(villa)} style={{ cursor: "pointer" }}>
+      <div className="villa-card-image" style={{ position: "relative" }}>
+        <img src={images[imgIndex]} alt={villa.name} />
+        {images.length > 1 && (
+          <>
+            <button className="card-img-nav card-img-prev" onClick={prev}>‹</button>
+            <button className="card-img-nav card-img-next" onClick={next}>›</button>
+            <div className="card-img-dots">
+              {images.map((_, i) => (
+                <span
+                  key={i}
+                  className={`card-img-dot${i === imgIndex ? " active" : ""}`}
+                  onClick={(e) => { e.stopPropagation(); setImgIndex(i); }}
+                />
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
       <div className="villa-card-header">
@@ -57,7 +84,13 @@ const VillaCard: React.FC<VillaCardProps> = ({ villa, onSelectVilla }) => {
           </span>
         </div>
 
-        <p className="villa-description">{villa.description}</p>
+        <div className="villa-amenity-chips">
+          <span className="villa-amenity-chip">Pool</span>
+          <span className="villa-amenity-chip">AC</span>
+          <span className="villa-amenity-chip">Kitchen</span>
+          <span className="villa-amenity-chip">WiFi</span>
+          <span className="villa-amenity-chip">Laundry</span>
+        </div>
 
         <div className="villa-status">
           {villa.isAvailable ? (
@@ -83,6 +116,7 @@ const VillaCard: React.FC<VillaCardProps> = ({ villa, onSelectVilla }) => {
               href={waLink}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
               style={{ backgroundColor: "#25d366", display: "flex", alignItems: "center", gap: 7, justifyContent: "center" }}
             >
               <svg width="16" height="16" viewBox="0 0 32 32" fill="white" xmlns="http://www.w3.org/2000/svg">
