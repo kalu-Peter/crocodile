@@ -248,8 +248,8 @@ const Gallery: React.FC = () => {
 
         body {
           font-family: 'Cormorant Garamond', serif;
-          background: var(--croc-deep);
-          color: var(--croc-cream);
+          background: #ffffff;
+          color: #0a0a0a;
           overflow-x: hidden;
         }
 
@@ -408,7 +408,7 @@ const Gallery: React.FC = () => {
         /* GALLERY */
         .gallery-container {
           min-height: 100vh;
-          background: var(--croc-deep);
+          background: #ffffff;
           padding-top: 120px;
           padding-bottom: 80px;
         }
@@ -425,7 +425,7 @@ const Gallery: React.FC = () => {
           font-weight: 300;
           letter-spacing: 0.35em;
           text-transform: uppercase;
-          color: var(--croc-gold);
+          color: rgba(10,10,10,0.45);
           margin-bottom: 20px;
           display: flex;
           align-items: center;
@@ -437,21 +437,21 @@ const Gallery: React.FC = () => {
           display: block;
           width: 50px;
           height: 1px;
-          background: var(--croc-gold);
+          background: rgba(10,10,10,0.2);
         }
         .gallery-eyebrow::after {
           content: '';
           display: block;
           width: 50px;
           height: 1px;
-          background: var(--croc-gold);
+          background: rgba(10,10,10,0.2);
         }
 
         .gallery-title {
           font-family: 'Playfair Display', serif;
           font-size: clamp(2.5rem, 5vw, 4rem);
           font-weight: 900;
-          color: var(--croc-cream);
+          color: #0a0a0a;
           margin-bottom: 40px;
         }
 
@@ -471,22 +471,23 @@ const Gallery: React.FC = () => {
           letter-spacing: 0.2em;
           text-transform: uppercase;
           padding: 14px 28px;
-          border: 1px solid rgba(201,168,76,0.3);
+          border: 1px solid rgba(10,10,10,0.2);
           background: transparent;
-          color: var(--croc-cream);
+          color: #0a0a0a;
           cursor: pointer;
           transition: all 0.3s;
         }
 
         .section-tab.active {
-          background: var(--croc-gold);
-          color: var(--croc-deep);
-          border-color: var(--croc-gold);
+          background: #0a0a0a;
+          color: #ffffff;
+          border-color: #0a0a0a;
         }
 
         .section-tab:hover {
-          border-color: var(--croc-gold);
-          color: var(--croc-gold);
+          border-color: #0a0a0a;
+          color: #0a0a0a;
+          background: rgba(10,10,10,0.06);
         }
 
         /* GALLERY ITEMS */

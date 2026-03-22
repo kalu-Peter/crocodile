@@ -1757,6 +1757,10 @@ const CrocodileLodge: React.FC = () => {
           .nav-links { display: none; }
           .nav-book { display: none; }
           nav { padding: 20px 24px; }
+          .hero-content { align-items: center; padding: 0 16px; }
+          .booking-bar-hero { width: 100%; display: flex; justify-content: center; }
+          .booking-bar { grid-template-columns: 1fr; width: 100%; }
+          .booking-submit { border-radius: 0 0 16px 16px; }
         }
       `}</style>
 
