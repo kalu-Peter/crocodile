@@ -14,6 +14,8 @@ const CrocodileLodge: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [guests, setGuests] = useState<number>(1);
   const [accommodationType, setAccommodationType] = useState<string>("Villa");
+  const [navVisible, setNavVisible] = useState<boolean>(true);
+  const [navScrolled, setNavScrolled] = useState<boolean>(false);
 
   // Set default dates on mount
   useEffect(() => {
@@ -24,6 +26,19 @@ const CrocodileLodge: React.FC = () => {
     const fmt = (d: Date) => d.toISOString().split("T")[0];
     setCheckin(fmt(today));
     setCheckout(fmt(tomorrow));
+  }, []);
+
+  // Nav hide/show on scroll
+  useEffect(() => {
+    let lastY = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      setNavScrolled(y > 80);
+      setNavVisible(y < lastY || y < 80);
+      lastY = y;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   // Scroll Reveal Logic
@@ -145,6 +160,14 @@ const CrocodileLodge: React.FC = () => {
           align-items: center;
           background: linear-gradient(180deg, rgba(10,10,10,0.95) 0%, transparent 100%);
           backdrop-filter: blur(2px);
+          transition: transform 0.35s ease, background 0.35s ease, padding 0.35s ease;
+        }
+        nav.nav-hidden { transform: translateY(-100%); }
+        nav.nav-scrolled {
+          background: rgba(12,12,12,0.97);
+          backdrop-filter: blur(12px);
+          padding: 18px 60px;
+          box-shadow: 0 2px 24px rgba(0,0,0,0.4);
         }
 
         .nav-logo {
@@ -1765,7 +1788,7 @@ const CrocodileLodge: React.FC = () => {
       `}</style>
 
       {/* NAV */}
-      <nav>
+      <nav className={`${navScrolled ? "nav-scrolled" : ""} ${!navVisible ? "nav-hidden" : ""}`}>
         <Link to="/" className="nav-logo">
           Croc<span>odile</span> Lodge
         </Link>

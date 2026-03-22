@@ -213,6 +213,29 @@ const Gallery: React.FC = () => {
         alt: "Gold Lodge Pool",
       },
     ],
+    mango1stfloor: [
+      { src: "/images/mango 1st floor/1st floor 1.jpg", alt: "Mango 1st Floor" },
+      { src: "/images/mango 1st floor/1st floor 2.jpg", alt: "Mango 1st Floor" },
+      { src: "/images/mango 1st floor/1st floor 3.jpg", alt: "Mango 1st Floor" },
+      { src: "/images/mango 1st floor/1st floor 4.jpg", alt: "Mango 1st Floor" },
+      { src: "/images/mango 1st floor/1st floor 5.jpg", alt: "Mango 1st Floor" },
+      { src: "/images/mango 1st floor/1st floor 6.jpg", alt: "Mango 1st Floor" },
+      { src: "/images/mango 1st floor/1st floor 7.jpg", alt: "Mango 1st Floor" },
+      { src: "/images/mango 1st floor/1st floor 8.jpg", alt: "Mango 1st Floor" },
+      { src: "/images/mango 1st floor/1st floor 9.jpg", alt: "Mango 1st Floor" },
+      { src: "/images/mango 1st floor/1st floor 10.jpg", alt: "Mango 1st Floor" },
+    ],
+    mangopark: [
+      { src: "/images/mango park/Maisons Diani-photos-Pierre_Rich-55.jpg", alt: "Mango Park" },
+      { src: "/images/mango park/Maisons Diani-photos-Pierre_Rich-52.jpg", alt: "Mango Park" },
+      { src: "/images/mango park/Maisons Diani-photos-Pierre_Rich-61_BD.jpg", alt: "Mango Park" },
+      { src: "/images/mango park/Maisons Diani-photos-Pierre_Rich-58.jpg", alt: "Mango Park" },
+      { src: "/images/mango park/Maisons Diani-photos-Pierre_Rich-57.jpg", alt: "Mango Park" },
+      { src: "/images/mango park/20250731_100752.jpg", alt: "Mango Park" },
+      { src: "/images/mango park/20250731_100808.jpg", alt: "Mango Park" },
+      { src: "/images/mango park/20250731_100905.jpg", alt: "Mango Park" },
+      { src: "/images/mango park/20250731_101142.jpg", alt: "Mango Park" },
+    ],
   };
 
   const sections = [
@@ -220,6 +243,8 @@ const Gallery: React.FC = () => {
     { id: "blue", label: "Blue Villa", color: "#3b82f6" },
     { id: "green", label: "Green Villa", color: "#10b981" },
     { id: "gold", label: "Gold Lodge", color: "#eab308" },
+    { id: "mango1stfloor", label: "Mango Villas 1st Floor", color: "#f97316" },
+    { id: "mangopark", label: "Mango Villas", color: "#84cc16" },
   ];
 
   return (
