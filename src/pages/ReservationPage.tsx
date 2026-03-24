@@ -26,8 +26,8 @@ const ReservationPage: React.FC = () => {
 
   const villa = VILLAS.find((v) => v.id === villaId);
 
-  const [checkin, setCheckin] = useState(queryParams.get("checkIn") ?? "");
-  const [checkout, setCheckout] = useState(queryParams.get("checkOut") ?? "");
+  const [checkin, setCheckin] = useState(queryParams.get("checkin") ?? queryParams.get("checkIn") ?? "");
+  const [checkout, setCheckout] = useState(queryParams.get("checkout") ?? queryParams.get("checkOut") ?? "");
   const [guestCount, setGuestCount] = useState(Number(queryParams.get("guestCount") ?? 1));
   const [formData, setFormData] = useState({
     firstName: "", lastName: "", email: "",
@@ -48,7 +48,10 @@ const ReservationPage: React.FC = () => {
   const [seasonalPrice, setSeasonalPrice] = useState<number | null>(null);
   const pricePerNight = seasonalPrice ?? basePricePerNight;
   const nights = nightsBetween(checkin, checkout);
-  const total = pricePerNight * nights;
+  const accommodationTotal = pricePerNight * nights;
+  const laundryFee = nights > 0 ? Math.ceil(nights / 3) * 600 : 0;
+  const acFee = nights > 0 ? nights * 1000 * (villa?.bedrooms ?? 1) : 0;
+  const total = accommodationTotal + laundryFee + acFee;
 
   useEffect(() => {
     if (!checkin || !villa) { setSeasonalPrice(null); return; }
@@ -84,6 +87,8 @@ const ReservationPage: React.FC = () => {
           phone: formData.phone,
           email: formData.email,
           total_price: total,
+          laundry_fee: laundryFee,
+          ac_fee: acFee,
         }),
       });
       const data = await res.json();
@@ -367,9 +372,21 @@ const ReservationPage: React.FC = () => {
               <div className="rp-price-title">Price details</div>
               <div className="rp-price-row">
                 <span>{formatPrice(pricePerNight)} × {nights} night{nights !== 1 ? "s" : ""}</span>
-                <span>{formatPrice(total)}</span>
+                <span>{formatPrice(accommodationTotal)}</span>
               </div>
-<div className="rp-price-total">
+              {nights > 0 && (
+                <>
+                  <div className="rp-price-row">
+                    <span>Laundry service ({Math.ceil(nights / 3)} week{Math.ceil(nights / 3) !== 1 ? "s" : ""})</span>
+                    <span>{formatPrice(laundryFee)}</span>
+                  </div>
+                  <div className="rp-price-row">
+                    <span>AC ({villa.bedrooms ?? 1} room{(villa.bedrooms ?? 1) > 1 ? "s" : ""} × {nights} night{nights !== 1 ? "s" : ""})</span>
+                    <span>{formatPrice(acFee)}</span>
+                  </div>
+                </>
+              )}
+              <div className="rp-price-total">
                 <span>Total</span>
                 <span>{formatPrice(total)}</span>
               </div>

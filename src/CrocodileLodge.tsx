@@ -3,17 +3,14 @@ import { Link, useNavigate } from "react-router-dom";
 import VillaCard from "./components/VillaCard";
 import CurrencySelector from "./components/CurrencySelector";
 import type { Villa } from "./types";
-import { VILLAS, getVillaPrice } from "./types";
-import { useCurrency } from "./context/CurrencyContext";
+import { VILLAS } from "./types";
 
 const CrocodileLodge: React.FC = () => {
   const navigate = useNavigate();
-  const { formatPrice } = useCurrency();
   const [checkin, setCheckin] = useState<string>("");
   const [checkout, setCheckout] = useState<string>("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [guests, setGuests] = useState<number>(1);
-  const [accommodationType, setAccommodationType] = useState<string>("Villa");
   const [navVisible, setNavVisible] = useState<boolean>(true);
   const [navScrolled, setNavScrolled] = useState<boolean>(false);
 
@@ -67,51 +64,10 @@ const CrocodileLodge: React.FC = () => {
     );
   };
 
-  const getVillasOfType = (type: string): Villa[] =>
-    VILLAS.filter((v) => v.type === type);
-
-  const handleCheckAvailability = async () => {
-    if (!checkin || !checkout) {
-      alert("Please select check-in and check-out dates.");
-      return;
-    }
-    if (getNightsCount() <= 0) {
-      alert("Check-out date must be after check-in date.");
-      return;
-    }
-    try {
-      const villasOfType = getVillasOfType(accommodationType);
-      let availableVilla: Villa | null = null;
-
-      for (const villa of villasOfType) {
-        const params = new URLSearchParams({
-          property: villa.name,
-          checkin,
-          checkout,
-        });
-        const res = await fetch(`/api/availability?${params}`);
-        if (!res.ok) continue;
-        const data = await res.json();
-        if (data.available) {
-          availableVilla = villa;
-          break;
-        }
-      }
-
-      if (availableVilla) {
-        const pricePerNight = getVillaPrice(availableVilla.id, guests) ?? 0;
-        const totalPrice = pricePerNight * getNightsCount();
-        navigate(
-          `/reservation?villaId=${availableVilla.id}&guestCount=${guests}&price=${totalPrice}&checkIn=${checkin}&checkOut=${checkout}`,
-        );
-      } else {
-        alert(
-          `No ${accommodationType.toLowerCase()} is available for your selected dates. Please try different dates or another accommodation type.`,
-        );
-      }
-    } catch {
-      alert("Could not check availability. Please try again.");
-    }
+  const handleSearch = () => {
+    if (!checkin || !checkout) { alert("Please select check-in and check-out dates."); return; }
+    if (getNightsCount() <= 0) { alert("Check-out must be after check-in."); return; }
+    navigate(`/search?checkin=${checkin}&checkout=${checkout}&guests=${guests}`);
   };
 
   const handleSelectVilla = (villa: Villa) => {
@@ -1877,53 +1833,20 @@ const CrocodileLodge: React.FC = () => {
                 />
               </div>
               <div className="booking-field">
-                <label>Accommodation</label>
-                <select
-                  value={accommodationType}
-                  onChange={(e) => setAccommodationType(e.target.value)}
-                >
-                  <option value="Villa">Villa</option>
-                  <option value="Lodge">Lodge</option>
-                  <option value="Apartment">Apartment</option>
-                  <option value="Bungalow">Bungalow</option>
-                </select>
-              </div>
-              <div className="booking-field">
                 <label>Guests</label>
                 <input
                   type="number"
                   min="1"
-                  max={getVillasOfType(accommodationType)[0]?.maxGuests ?? 21}
+                  max="21"
                   value={guests}
                   onChange={(e) => setGuests(Number(e.target.value))}
                 />
               </div>
-              <div className="booking-field">
-                <label>Total Price</label>
-                <div
-                  style={{
-                    fontFamily: "'Playfair Display', serif",
-                    fontSize: "1.1rem",
-                    color: "var(--croc-deep)",
-                  }}
-                >
-                  {(() => {
-                    const nights = getNightsCount();
-                    if (nights <= 0) return "—";
-                    const sampleVilla = getVillasOfType(accommodationType)[0];
-                    const ppn = sampleVilla
-                      ? getVillaPrice(sampleVilla.id, guests)
-                      : null;
-                    if (!ppn) return "—";
-                    return formatPrice(ppn * nights);
-                  })()}
-                </div>
-              </div>
               <button
                 className="booking-submit"
-                onClick={handleCheckAvailability}
+                onClick={handleSearch}
               >
-                → Book Now
+                Search
               </button>
             </div>
           </div>

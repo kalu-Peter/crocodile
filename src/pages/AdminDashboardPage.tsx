@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { VILLAS } from "../types";
-import type { AdminReservation, BlockedDate, PricingRow, SeasonalPricingRule } from "../types";
+import type { AdminReservation, BlockedDate, SeasonalPricingRule } from "../types";
 
 type Tab = "reservations" | "blocked-dates" | "seasonal-pricing";
 type ResFilter = "all" | "pending" | "confirmed" | "cancelled";
@@ -73,21 +73,6 @@ const AdminDashboardPage: React.FC = () => {
     }
   }, [api, blockPropFilter]);
 
-  // ── Pricing ───────────────────────────────────────────────────────────────
-  const [pricing, setPricing] = useState<PricingRow[]>([]);
-  const [pricingLoading, setPricingLoading] = useState(false);
-  const [editingPrice, setEditingPrice] = useState<{ id: number; value: string } | null>(null);
-  const [pricingSaving, setPricingSaving] = useState<number | null>(null);
-
-  const fetchPricing = useCallback(async () => {
-    setPricingLoading(true);
-    try {
-      const res = await api("/pricing");
-      if (res.ok) setPricing(await res.json());
-    } finally {
-      setPricingLoading(false);
-    }
-  }, [api]);
 
   // ── Seasonal Pricing ──────────────────────────────────────────────────────
   const [seasonalRules, setSeasonalRules] = useState<SeasonalPricingRule[]>([]);
@@ -141,7 +126,7 @@ const AdminDashboardPage: React.FC = () => {
     if (activeTab === "reservations") fetchReservations();
     if (activeTab === "blocked-dates") fetchBlockedDates();
     if (activeTab === "seasonal-pricing") fetchSeasonalPricing(seasonalVilla);
-  }, [activeTab, fetchReservations, fetchBlockedDates, fetchPricing, fetchSeasonalPricing, seasonalVilla]);
+  }, [activeTab, fetchReservations, fetchBlockedDates, fetchSeasonalPricing, seasonalVilla]);
 
   useEffect(() => {
     if (activeTab === "blocked-dates") fetchBlockedDates();
@@ -191,22 +176,6 @@ const AdminDashboardPage: React.FC = () => {
     await fetchBlockedDates();
   };
 
-  const savePricing = async (id: number, value: string) => {
-    const price = parseFloat(value);
-    if (isNaN(price) || price <= 0) return;
-    setPricingSaving(id);
-    try {
-      await api(`/pricing/${id}`, {
-        method: "PUT",
-        body: JSON.stringify({ price }),
-      });
-      await fetchPricing();
-    } finally {
-      setPricingSaving(null);
-      setEditingPrice(null);
-    }
-  };
-
   // ── Derived ───────────────────────────────────────────────────────────────
   const filteredReservations = reservations.filter((r) => {
     const matchProp = resPropFilter === "all" || r.property_name === resPropFilter;
@@ -247,8 +216,8 @@ const AdminDashboardPage: React.FC = () => {
 
         .adm-root {
           min-height: 100vh;
-          background: #0a0a0a;
-          color: #d4d4d4;
+          background: #ffffff;
+          color: #1a1a1a;
           font-family: 'Josefin Sans', sans-serif;
           display: flex;
           flex-direction: column;
@@ -256,8 +225,8 @@ const AdminDashboardPage: React.FC = () => {
 
         /* ── Top bar ── */
         .adm-topbar {
-          background: #141414;
-          border-bottom: 1px solid #282828;
+          background: #ffffff;
+          border-bottom: 1px solid #e8e8e8;
           padding: 0 40px;
           display: flex;
           align-items: center;
@@ -268,10 +237,10 @@ const AdminDashboardPage: React.FC = () => {
         .adm-topbar-logo {
           font-family: 'Playfair Display', serif;
           font-size: 1.1rem;
-          color: #f0f0f0;
+          color: #0a0a0a;
           letter-spacing: 0.04em;
         }
-        .adm-topbar-logo span { color: #909090; }
+        .adm-topbar-logo span { color: #888888; }
         .adm-topbar-right {
           display: flex;
           align-items: center;
@@ -281,27 +250,27 @@ const AdminDashboardPage: React.FC = () => {
           font-size: 0.62rem;
           letter-spacing: 0.2em;
           text-transform: uppercase;
-          color: #505050;
+          color: #aaaaaa;
         }
-        .adm-topbar-user strong { color: #909090; }
+        .adm-topbar-user strong { color: #555555; }
         .adm-logout {
           font-size: 0.6rem;
           letter-spacing: 0.2em;
           text-transform: uppercase;
-          color: #505050;
+          color: #888888;
           background: none;
-          border: 1px solid #282828;
+          border: 1px solid #e0e0e0;
           padding: 7px 16px;
           cursor: pointer;
           transition: color 0.2s, border-color 0.2s;
           font-family: 'Josefin Sans', sans-serif;
         }
-        .adm-logout:hover { color: #f0f0f0; border-color: #505050; }
+        .adm-logout:hover { color: #0a0a0a; border-color: #aaaaaa; }
 
         /* ── Stats ── */
         .adm-stats {
-          background: #141414;
-          border-bottom: 1px solid #1e1e1e;
+          background: #f9f9f9;
+          border-bottom: 1px solid #e8e8e8;
           padding: 24px 40px;
           display: flex;
           gap: 0;
@@ -309,7 +278,7 @@ const AdminDashboardPage: React.FC = () => {
         .adm-stat {
           flex: 1;
           padding: 0 28px 0 0;
-          border-right: 1px solid #282828;
+          border-right: 1px solid #e8e8e8;
           margin-right: 28px;
         }
         .adm-stat:last-child { border-right: none; margin-right: 0; padding-right: 0; }
@@ -317,30 +286,30 @@ const AdminDashboardPage: React.FC = () => {
           font-size: 0.55rem;
           letter-spacing: 0.25em;
           text-transform: uppercase;
-          color: #505050;
+          color: #aaaaaa;
           margin-bottom: 6px;
         }
         .adm-stat-value {
           font-family: 'Playfair Display', serif;
           font-size: 1.8rem;
-          color: #f0f0f0;
+          color: #0a0a0a;
           line-height: 1;
         }
-        .adm-stat-value.accent { color: #909090; }
+        .adm-stat-value.accent { color: #555555; }
 
         /* ── Tabs ── */
         .adm-tabs {
           display: flex;
           gap: 0;
-          border-bottom: 1px solid #282828;
-          background: #0a0a0a;
+          border-bottom: 1px solid #e8e8e8;
+          background: #ffffff;
           padding: 0 40px;
         }
         .adm-tab {
           font-size: 0.6rem;
           letter-spacing: 0.25em;
           text-transform: uppercase;
-          color: #505050;
+          color: #aaaaaa;
           background: none;
           border: none;
           border-bottom: 2px solid transparent;
@@ -349,8 +318,8 @@ const AdminDashboardPage: React.FC = () => {
           font-family: 'Josefin Sans', sans-serif;
           transition: color 0.2s, border-color 0.2s;
         }
-        .adm-tab:hover { color: #d4d4d4; }
-        .adm-tab.active { color: #f0f0f0; border-bottom-color: #909090; }
+        .adm-tab:hover { color: #333333; }
+        .adm-tab.active { color: #0a0a0a; border-bottom-color: #0a0a0a; }
 
         /* ── Content area ── */
         .adm-body { flex: 1; padding: 36px 40px; }
@@ -367,7 +336,7 @@ const AdminDashboardPage: React.FC = () => {
         .adm-section-title {
           font-family: 'Playfair Display', serif;
           font-size: 1.4rem;
-          color: #f0f0f0;
+          color: #0a0a0a;
         }
         .adm-filters {
           display: flex;
@@ -375,9 +344,9 @@ const AdminDashboardPage: React.FC = () => {
           flex-wrap: wrap;
         }
         .adm-select {
-          background: #141414;
-          border: 1px solid #282828;
-          color: #d4d4d4;
+          background: #ffffff;
+          border: 1px solid #e0e0e0;
+          color: #333333;
           font-family: 'Josefin Sans', sans-serif;
           font-size: 0.65rem;
           letter-spacing: 0.1em;
@@ -387,8 +356,8 @@ const AdminDashboardPage: React.FC = () => {
         }
         .adm-filter-btn {
           background: none;
-          border: 1px solid #282828;
-          color: #505050;
+          border: 1px solid #e0e0e0;
+          color: #aaaaaa;
           font-family: 'Josefin Sans', sans-serif;
           font-size: 0.6rem;
           letter-spacing: 0.15em;
@@ -397,8 +366,8 @@ const AdminDashboardPage: React.FC = () => {
           cursor: pointer;
           transition: all 0.2s;
         }
-        .adm-filter-btn:hover { color: #d4d4d4; border-color: #505050; }
-        .adm-filter-btn.active { background: #282828; color: #f0f0f0; border-color: #505050; }
+        .adm-filter-btn:hover { color: #333333; border-color: #aaaaaa; }
+        .adm-filter-btn.active { background: #0a0a0a; color: #ffffff; border-color: #0a0a0a; }
 
         /* ── Table ── */
         .adm-table-wrap { overflow-x: auto; }
@@ -411,21 +380,21 @@ const AdminDashboardPage: React.FC = () => {
           font-size: 0.55rem;
           letter-spacing: 0.25em;
           text-transform: uppercase;
-          color: #505050;
+          color: #aaaaaa;
           text-align: left;
           padding: 12px 14px;
-          border-bottom: 1px solid #282828;
+          border-bottom: 1px solid #e8e8e8;
           white-space: nowrap;
-          background: #0a0a0a;
+          background: #f9f9f9;
         }
         .adm-table td {
           font-size: 0.78rem;
-          color: #d4d4d4;
+          color: #333333;
           padding: 14px 14px;
-          border-bottom: 1px solid #1a1a1a;
+          border-bottom: 1px solid #f0f0f0;
           vertical-align: middle;
         }
-        .adm-table tr:hover td { background: #111; }
+        .adm-table tr:hover td { background: #fafafa; }
         .adm-table tr:last-child td { border-bottom: none; }
 
         /* ── Status badges ── */
@@ -438,12 +407,12 @@ const AdminDashboardPage: React.FC = () => {
           border-radius: 2px;
           font-weight: 400;
         }
-        .badge-confirmed { background: rgba(16,185,129,0.12); color: #10b981; border: 1px solid rgba(16,185,129,0.25); }
-        .badge-pending   { background: rgba(234,179,8,0.12);  color: #eab308; border: 1px solid rgba(234,179,8,0.25); }
-        .badge-cancelled { background: rgba(239,68,68,0.12);  color: #ef4444; border: 1px solid rgba(239,68,68,0.25); }
-        .badge-paid      { background: rgba(16,185,129,0.12); color: #10b981; border: 1px solid rgba(16,185,129,0.25); }
-        .badge-failed    { background: rgba(239,68,68,0.12);  color: #ef4444; border: 1px solid rgba(239,68,68,0.25); }
-        .badge-default   { background: rgba(144,144,144,0.1); color: #909090; border: 1px solid rgba(144,144,144,0.2); }
+        .badge-confirmed { background: rgba(16,185,129,0.1); color: #059669; border: 1px solid rgba(16,185,129,0.25); }
+        .badge-pending   { background: rgba(234,179,8,0.1);  color: #b45309; border: 1px solid rgba(234,179,8,0.25); }
+        .badge-cancelled { background: rgba(239,68,68,0.1);  color: #dc2626; border: 1px solid rgba(239,68,68,0.2); }
+        .badge-paid      { background: rgba(16,185,129,0.1); color: #059669; border: 1px solid rgba(16,185,129,0.25); }
+        .badge-failed    { background: rgba(239,68,68,0.1);  color: #dc2626; border: 1px solid rgba(239,68,68,0.2); }
+        .badge-default   { background: #f5f5f5; color: #888888; border: 1px solid #e0e0e0; }
 
         /* ── Action buttons ── */
         .adm-btn {
@@ -458,14 +427,14 @@ const AdminDashboardPage: React.FC = () => {
           white-space: nowrap;
         }
         .adm-btn:disabled { opacity: 0.35; cursor: not-allowed; }
-        .adm-btn-confirm { background: #10b981; color: #0a0a0a; }
+        .adm-btn-confirm { background: #10b981; color: #ffffff; }
         .adm-btn-confirm:hover:not(:disabled) { opacity: 0.85; }
-        .adm-btn-cancel  { background: #282828; color: #d4d4d4; }
+        .adm-btn-cancel  { background: #f0f0f0; color: #555555; }
         .adm-btn-cancel:hover:not(:disabled)  { background: #ef4444; color: #fff; }
-        .adm-btn-remove  { background: #282828; color: #d4d4d4; }
+        .adm-btn-remove  { background: #f0f0f0; color: #555555; }
         .adm-btn-remove:hover:not(:disabled)  { background: #ef4444; color: #fff; }
-        .adm-btn-save    { background: #909090; color: #0a0a0a; }
-        .adm-btn-save:hover:not(:disabled)    { background: #e0e0e0; }
+        .adm-btn-save    { background: #0a0a0a; color: #ffffff; }
+        .adm-btn-save:hover:not(:disabled)    { background: #333333; }
 
         /* ── Loading / empty ── */
         .adm-loading {
@@ -474,13 +443,13 @@ const AdminDashboardPage: React.FC = () => {
           font-size: 0.65rem;
           letter-spacing: 0.25em;
           text-transform: uppercase;
-          color: #505050;
+          color: #aaaaaa;
         }
 
         /* ── Block date form ── */
         .adm-form-card {
-          background: #141414;
-          border: 1px solid #282828;
+          background: #f9f9f9;
+          border: 1px solid #e8e8e8;
           padding: 28px 32px;
           margin-top: 32px;
         }
@@ -488,7 +457,7 @@ const AdminDashboardPage: React.FC = () => {
           font-size: 0.62rem;
           letter-spacing: 0.25em;
           text-transform: uppercase;
-          color: #909090;
+          color: #888888;
           margin-bottom: 20px;
         }
         .adm-form-row {
@@ -502,13 +471,13 @@ const AdminDashboardPage: React.FC = () => {
           font-size: 0.55rem;
           letter-spacing: 0.2em;
           text-transform: uppercase;
-          color: #505050;
+          color: #aaaaaa;
         }
         .adm-form-field input,
         .adm-form-field select {
-          background: #0a0a0a;
-          border: 1px solid #282828;
-          color: #d4d4d4;
+          background: #ffffff;
+          border: 1px solid #e0e0e0;
+          color: #1a1a1a;
           font-family: 'Josefin Sans', sans-serif;
           font-size: 0.8rem;
           padding: 10px 14px;
@@ -516,21 +485,21 @@ const AdminDashboardPage: React.FC = () => {
           min-width: 160px;
         }
         .adm-form-field input:focus,
-        .adm-form-field select:focus { border-color: #505050; }
+        .adm-form-field select:focus { border-color: #0a0a0a; }
         .adm-form-msg {
           font-size: 0.68rem;
           letter-spacing: 0.05em;
           margin-top: 12px;
           padding: 8px 12px;
         }
-        .adm-form-msg.error { color: #ef4444; background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); }
-        .adm-form-msg.success { color: #10b981; background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.2); }
+        .adm-form-msg.error { color: #dc2626; background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2); }
+        .adm-form-msg.success { color: #059669; background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.2); }
 
         /* ── Price input ── */
         .adm-price-input {
-          background: #0a0a0a;
-          border: 1px solid #909090;
-          color: #f0f0f0;
+          background: #ffffff;
+          border: 1px solid #0a0a0a;
+          color: #0a0a0a;
           font-family: 'Josefin Sans', sans-serif;
           font-size: 0.85rem;
           padding: 6px 10px;
@@ -540,10 +509,10 @@ const AdminDashboardPage: React.FC = () => {
         .adm-price-cell { display: flex; align-items: center; gap: 8px; }
         .adm-price-click {
           cursor: pointer;
-          border-bottom: 1px dashed #505050;
+          border-bottom: 1px dashed #aaaaaa;
           padding-bottom: 1px;
         }
-        .adm-price-click:hover { border-bottom-color: #909090; color: #f0f0f0; }
+        .adm-price-click:hover { border-bottom-color: #0a0a0a; color: #0a0a0a; }
 
         @media (max-width: 768px) {
           .adm-topbar { padding: 0 20px; }
@@ -664,13 +633,13 @@ const AdminDashboardPage: React.FC = () => {
                         const status = r.cancelled ? "cancelled" : r.confirmed ? "confirmed" : "pending";
                         return (
                           <tr key={r.id}>
-                            <td style={{ fontFamily: "monospace", fontSize: "0.7rem", color: "#505050" }}>
+                            <td style={{ fontFamily: "monospace", fontSize: "0.7rem", color: "#aaaaaa" }}>
                               {r.id.slice(0, 8)}…
                             </td>
                             <td>{r.property_name}</td>
                             <td>
                               <div>{r.name}</div>
-                              <div style={{ fontSize: "0.65rem", color: "#505050" }}>{r.email}</div>
+                              <div style={{ fontSize: "0.65rem", color: "#aaaaaa" }}>{r.email}</div>
                             </td>
                             <td>{r.phone}</td>
                             <td style={{ textAlign: "center" }}>{r.guests}</td>
@@ -685,7 +654,7 @@ const AdminDashboardPage: React.FC = () => {
                             <td>
                               <span className={`badge badge-${status}`}>{status}</span>
                             </td>
-                            <td style={{ fontSize: "0.68rem", color: "#505050" }}>
+                            <td style={{ fontSize: "0.68rem", color: "#aaaaaa" }}>
                               {fmt(r.created_at)}
                             </td>
                             <td>
@@ -760,7 +729,7 @@ const AdminDashboardPage: React.FC = () => {
                               {b.reason.replace("_", " ")}
                             </span>
                           </td>
-                          <td style={{ fontSize: "0.68rem", color: "#505050" }}>{fmt(b.created_at)}</td>
+                          <td style={{ fontSize: "0.68rem", color: "#aaaaaa" }}>{fmt(b.created_at)}</td>
                           <td>
                             <button
                               className="adm-btn adm-btn-remove"
@@ -805,7 +774,7 @@ const AdminDashboardPage: React.FC = () => {
                       <select
                         value={blockForm.reason}
                         onChange={(e) => setBlockForm((f) => ({ ...f, reason: e.target.value }))}
-                        style={{ background: "#0a0a0a", border: "1px solid #282828", color: "#d4d4d4", fontFamily: "'Josefin Sans', sans-serif", fontSize: "0.8rem", padding: "10px 14px", outline: "none", minWidth: 160 }}
+                        style={{ background: "#ffffff", border: "1px solid #e0e0e0", color: "#1a1a1a", fontFamily: "'Josefin Sans', sans-serif", fontSize: "0.8rem", padding: "10px 14px", outline: "none", minWidth: 160 }}
                       >
                         <option value="manual_block">Manual Block</option>
                         <option value="maintenance">Maintenance</option>
@@ -865,8 +834,8 @@ const AdminDashboardPage: React.FC = () => {
                           <td>{r.label}</td>
                           <td>{fmt(r.start_date)}</td>
                           <td>{fmt(r.end_date)}</td>
-                          <td style={{ color: "#f0f0f0", fontFamily: "monospace" }}>Ksh {Number(r.price_per_night).toLocaleString()}</td>
-                          <td style={{ fontSize: "0.68rem", color: "#505050" }}>{fmt(r.created_at)}</td>
+                          <td style={{ color: "#0a0a0a", fontFamily: "monospace" }}>Ksh {Number(r.price_per_night).toLocaleString()}</td>
+                          <td style={{ fontSize: "0.68rem", color: "#aaaaaa" }}>{fmt(r.created_at)}</td>
                           <td>
                             <button className="adm-btn adm-btn-remove" onClick={() => deleteSeasonalRule(r.id)}>
                               Delete
