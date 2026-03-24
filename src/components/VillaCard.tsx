@@ -6,7 +6,6 @@ interface VillaCardProps {
   onSelectVilla: (villa: Villa) => void;
 }
 
-const WA_NUMBER = "254715510119";
 
 const BedIcon = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -30,10 +29,6 @@ const VillaCard: React.FC<VillaCardProps> = ({ villa, onSelectVilla }) => {
   const images = villa.gallery && villa.gallery.length > 0 ? villa.gallery : [villa.image];
   const [imgIndex, setImgIndex] = useState(0);
 
-  const waMessage = encodeURIComponent(
-    `Hi, I'm interested in booking the ${villa.name}. Could you please provide more details?`
-  );
-  const waLink = `https://wa.me/${WA_NUMBER}?text=${waMessage}`;
 
   const prev = (e: React.MouseEvent) => {
     e.stopPropagation();
