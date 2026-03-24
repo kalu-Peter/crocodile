@@ -261,3 +261,13 @@ export interface PricingRow {
   max_guests: number;
   price: number;
 }
+
+export interface SeasonalPricingRule {
+  id: number;
+  villa_id: string;
+  label: string;
+  start_date: string;
+  end_date: string;
+  price_per_night: number;
+  created_at: string;
+}

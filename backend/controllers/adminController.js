@@ -130,3 +130,69 @@ export async function updatePricing(req, res) {
 
   res.json({ message: "Pricing updated", pricing: data });
 }
+
+// ─── Seasonal Pricing ─────────────────────────────────────
+
+export async function getSeasonalPricing(req, res) {
+  const { villa_id } = req.query;
+  let query = supabase.from("seasonal_pricing").select("*").order("start_date");
+  if (villa_id) query = query.eq("villa_id", villa_id);
+  const { data, error } = await query;
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
+}
+
+export async function createSeasonalPricing(req, res) {
+  const { villa_id, label, start_date, end_date, price_per_night } = req.body;
+
+  if (!villa_id || !start_date || !end_date || !price_per_night) {
+    return res.status(400).json({ error: "villa_id, start_date, end_date and price_per_night are required" });
+  }
+  if (new Date(end_date) < new Date(start_date)) {
+    return res.status(400).json({ error: "end_date must be on or after start_date" });
+  }
+  if (parseFloat(price_per_night) <= 0) {
+    return res.status(400).json({ error: "price_per_night must be a positive number" });
+  }
+
+  const { data, error } = await supabase
+    .from("seasonal_pricing")
+    .insert({ villa_id, label: label || "Custom Rate", start_date, end_date, price_per_night: parseFloat(price_per_night) })
+    .select()
+    .single();
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.status(201).json({ message: "Seasonal pricing rule created", rule: data });
+}
+
+export async function updateSeasonalPricing(req, res) {
+  const { id } = req.params;
+  const { label, start_date, end_date, price_per_night } = req.body;
+
+  const updates = {};
+  if (label !== undefined) updates.label = label;
+  if (start_date !== undefined) updates.start_date = start_date;
+  if (end_date !== undefined) updates.end_date = end_date;
+  if (price_per_night !== undefined) {
+    if (parseFloat(price_per_night) <= 0) return res.status(400).json({ error: "price_per_night must be positive" });
+    updates.price_per_night = parseFloat(price_per_night);
+  }
+
+  const { data, error } = await supabase
+    .from("seasonal_pricing")
+    .update(updates)
+    .eq("id", id)
+    .select()
+    .single();
+
+  if (error) return res.status(500).json({ error: error.message });
+  if (!data) return res.status(404).json({ error: "Rule not found" });
+  res.json({ message: "Seasonal pricing updated", rule: data });
+}
+
+export async function deleteSeasonalPricing(req, res) {
+  const { id } = req.params;
+  const { error } = await supabase.from("seasonal_pricing").delete().eq("id", id);
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ message: "Seasonal pricing rule deleted" });
+}

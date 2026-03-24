@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { VILLAS } from "../types";
-import type { AdminReservation, BlockedDate, PricingRow } from "../types";
+import type { AdminReservation, BlockedDate, PricingRow, SeasonalPricingRule } from "../types";
 
-type Tab = "reservations" | "blocked-dates" | "pricing";
+type Tab = "reservations" | "blocked-dates" | "seasonal-pricing";
 type ResFilter = "all" | "pending" | "confirmed" | "cancelled";
 
 const PROPERTY_NAMES = VILLAS.map((v) => v.name);
@@ -89,12 +89,59 @@ const AdminDashboardPage: React.FC = () => {
     }
   }, [api]);
 
+  // ── Seasonal Pricing ──────────────────────────────────────────────────────
+  const [seasonalRules, setSeasonalRules] = useState<SeasonalPricingRule[]>([]);
+  const [seasonalLoading, setSeasonalLoading] = useState(false);
+  const [seasonalVilla, setSeasonalVilla] = useState(VILLAS[0].id);
+  const [seasonalForm, setSeasonalForm] = useState({ label: "", start_date: "", end_date: "", price_per_night: "" });
+  const [seasonalError, setSeasonalError] = useState("");
+  const [seasonalSuccess, setSeasonalSuccess] = useState("");
+  const [seasonalSaving, setSeasonalSaving] = useState(false);
+
+  const fetchSeasonalPricing = useCallback(async (villaId: string) => {
+    setSeasonalLoading(true);
+    try {
+      const res = await api(`/seasonal-pricing?villa_id=${encodeURIComponent(villaId)}`);
+      if (res.ok) setSeasonalRules(await res.json());
+    } finally {
+      setSeasonalLoading(false);
+    }
+  }, [api]);
+
+  const submitSeasonalRule = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSeasonalError(""); setSeasonalSuccess("");
+    if (!seasonalForm.start_date || !seasonalForm.end_date || !seasonalForm.price_per_night) {
+      setSeasonalError("Start date, end date and price are required."); return;
+    }
+    setSeasonalSaving(true);
+    try {
+      const res = await api("/seasonal-pricing", {
+        method: "POST",
+        body: JSON.stringify({ villa_id: seasonalVilla, ...seasonalForm, price_per_night: parseFloat(seasonalForm.price_per_night) }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setSeasonalError(data.error ?? "Failed to create rule."); return; }
+      setSeasonalSuccess("Pricing rule added.");
+      setSeasonalForm({ label: "", start_date: "", end_date: "", price_per_night: "" });
+      await fetchSeasonalPricing(seasonalVilla);
+    } finally {
+      setSeasonalSaving(false);
+    }
+  };
+
+  const deleteSeasonalRule = async (id: number) => {
+    if (!window.confirm("Delete this pricing rule?")) return;
+    await api(`/seasonal-pricing/${id}`, { method: "DELETE" });
+    await fetchSeasonalPricing(seasonalVilla);
+  };
+
   // ── Load on tab switch ────────────────────────────────────────────────────
   useEffect(() => {
     if (activeTab === "reservations") fetchReservations();
     if (activeTab === "blocked-dates") fetchBlockedDates();
-    if (activeTab === "pricing") fetchPricing();
-  }, [activeTab, fetchReservations, fetchBlockedDates, fetchPricing]);
+    if (activeTab === "seasonal-pricing") fetchSeasonalPricing(seasonalVilla);
+  }, [activeTab, fetchReservations, fetchBlockedDates, fetchPricing, fetchSeasonalPricing, seasonalVilla]);
 
   useEffect(() => {
     if (activeTab === "blocked-dates") fetchBlockedDates();
@@ -547,7 +594,7 @@ const AdminDashboardPage: React.FC = () => {
 
         {/* Tabs */}
         <div className="adm-tabs">
-          {(["reservations", "blocked-dates", "pricing"] as Tab[]).map((t) => (
+          {(["reservations", "blocked-dates", "seasonal-pricing"] as Tab[]).map((t) => (
             <button
               key={t}
               className={`adm-tab${activeTab === t ? " active" : ""}`}
@@ -775,90 +822,55 @@ const AdminDashboardPage: React.FC = () => {
             </>
           )}
 
-          {/* ── PRICING ───────────────────────────────────── */}
-          {activeTab === "pricing" && (
+          {/* ── SEASONAL PRICING ──────────────────────────── */}
+          {activeTab === "seasonal-pricing" && (
             <>
               <div className="adm-section-head">
-                <div className="adm-section-title">Pricing</div>
+                <div className="adm-section-title">Seasonal Pricing</div>
                 <div className="adm-filters">
-                  <button className="adm-filter-btn" onClick={fetchPricing}>↺ Refresh</button>
+                  <select
+                    className="adm-select"
+                    value={seasonalVilla}
+                    onChange={(e) => { setSeasonalVilla(e.target.value); fetchSeasonalPricing(e.target.value); }}
+                  >
+                    {VILLAS.map((v) => <option key={v.id} value={v.id}>{v.name}</option>)}
+                  </select>
+                  <button className="adm-filter-btn" onClick={() => fetchSeasonalPricing(seasonalVilla)}>↺ Refresh</button>
                 </div>
               </div>
               <div style={{ fontSize: "0.65rem", color: "#505050", letterSpacing: "0.05em", marginBottom: 20 }}>
-                Click on a price to edit it inline. Press Enter or click Save to update.
+                Set date-range prices per villa. When a guest's check-in falls within a range, the seasonal price overrides the base price.
               </div>
 
-              {pricingLoading ? (
-                <div className="adm-loading">Loading pricing…</div>
-              ) : pricing.length === 0 ? (
-                <div className="adm-loading">No pricing records found.</div>
+              {seasonalLoading ? (
+                <div className="adm-loading">Loading rules…</div>
+              ) : seasonalRules.length === 0 ? (
+                <div className="adm-loading">No seasonal pricing rules for this villa.</div>
               ) : (
                 <div className="adm-table-wrap">
                   <table className="adm-table">
                     <thead>
                       <tr>
-                        <th>Property</th>
-                        <th>Min Guests</th>
-                        <th>Max Guests</th>
+                        <th>Label</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
                         <th>Price / Night (Ksh)</th>
+                        <th>Created</th>
                         <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {pricing.map((p) => (
-                        <tr key={p.id}>
-                          <td>{p.property_name}</td>
-                          <td style={{ textAlign: "center" }}>{p.min_guests}</td>
-                          <td style={{ textAlign: "center" }}>{p.max_guests}</td>
+                      {seasonalRules.map((r) => (
+                        <tr key={r.id}>
+                          <td>{r.label}</td>
+                          <td>{fmt(r.start_date)}</td>
+                          <td>{fmt(r.end_date)}</td>
+                          <td style={{ color: "#f0f0f0", fontFamily: "monospace" }}>Ksh {Number(r.price_per_night).toLocaleString()}</td>
+                          <td style={{ fontSize: "0.68rem", color: "#505050" }}>{fmt(r.created_at)}</td>
                           <td>
-                            {editingPrice?.id === p.id ? (
-                              <div className="adm-price-cell">
-                                <input
-                                  className="adm-price-input"
-                                  type="number"
-                                  value={editingPrice.value}
-                                  autoFocus
-                                  onChange={(e) => setEditingPrice({ id: p.id, value: e.target.value })}
-                                  onKeyDown={(e) => {
-                                    if (e.key === "Enter") savePricing(p.id, editingPrice.value);
-                                    if (e.key === "Escape") setEditingPrice(null);
-                                  }}
-                                />
-                              </div>
-                            ) : (
-                              <span
-                                className="adm-price-click"
-                                onClick={() => setEditingPrice({ id: p.id, value: String(p.price) })}
-                              >
-                                Ksh {Number(p.price).toLocaleString()}
-                              </span>
-                            )}
-                          </td>
-                          <td>
-                            {editingPrice?.id === p.id ? (
-                              <div style={{ display: "flex", gap: 8 }}>
-                                <button
-                                  className="adm-btn adm-btn-save"
-                                  disabled={pricingSaving === p.id}
-                                  onClick={() => savePricing(p.id, editingPrice.value)}
-                                >
-                                  {pricingSaving === p.id ? "…" : "Save"}
-                                </button>
-                                <button
-                                  className="adm-btn adm-btn-cancel"
-                                  onClick={() => setEditingPrice(null)}
-                                >
-                                  Cancel
-                                </button>
-                              </div>
-                            ) : (
-                              <button
-                                className="adm-btn adm-btn-cancel"
-                                onClick={() => setEditingPrice({ id: p.id, value: String(p.price) })}
-                              >
-                                Edit
-                              </button>
-                            )}
+                            <button className="adm-btn adm-btn-remove" onClick={() => deleteSeasonalRule(r.id)}>
+                              Delete
+                            </button>
                           </td>
                         </tr>
                       ))}
@@ -866,6 +878,59 @@ const AdminDashboardPage: React.FC = () => {
                   </table>
                 </div>
               )}
+
+              {/* Add rule form */}
+              <div className="adm-form-card">
+                <h3>Add Pricing Rule — {VILLAS.find((v) => v.id === seasonalVilla)?.name}</h3>
+                <form onSubmit={submitSeasonalRule}>
+                  <div className="adm-form-row">
+                    <div className="adm-form-field">
+                      <label>Label (e.g. High Season)</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Easter Holiday"
+                        value={seasonalForm.label}
+                        onChange={(e) => setSeasonalForm((f) => ({ ...f, label: e.target.value }))}
+                      />
+                    </div>
+                    <div className="adm-form-field">
+                      <label>Start Date</label>
+                      <input
+                        type="date"
+                        value={seasonalForm.start_date}
+                        onChange={(e) => setSeasonalForm((f) => ({ ...f, start_date: e.target.value }))}
+                        required
+                      />
+                    </div>
+                    <div className="adm-form-field">
+                      <label>End Date</label>
+                      <input
+                        type="date"
+                        value={seasonalForm.end_date}
+                        min={seasonalForm.start_date}
+                        onChange={(e) => setSeasonalForm((f) => ({ ...f, end_date: e.target.value }))}
+                        required
+                      />
+                    </div>
+                    <div className="adm-form-field">
+                      <label>Price / Night (Ksh)</label>
+                      <input
+                        type="number"
+                        min="1"
+                        placeholder="e.g. 9500"
+                        value={seasonalForm.price_per_night}
+                        onChange={(e) => setSeasonalForm((f) => ({ ...f, price_per_night: e.target.value }))}
+                        required
+                      />
+                    </div>
+                    <button className="adm-btn adm-btn-save" type="submit" disabled={seasonalSaving} style={{ padding: "10px 24px", alignSelf: "flex-end" }}>
+                      {seasonalSaving ? "…" : "Add Rule"}
+                    </button>
+                  </div>
+                  {seasonalError   && <div className="adm-form-msg error">{seasonalError}</div>}
+                  {seasonalSuccess && <div className="adm-form-msg success">{seasonalSuccess}</div>}
+                </form>
+              </div>
             </>
           )}
 

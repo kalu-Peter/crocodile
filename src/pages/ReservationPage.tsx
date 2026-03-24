@@ -44,9 +44,19 @@ const ReservationPage: React.FC = () => {
 
   if (!villa) return null;
 
-  const pricePerNight = getVillaPrice(villa.id, guestCount) ?? 0;
+  const basePricePerNight = getVillaPrice(villa.id, guestCount) ?? 0;
+  const [seasonalPrice, setSeasonalPrice] = useState<number | null>(null);
+  const pricePerNight = seasonalPrice ?? basePricePerNight;
   const nights = nightsBetween(checkin, checkout);
   const total = pricePerNight * nights;
+
+  useEffect(() => {
+    if (!checkin || !villa) { setSeasonalPrice(null); return; }
+    fetch(`/api/seasonal-price?villaId=${encodeURIComponent(villa.id)}&checkin=${checkin}`)
+      .then((r) => r.json())
+      .then((data) => setSeasonalPrice(data.price ?? null))
+      .catch(() => setSeasonalPrice(null));
+  }, [checkin, villa]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;

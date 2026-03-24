@@ -9,6 +9,10 @@ import {
   unblockDate,
   getAllPricing,
   updatePricing,
+  getSeasonalPricing,
+  createSeasonalPricing,
+  updateSeasonalPricing,
+  deleteSeasonalPricing,
 } from "../controllers/adminController.js";
 
 const router = Router();
@@ -29,5 +33,11 @@ router.delete("/block-date/:id", unblockDate);
 // Pricing
 router.get("/pricing",        getAllPricing);
 router.put("/pricing/:id",    updatePricing);
+
+// Seasonal Pricing
+router.get("/seasonal-pricing",           getSeasonalPricing);
+router.post("/seasonal-pricing",          createSeasonalPricing);
+router.put("/seasonal-pricing/:id",       updateSeasonalPricing);
+router.delete("/seasonal-pricing/:id",    deleteSeasonalPricing);
 
 export default router;
