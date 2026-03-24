@@ -65,9 +65,17 @@ const CrocodileLodge: React.FC = () => {
   };
 
   const handleSearch = () => {
-    if (!checkin || !checkout) { alert("Please select check-in and check-out dates."); return; }
-    if (getNightsCount() <= 0) { alert("Check-out must be after check-in."); return; }
-    navigate(`/search?checkin=${checkin}&checkout=${checkout}&guests=${guests}`);
+    if (!checkin || !checkout) {
+      alert("Please select check-in and check-out dates.");
+      return;
+    }
+    if (getNightsCount() <= 0) {
+      alert("Check-out must be after check-in.");
+      return;
+    }
+    navigate(
+      `/search?checkin=${checkin}&checkout=${checkout}&guests=${guests}`,
+    );
   };
 
   const handleSelectVilla = (villa: Villa) => {
@@ -1876,17 +1884,32 @@ const CrocodileLodge: React.FC = () => {
 
       {/* TOP BAR */}
       <div className="topbar">
-        <span className="topbar-item topbar-addr">📍 Diani, Kwale County, Kenya</span>
+        <span className="topbar-item topbar-addr">
+          📍 Diani, Kwale County, Kenya
+        </span>
         <span className="topbar-divider topbar-div-addr" />
-        <a href="tel:+254715510119" className="topbar-item">📞 +254 715 510 119</a>
+        <a href="tel:+254715510119" className="topbar-item">
+          📞 +254 715 510 119
+        </a>
         <span className="topbar-divider" />
-        <a href="mailto:crocodilelodgediani@gmail.com" className="topbar-item">📧 crocodilelodgediani@gmail.com</a>
+        <a href="mailto:crocodilelodgediani@gmail.com" className="topbar-item">
+          📧 crocodilelodgediani@gmail.com
+        </a>
         <span className="topbar-divider topbar-div-maps" />
-        <a href="https://maps.app.goo.gl/tSFjVexSKAK9GiRE7" target="_blank" rel="noopener noreferrer" className="topbar-item topbar-maps">🗺 View on Maps</a>
+        <a
+          href="https://maps.app.goo.gl/tSFjVexSKAK9GiRE7"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="topbar-item topbar-maps"
+        >
+          🗺 View on Maps
+        </a>
       </div>
 
       {/* NAV */}
-      <nav className={`${navScrolled ? "nav-scrolled" : ""} ${!navVisible ? "nav-hidden" : ""}`}>
+      <nav
+        className={`${navScrolled ? "nav-scrolled" : ""} ${!navVisible ? "nav-hidden" : ""}`}
+      >
         <Link to="/" className="nav-logo">
           Croc<span>odile</span> Lodge
         </Link>
@@ -1984,10 +2007,7 @@ const CrocodileLodge: React.FC = () => {
                   onChange={(e) => setGuests(Number(e.target.value))}
                 />
               </div>
-              <button
-                className="booking-submit"
-                onClick={handleSearch}
-              >
+              <button className="booking-submit" onClick={handleSearch}>
                 Search
               </button>
             </div>
@@ -2017,19 +2037,20 @@ const CrocodileLodge: React.FC = () => {
             <div className="location-label">Find Us</div>
             <h2 className="location-title">Our Location</h2>
             <p className="location-desc">
-              Nestled along the pristine shores of Diani Beach, Crocodile Lodge is your perfect coastal retreat.
+              Crocodile Lodge is your perfect coastal retreat.
             </p>
             <div className="location-detail">
               <span className="location-detail-icon">📍</span>
-              <span className="location-detail-text">Diani Beach Road, Kwale County, Kenya<br />Plus Code: JHW3+3J7</span>
+              <span className="location-detail-text">
+                Diani, Kwale County, Kenya
+              </span>
             </div>
-            <div className="location-detail">
-              <span className="location-detail-icon">🏖️</span>
-              <span className="location-detail-text">Steps from Diani Beach — one of East Africa's finest white sand beaches</span>
-            </div>
+
             <div className="location-detail">
               <span className="location-detail-icon">✈️</span>
-              <span className="location-detail-text">~60 km from Moi International Airport, Mombasa</span>
+              <span className="location-detail-text">
+                45 mins - 1.5 hrs drive from Moi International Airport, Mombasa
+              </span>
             </div>
             <a
               href="https://maps.app.goo.gl/tSFjVexSKAK9GiRE7"
@@ -2057,36 +2078,6 @@ const CrocodileLodge: React.FC = () => {
         <div className="footer-main">
           <div className="footer-logo">
             Croc<span>odile</span> Villas
-          </div>
-          <div className="footer-contact-row">
-            <div className="footer-contact-item">
-              <span className="contact-icon">📍</span>
-              <span className="contact-text">
-                Diani Beach Road, Kwale County, Kenya
-              </span>
-            </div>
-            <div className="footer-contact-item">
-              <span className="contact-icon">📞</span>
-              <a
-                href="https://wa.me/254715510119"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ color: "inherit", textDecoration: "none" }}
-              >
-                <span className="contact-text">+254 715 510 119</span>
-              </a>
-            </div>
-            <div className="footer-contact-item">
-              <span className="contact-icon">📧</span>
-              <a
-                href="mailto:crocodilelodgediani@gmail.com"
-                style={{ color: "inherit", textDecoration: "none" }}
-              >
-                <span className="contact-text">
-                  crocodilelodgediani@gmail.com
-                </span>
-              </a>
-            </div>
           </div>
           <div className="social-links">
             <a
