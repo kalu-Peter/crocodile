@@ -9,11 +9,19 @@ export interface Currency {
 export const SUPPORTED_CURRENCIES: Currency[] = [
   { code: "KES", symbol: "Ksh", name: "Kenyan Shilling" },
   { code: "USD", symbol: "$",   name: "US Dollar" },
-  { code: "EUR", symbol: "€",   name: "Euro" },
   { code: "GBP", symbol: "£",   name: "British Pound" },
+  { code: "EUR", symbol: "€",   name: "Euro" },
+  { code: "AUD", symbol: "$",   name: "Australian Dollar" },
+  { code: "BRL", symbol: "R$",  name: "Brazilian Real" },
+  { code: "CAD", symbol: "$",   name: "Canadian Dollar" },
+  { code: "CHF", symbol: "CHF", name: "Swiss Franc" },
+  { code: "CLP", symbol: "$",   name: "Chilean Peso" },
+  { code: "MAD", symbol: "د.م.", name: "Moroccan Dirham" },
+  { code: "MXN", symbol: "$",   name: "Mexican Peso" },
+  { code: "TND", symbol: "د.ت", name: "Tunisian Dinar" },
+  { code: "ZAR", symbol: "R",   name: "South African Rand" },
   { code: "TZS", symbol: "TSh", name: "Tanzanian Shilling" },
   { code: "UGX", symbol: "USh", name: "Ugandan Shilling" },
-  { code: "ZAR", symbol: "R",   name: "South African Rand" },
   { code: "AED", symbol: "د.إ", name: "UAE Dirham" },
   { code: "INR", symbol: "₹",   name: "Indian Rupee" },
 ];
@@ -51,7 +59,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     const rate = rates[currency.code] ?? 1;
     const converted = kes * rate;
     const formatted =
-      currency.code === "KES" || currency.code === "TZS" || currency.code === "UGX"
+      ["KES","TZS","UGX","CLP"].includes(currency.code)
         ? Math.round(converted).toLocaleString()
         : converted.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     return `${currency.symbol} ${formatted}`;

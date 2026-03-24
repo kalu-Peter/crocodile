@@ -19,7 +19,7 @@ const CurrencySelector: React.FC = () => {
       >
         {SUPPORTED_CURRENCIES.map((c) => (
           <option key={c.code} value={c.code}>
-            {c.code} — {c.name}
+            {c.symbol} {c.code}
           </option>
         ))}
       </select>
