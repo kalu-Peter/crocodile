@@ -610,20 +610,20 @@ const CrocodileLodge: React.FC = () => {
         }
 
         .booking-bar {
-          max-width: 1100px;
+          max-width: 860px;
           margin: 0 auto;
           padding: 0;
           display: grid;
-          grid-template-columns: 1fr 1fr 1fr 1fr 1fr auto;
+          grid-template-columns: 1fr 1fr 1fr auto;
           gap: 0;
           background: var(--croc-sand);
-          border-radius: 16px;
+          border-radius: 12px;
           overflow: hidden;
-          box-shadow: 0 12px 50px rgba(0,0,0,0.35);
+          box-shadow: 0 8px 36px rgba(0,0,0,0.32);
         }
 
         .booking-field {
-          padding: 32px 40px;
+          padding: 18px 24px;
           border-right: 1px solid rgba(10,10,10,0.15);
           position: relative;
         }
@@ -631,11 +631,11 @@ const CrocodileLodge: React.FC = () => {
         .booking-field label {
           display: block;
           font-family: 'Josefin Sans', sans-serif;
-          font-size: 0.6rem;
-          letter-spacing: 0.25em;
+          font-size: 0.55rem;
+          letter-spacing: 0.22em;
           text-transform: uppercase;
           color: rgba(10,10,10,0.5);
-          margin-bottom: 8px;
+          margin-bottom: 5px;
         }
 
         .booking-field input, .booking-field select {
@@ -644,7 +644,7 @@ const CrocodileLodge: React.FC = () => {
           border: none;
           outline: none;
           font-family: 'Playfair Display', serif;
-          font-size: 1.1rem;
+          font-size: 0.95rem;
           color: var(--croc-deep);
           cursor: pointer;
         }
@@ -652,15 +652,15 @@ const CrocodileLodge: React.FC = () => {
         .booking-field select option { background: var(--croc-sand); }
 
         .booking-check {
-          padding: 32px 40px;
+          padding: 18px 24px;
           display: flex;
           align-items: center;
-          gap: 16px;
+          gap: 12px;
           cursor: pointer;
         }
         .booking-check span {
           font-family: 'Josefin Sans', sans-serif;
-          font-size: 0.65rem;
+          font-size: 0.6rem;
           letter-spacing: 0.15em;
           text-transform: uppercase;
           color: rgba(10,10,10,0.5);
@@ -670,16 +670,16 @@ const CrocodileLodge: React.FC = () => {
           background: var(--croc-forest);
           color: var(--croc-cream);
           border: none;
-          padding: 0 50px;
+          padding: 0 36px;
           font-family: 'Josefin Sans', sans-serif;
-          font-size: 0.7rem;
+          font-size: 0.65rem;
           font-weight: 400;
           letter-spacing: 0.2em;
           text-transform: uppercase;
           cursor: pointer;
           transition: background 0.3s;
           white-space: nowrap;
-          border-radius: 0 16px 16px 0;
+          border-radius: 0 12px 12px 0;
         }
         .booking-submit:hover { background: var(--croc-moss); }
 
@@ -1711,7 +1711,7 @@ const CrocodileLodge: React.FC = () => {
           .hero-content { padding-left: 6%; }
           .hero-stats { right: 6%; gap: 30px; }
           .booking-bar { grid-template-columns: 1fr 1fr; }
-          .booking-submit { grid-column: span 2; padding: 20px; }
+          .booking-submit { grid-column: span 2; padding: 16px; }
           .booking-bar .booking-field:last-of-type { grid-column: span 2; }
           .booking-result-section { padding: 80px 24px; }
           .price-summary { padding: 24px; }
@@ -1721,7 +1721,7 @@ const CrocodileLodge: React.FC = () => {
           .experience-inner { grid-template-columns: 1fr; }
           .testimonials-grid { grid-template-columns: 1fr 1fr; }
           .footer-top { grid-template-columns: 1fr; gap: 40px; }
-          .booking-field { padding: 24px 20px; }
+          .booking-field { padding: 16px 18px; }
         }
 
         @media (max-width: 600px) {
