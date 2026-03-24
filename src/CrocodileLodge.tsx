@@ -105,10 +105,48 @@ const CrocodileLodge: React.FC = () => {
           overflow-x: hidden;
         }
 
+        /* TOP BAR */
+        .topbar {
+          position: fixed;
+          top: 0; left: 0; right: 0;
+          z-index: 101;
+          height: 42px;
+          background: #fff;
+          border-bottom: 1px solid rgba(0,0,0,0.1);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 28px;
+          padding: 0 40px;
+        }
+        .topbar-item {
+          display: flex;
+          align-items: center;
+          gap: 7px;
+          font-family: 'Josefin Sans', sans-serif;
+          font-size: 0.72rem;
+          letter-spacing: 0.08em;
+          color: rgba(10,10,10,0.55);
+          text-decoration: none;
+          white-space: nowrap;
+          transition: color 0.2s;
+        }
+        .topbar-item:hover { color: #0a0a0a; }
+        .topbar-divider { width: 1px; height: 14px; background: rgba(0,0,0,0.15); }
+        @media (max-width: 768px) {
+          .topbar { gap: 14px; padding: 0 16px; }
+          .topbar-item { font-size: 0.65rem; }
+          .topbar-item.topbar-addr { display: none; }
+        }
+        @media (max-width: 480px) {
+          .topbar-item.topbar-maps { display: none; }
+          .topbar-divider.topbar-div-maps { display: none; }
+        }
+
         /* NAV */
         nav {
           position: fixed;
-          top: 0; left: 0; right: 0;
+          top: 42px; left: 0; right: 0;
           z-index: 100;
           padding: 28px 60px;
           display: flex;
@@ -1611,6 +1649,99 @@ const CrocodileLodge: React.FC = () => {
           margin-bottom: 14px;
         }
 
+        /* LOCATION MAP */
+        .location-section {
+          background: var(--croc-cream);
+          padding: 100px 60px;
+        }
+        .location-inner {
+          max-width: 1200px;
+          margin: 0 auto;
+          display: grid;
+          grid-template-columns: 1fr 1.6fr;
+          gap: 60px;
+          align-items: center;
+        }
+        .location-label {
+          font-family: 'Josefin Sans', sans-serif;
+          font-size: 0.6rem;
+          letter-spacing: 0.3em;
+          text-transform: uppercase;
+          color: var(--croc-moss);
+          margin-bottom: 16px;
+        }
+        .location-title {
+          font-family: 'Playfair Display', serif;
+          font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+          font-weight: 700;
+          color: var(--croc-deep);
+          line-height: 1.15;
+          margin-bottom: 24px;
+        }
+        .location-desc {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 1.05rem;
+          color: rgba(10,10,10,0.6);
+          line-height: 1.8;
+          margin-bottom: 32px;
+        }
+        .location-detail {
+          display: flex;
+          align-items: flex-start;
+          gap: 12px;
+          margin-bottom: 14px;
+        }
+        .location-detail-icon {
+          font-size: 0.9rem;
+          margin-top: 2px;
+          flex-shrink: 0;
+        }
+        .location-detail-text {
+          font-family: 'Josefin Sans', sans-serif;
+          font-size: 0.72rem;
+          letter-spacing: 0.06em;
+          color: rgba(10,10,10,0.65);
+          line-height: 1.6;
+        }
+        .location-directions-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          margin-top: 28px;
+          padding: 14px 28px;
+          background: var(--croc-forest);
+          color: var(--croc-cream);
+          font-family: 'Josefin Sans', sans-serif;
+          font-size: 0.65rem;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+          text-decoration: none;
+          border-radius: 6px;
+          transition: background 0.3s;
+        }
+        .location-directions-btn:hover { background: var(--croc-moss); }
+        .location-map {
+          border-radius: 16px;
+          overflow: hidden;
+          box-shadow: 0 16px 60px rgba(0,0,0,0.15);
+          height: 420px;
+        }
+        .location-map iframe {
+          width: 100%;
+          height: 100%;
+          border: none;
+          display: block;
+        }
+        @media (max-width: 1024px) {
+          .location-section { padding: 80px 30px; }
+          .location-inner { grid-template-columns: 1fr; gap: 40px; }
+          .location-map { height: 320px; }
+        }
+        @media (max-width: 600px) {
+          .location-section { padding: 60px 24px; }
+          .location-map { height: 260px; border-radius: 10px; }
+        }
+
         /* CONTACT/FOOTER */
         footer {
           background: var(--croc-sand);
@@ -1743,6 +1874,17 @@ const CrocodileLodge: React.FC = () => {
         }
       `}</style>
 
+      {/* TOP BAR */}
+      <div className="topbar">
+        <span className="topbar-item topbar-addr">📍 Diani, Kwale County, Kenya</span>
+        <span className="topbar-divider topbar-div-addr" />
+        <a href="tel:+254715510119" className="topbar-item">📞 +254 715 510 119</a>
+        <span className="topbar-divider" />
+        <a href="mailto:crocodilelodgediani@gmail.com" className="topbar-item">📧 crocodilelodgediani@gmail.com</a>
+        <span className="topbar-divider topbar-div-maps" />
+        <a href="https://maps.app.goo.gl/tSFjVexSKAK9GiRE7" target="_blank" rel="noopener noreferrer" className="topbar-item topbar-maps">🗺 View on Maps</a>
+      </div>
+
       {/* NAV */}
       <nav className={`${navScrolled ? "nav-scrolled" : ""} ${!navVisible ? "nav-hidden" : ""}`}>
         <Link to="/" className="nav-logo">
@@ -1865,6 +2007,48 @@ const CrocodileLodge: React.FC = () => {
               <VillaCard villa={villa} onSelectVilla={handleSelectVilla} />
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* LOCATION */}
+      <section className="location-section">
+        <div className="location-inner">
+          <div>
+            <div className="location-label">Find Us</div>
+            <h2 className="location-title">Our Location</h2>
+            <p className="location-desc">
+              Nestled along the pristine shores of Diani Beach, Crocodile Lodge is your perfect coastal retreat.
+            </p>
+            <div className="location-detail">
+              <span className="location-detail-icon">📍</span>
+              <span className="location-detail-text">Diani Beach Road, Kwale County, Kenya<br />Plus Code: JHW3+3J7</span>
+            </div>
+            <div className="location-detail">
+              <span className="location-detail-icon">🏖️</span>
+              <span className="location-detail-text">Steps from Diani Beach — one of East Africa's finest white sand beaches</span>
+            </div>
+            <div className="location-detail">
+              <span className="location-detail-icon">✈️</span>
+              <span className="location-detail-text">~60 km from Moi International Airport, Mombasa</span>
+            </div>
+            <a
+              href="https://maps.app.goo.gl/tSFjVexSKAK9GiRE7"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="location-directions-btn"
+            >
+              Get Directions →
+            </a>
+          </div>
+          <div className="location-map">
+            <iframe
+              title="Crocodile Lodge Location"
+              src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d3978.2948503175276!2d39.5494013!3d-4.3556933!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x18404f0031034e99%3A0xa1696bc658b00344!2scrocodile%20lodge!5e0!3m2!1sen!2ske!4v1774341398801!5m2!1sen!2ske"
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </div>
         </div>
       </section>
 
