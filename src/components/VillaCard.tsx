@@ -87,13 +87,6 @@ const VillaCard: React.FC<VillaCardProps> = ({ villa, onSelectVilla }) => {
           <span className="villa-amenity-chip">Laundry</span>
         </div>
 
-        <div className="villa-status">
-          {villa.isAvailable ? (
-            <span className="status-available">✓ Available</span>
-          ) : (
-            <span className="status-unavailable">✗ Unavailable</span>
-          )}
-        </div>
 
         <div className="villa-card-buttons">
           <span
