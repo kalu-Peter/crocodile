@@ -136,7 +136,7 @@ const AdminDashboardPage: React.FC = () => {
   const confirmReservation = async (id: string) => {
     setActionLoading(id + "-confirm");
     try {
-      await api(`/reservations/${id}/confirm`, { method: "PUT" });
+      await api(`/reservations/${id}`, { method: "PUT", body: JSON.stringify({ action: "confirm" }) });
       await fetchReservations();
     } finally {
       setActionLoading(null);
@@ -147,7 +147,7 @@ const AdminDashboardPage: React.FC = () => {
     if (!window.confirm("Cancel this reservation?")) return;
     setActionLoading(id + "-cancel");
     try {
-      await api(`/reservations/${id}/cancel`, { method: "PUT" });
+      await api(`/reservations/${id}`, { method: "PUT", body: JSON.stringify({ action: "cancel" }) });
       await fetchReservations();
     } finally {
       setActionLoading(null);
@@ -156,7 +156,7 @@ const AdminDashboardPage: React.FC = () => {
 
   const unblockDate = async (id: number) => {
     if (!window.confirm("Unblock this date?")) return;
-    await api(`/block-date/${id}`, { method: "DELETE" });
+    await api(`/blocked-dates/${id}`, { method: "DELETE" });
     await fetchBlockedDates();
   };
 
@@ -165,7 +165,7 @@ const AdminDashboardPage: React.FC = () => {
     setBlockError("");
     setBlockSuccess("");
     if (!blockForm.blocked_date) { setBlockError("Please select a date."); return; }
-    const res = await api("/block-date", {
+    const res = await api("/blocked-dates", {
       method: "POST",
       body: JSON.stringify(blockForm),
     });
