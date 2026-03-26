@@ -236,15 +236,23 @@ const SearchResultsPage: React.FC = () => {
                         <div className="sr-card-price-total">{formatPrice(totalBase)} for {nights} night{nights !== 1 ? "s" : ""}</div>
                       )}
                     </div>
-                    {available ? (
-                      <button className="sr-btn-reserve" onClick={() => handleReserve(villa.id)}>
-                        Reserve
-                      </button>
-                    ) : (
-                      <button className="sr-btn-reserved" disabled>
-                        Reserved
-                      </button>
-                    )}
+                    <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginTop:4 }}>
+                      <Link
+                        to={`/villa/${villa.id}`}
+                        style={{ fontFamily:"'Josefin Sans',sans-serif", fontSize:"0.65rem", letterSpacing:"0.12em", textTransform:"uppercase", color: villa.color ?? "#0a0a0a", textDecoration:"underline", textUnderlineOffset:3 }}
+                      >
+                        View Details
+                      </Link>
+                      {available ? (
+                        <button className="sr-btn-reserve" style={{ width:"auto", padding:"10px 20px" }} onClick={() => handleReserve(villa.id)}>
+                          Reserve
+                        </button>
+                      ) : (
+                        <button className="sr-btn-reserved" style={{ width:"auto", padding:"10px 20px" }} disabled>
+                          Reserved
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               );
