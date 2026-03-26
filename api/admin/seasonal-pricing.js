@@ -7,7 +7,7 @@ export default async function handler(req, res) {
 
   if (req.method === "GET") {
     const { villa_id } = req.query;
-    let query = supabase.from("seasonal_pricing").select("*").order("start_date");
+    let query = supabase.from("seasonal_pricing").select("id, villa_id, label, start_date, end_date, price_per_night, created_at").order("start_date");
     if (villa_id) query = query.eq("villa_id", villa_id);
     const { data, error } = await query;
     if (error) return res.status(500).json({ error: error.message });

@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react({
@@ -17,5 +16,22 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
+  },
+  build: {
+    target: 'esnext',
+    cssCodeSplit: true,
+    minify: 'esbuild',
+    reportCompressedSize: false, // speeds up build output
+    rollupOptions: {
+      output: {
+        // Split vendor libs into their own cached chunk
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-supabase': ['@supabase/supabase-js'],
+        },
+      },
+    },
+    // Warn only for chunks over 600 kB
+    chunkSizeWarningLimit: 600,
   },
 })

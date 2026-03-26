@@ -5,7 +5,7 @@ import supabase from "../db/supabase.js";
 export async function getAllReservations(req, res) {
   const { data, error } = await supabase
     .from("reservations")
-    .select("*")
+    .select("id, property_name, guests, checkin, checkout, name, email, phone, total_price, confirmed, cancelled, payment_method, created_at")
     .order("created_at", { ascending: false });
 
   if (error) return res.status(500).json({ error: error.message });
@@ -78,7 +78,7 @@ export async function getBlockedDates(req, res) {
 
   let query = supabase
     .from("blocked_dates")
-    .select("*")
+    .select("id, property_name, blocked_date, reason")
     .order("blocked_date");
 
   if (property) query = query.eq("property_name", property);
@@ -135,7 +135,7 @@ export async function updatePricing(req, res) {
 
 export async function getSeasonalPricing(req, res) {
   const { villa_id } = req.query;
-  let query = supabase.from("seasonal_pricing").select("*").order("start_date");
+  let query = supabase.from("seasonal_pricing").select("id, villa_id, label, start_date, end_date, price_per_night, created_at").order("start_date");
   if (villa_id) query = query.eq("villa_id", villa_id);
   const { data, error } = await query;
   if (error) return res.status(500).json({ error: error.message });

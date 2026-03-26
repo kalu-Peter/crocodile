@@ -7,7 +7,7 @@ export default async function handler(req, res) {
 
   if (req.method === "GET") {
     const { property } = req.query;
-    let query = supabase.from("blocked_dates").select("*").order("blocked_date");
+    let query = supabase.from("blocked_dates").select("id, property_name, blocked_date, reason").order("blocked_date");
     if (property) query = query.eq("property_name", property);
     const { data, error } = await query;
     if (error) return res.status(500).json({ error: error.message });

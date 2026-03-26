@@ -1,32 +1,37 @@
+import { lazy, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import CrocodileLodge from "./CrocodileLodge";
-import Gallery from "./Gallery";
-import ReservationPage from "./pages/ReservationPage";
-import SearchResultsPage from "./pages/SearchResultsPage";
-import AdminLoginPage from "./pages/AdminLoginPage";
-import AdminDashboardPage from "./pages/AdminDashboardPage";
-import VillaDetailsPage from "./pages/VillaDetailsPage";
-import PageTransition from "./components/PageTransition";
 import { CurrencyProvider } from "./context/CurrencyContext";
+import PageTransition from "./components/PageTransition";
 import WhatsAppFloat from "./components/WhatsAppFloat";
+
+// Lazy-load every page so each is a separate JS chunk loaded on demand
+const CrocodileLodge     = lazy(() => import("./CrocodileLodge"));
+const Gallery            = lazy(() => import("./Gallery"));
+const VillaDetailsPage   = lazy(() => import("./pages/VillaDetailsPage"));
+const SearchResultsPage  = lazy(() => import("./pages/SearchResultsPage"));
+const ReservationPage    = lazy(() => import("./pages/ReservationPage"));
+const AdminLoginPage     = lazy(() => import("./pages/AdminLoginPage"));
+const AdminDashboardPage = lazy(() => import("./pages/AdminDashboardPage"));
 
 function App() {
   return (
     <CurrencyProvider>
       <Router>
-      <PageTransition>
-        <Routes>
-          <Route path="/" element={<CrocodileLodge />} />
-          <Route path="/gallery" element={<Gallery />} />
-          <Route path="/villa/:villaId" element={<VillaDetailsPage />} />
-          <Route path="/search" element={<SearchResultsPage />} />
-          <Route path="/reservation" element={<ReservationPage />} />
-          <Route path="/crocodile-admin" element={<AdminLoginPage />} />
-          <Route path="/crocodile-admin/dashboard" element={<AdminDashboardPage />} />
-        </Routes>
-      </PageTransition>
-      <WhatsAppFloat />
-    </Router>
+        <Suspense fallback={null}>
+          <PageTransition>
+            <Routes>
+              <Route path="/"                          element={<CrocodileLodge />} />
+              <Route path="/gallery"                   element={<Gallery />} />
+              <Route path="/villa/:villaId"            element={<VillaDetailsPage />} />
+              <Route path="/search"                    element={<SearchResultsPage />} />
+              <Route path="/reservation"               element={<ReservationPage />} />
+              <Route path="/crocodile-admin"           element={<AdminLoginPage />} />
+              <Route path="/crocodile-admin/dashboard" element={<AdminDashboardPage />} />
+            </Routes>
+          </PageTransition>
+        </Suspense>
+        <WhatsAppFloat />
+      </Router>
     </CurrencyProvider>
   );
 }

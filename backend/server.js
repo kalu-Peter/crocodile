@@ -32,6 +32,22 @@ const limiter = rateLimit({
 });
 app.use("/api/", limiter);
 
+// ─── Cache headers ────────────────────────────────────────────
+// Public read-only endpoints: cache for 60 seconds
+app.use("/api/seasonal-price", (_req, res, next) => {
+  res.set("Cache-Control", "public, max-age=60, stale-while-revalidate=300");
+  next();
+});
+app.use("/api/availability", (_req, res, next) => {
+  res.set("Cache-Control", "public, max-age=30");
+  next();
+});
+// Admin & mutations: never cache
+app.use("/api/admin", (_req, res, next) => {
+  res.set("Cache-Control", "no-store");
+  next();
+});
+
 // ─── Routes ──────────────────────────────────────────────────
 app.use("/api", publicRoutes);
 app.use("/api/admin", adminRoutes);
