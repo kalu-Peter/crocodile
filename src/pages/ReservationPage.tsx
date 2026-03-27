@@ -6,20 +6,27 @@ import { useCurrency } from "../context/CurrencyContext";
 declare global {
   interface Window {
     paypal?: {
-      Buttons: (config: Record<string, unknown>) => { render: (selector: string) => void };
+      Buttons: (config: Record<string, unknown>) => {
+        render: (selector: string) => void;
+      };
     };
   }
 }
 
 function nightsBetween(a: string, b: string) {
   if (!a || !b) return 0;
-  return Math.max(0, Math.round((new Date(b).getTime() - new Date(a).getTime()) / 86400000));
+  return Math.max(
+    0,
+    Math.round((new Date(b).getTime() - new Date(a).getTime()) / 86400000),
+  );
 }
 
 function formatDate(d: string) {
   if (!d) return "";
   return new Date(d + "T00:00:00").toLocaleDateString("en-GB", {
-    month: "short", day: "numeric", year: "numeric",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
   });
 }
 
@@ -34,15 +41,28 @@ const ReservationPage: React.FC = () => {
   const villaId = queryParams.get("villaId") ?? "";
   const villa = VILLAS.find((v) => v.id === villaId);
 
-  const [checkin, setCheckin] = useState(queryParams.get("checkin") ?? queryParams.get("checkIn") ?? "");
-  const [checkout, setCheckout] = useState(queryParams.get("checkout") ?? queryParams.get("checkOut") ?? "");
-  const [guestCount, setGuestCount] = useState(Number(queryParams.get("guestCount") ?? 1));
-  const [formData, setFormData] = useState({ firstName: "", lastName: "", email: "", phone: "" });
+  const [checkin, setCheckin] = useState(
+    queryParams.get("checkin") ?? queryParams.get("checkIn") ?? "",
+  );
+  const [checkout, setCheckout] = useState(
+    queryParams.get("checkout") ?? queryParams.get("checkOut") ?? "",
+  );
+  const [guestCount, setGuestCount] = useState(
+    Number(queryParams.get("guestCount") ?? 1),
+  );
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+  });
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
   const [confirmationId, setConfirmationId] = useState("");
 
   // Payment state
-  const [paymentMethod, setPaymentMethod] = useState<"mpesa" | "paypal">("mpesa");
+  const [paymentMethod, setPaymentMethod] = useState<"mpesa" | "paypal">(
+    "mpesa",
+  );
   const [mpesaPhone, setMpesaPhone] = useState("");
   const [mpesaStatus, setMpesaStatus] = useState<MpesaStatus>("idle");
   const [mpesaMessage, setMpesaMessage] = useState("");
@@ -56,7 +76,9 @@ const ReservationPage: React.FC = () => {
   }, [villaId, navigate]);
 
   useEffect(() => {
-    return () => { if (pollRef.current) clearInterval(pollRef.current); };
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
   }, []);
 
   if (!villa) return null;
@@ -70,8 +92,13 @@ const ReservationPage: React.FC = () => {
   const total = accommodationTotal + laundryFee + acFee;
 
   useEffect(() => {
-    if (!checkin || !villa) { setSeasonalPrice(null); return; }
-    fetch(`/api/seasonal-price?villaId=${encodeURIComponent(villa.id)}&checkin=${checkin}`)
+    if (!checkin || !villa) {
+      setSeasonalPrice(null);
+      return;
+    }
+    fetch(
+      `/api/seasonal-price?villaId=${encodeURIComponent(villa.id)}&checkin=${checkin}`,
+    )
       .then((r) => r.json())
       .then((data) => setSeasonalPrice(data.price ?? null))
       .catch(() => setSeasonalPrice(null));
@@ -87,36 +114,58 @@ const ReservationPage: React.FC = () => {
       const container = document.getElementById("paypal-btn-container");
       if (!container || !window.paypal) return;
       container.innerHTML = "";
-      window.paypal.Buttons({
-        createOrder: async () => {
-          if (!validateForm()) throw new Error("Please fill in all required fields.");
-          const res = await fetch("/api/payments", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ action: "paypal-create", amountKES: total, description: `${villa.name} – ${nights} nights` }),
-          });
-          const data = await res.json() as { orderId?: string; error?: string };
-          if (!res.ok) throw new Error(data.error ?? "PayPal order failed");
-          return data.orderId;
-        },
-        onApprove: async (data: { orderID: string }) => {
-          const res = await fetch("/api/payments", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ action: "paypal-capture", orderId: data.orderID }),
-          });
-          const result = await res.json() as { success?: boolean; transactionId?: string; error?: string };
-          if (result.success) {
-            await createReservation("paypal", result.transactionId);
-          } else {
-            alert(result.error ?? "PayPal capture failed. Please try again.");
-          }
-        },
-        onError: () => { alert("PayPal encountered an error. Please try again."); },
-      }).render("#paypal-btn-container");
+      window.paypal
+        .Buttons({
+          createOrder: async () => {
+            if (!validateForm())
+              throw new Error("Please fill in all required fields.");
+            const res = await fetch("/api/payments", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                action: "paypal-create",
+                amountKES: total,
+                description: `${villa.name} – ${nights} nights`,
+              }),
+            });
+            const data = (await res.json()) as {
+              orderId?: string;
+              error?: string;
+            };
+            if (!res.ok) throw new Error(data.error ?? "PayPal order failed");
+            return data.orderId;
+          },
+          onApprove: async (data: { orderID: string }) => {
+            const res = await fetch("/api/payments", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                action: "paypal-capture",
+                orderId: data.orderID,
+              }),
+            });
+            const result = (await res.json()) as {
+              success?: boolean;
+              transactionId?: string;
+              error?: string;
+            };
+            if (result.success) {
+              await createReservation("paypal", result.transactionId);
+            } else {
+              alert(result.error ?? "PayPal capture failed. Please try again.");
+            }
+          },
+          onError: () => {
+            alert("PayPal encountered an error. Please try again.");
+          },
+        })
+        .render("#paypal-btn-container");
     };
 
-    if (window.paypal) { renderButtons(); return; }
+    if (window.paypal) {
+      renderButtons();
+      return;
+    }
 
     const existing = document.getElementById("paypal-sdk-script");
     if (existing) {
@@ -138,10 +187,25 @@ const ReservationPage: React.FC = () => {
   };
 
   const validateForm = () => {
-    if (!checkin || !checkout || nights <= 0) { alert("Please select valid check-in and check-out dates."); return false; }
-    if (!formData.firstName.trim() || !formData.lastName.trim()) { alert("Please enter your full name."); return false; }
-    if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) { alert("Please enter a valid email."); return false; }
-    if (!formData.phone.trim()) { alert("Please enter your phone number."); return false; }
+    if (!checkin || !checkout || nights <= 0) {
+      alert("Please select valid check-in and check-out dates.");
+      return false;
+    }
+    if (!formData.firstName.trim() || !formData.lastName.trim()) {
+      alert("Please enter your full name.");
+      return false;
+    }
+    if (
+      !formData.email.trim() ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)
+    ) {
+      alert("Please enter a valid email.");
+      return false;
+    }
+    if (!formData.phone.trim()) {
+      alert("Please enter your phone number.");
+      return false;
+    }
     return true;
   };
 
@@ -164,7 +228,10 @@ const ReservationPage: React.FC = () => {
         payment_transaction_id: transactionId ?? null,
       }),
     });
-    const data = await res.json() as { reservation?: { id: string }; error?: string };
+    const data = (await res.json()) as {
+      reservation?: { id: string };
+      error?: string;
+    };
     if (!res.ok) throw new Error(data.error ?? "Could not save reservation");
     setConfirmationId(data.reservation?.id ?? "");
     setBookingConfirmed(true);
@@ -173,7 +240,10 @@ const ReservationPage: React.FC = () => {
   const handleMpesaPay = async () => {
     if (!validateForm()) return;
     const phone = mpesaPhone.trim() || formData.phone.trim();
-    if (!phone) { alert("Please enter an M-Pesa phone number."); return; }
+    if (!phone) {
+      alert("Please enter an M-Pesa phone number.");
+      return;
+    }
 
     setMpesaStatus("pending");
     setMpesaMessage("Sending STK Push to your phone...");
@@ -182,9 +252,18 @@ const ReservationPage: React.FC = () => {
       const res = await fetch("/api/payments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "mpesa-initiate", phone, amount: total, reference: villa.name }),
+        body: JSON.stringify({
+          action: "mpesa-initiate",
+          phone,
+          amount: total,
+          reference: villa.name,
+        }),
       });
-      const data = await res.json() as { success?: boolean; checkoutRequestId?: string; error?: string };
+      const data = (await res.json()) as {
+        success?: boolean;
+        checkoutRequestId?: string;
+        error?: string;
+      };
 
       if (!res.ok || !data.checkoutRequestId) {
         setMpesaStatus("failed");
@@ -211,7 +290,7 @@ const ReservationPage: React.FC = () => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ action: "mpesa-query", checkoutRequestId }),
           });
-          const q = await qRes.json() as { status: string; message?: string };
+          const q = (await qRes.json()) as { status: string; message?: string };
           if (q.status === "success") {
             if (pollRef.current) clearInterval(pollRef.current);
             setMpesaStatus("success");
@@ -251,9 +330,20 @@ const ReservationPage: React.FC = () => {
           <div className="confirm-box">
             <div className="confirm-icon">✓</div>
             <h1>Booking Confirmed</h1>
-            <p>Thank you, <strong>{formData.firstName}</strong>! Your reservation at <strong>{villa.name}</strong> has been received. We'll be in touch shortly.</p>
-            {confirmationId && <div className="confirm-id">Confirmation # RES-{confirmationId.substring(0, 8).toUpperCase()}</div>}
-            <button className="btn-home" onClick={() => navigate("/")}>Back to Home</button>
+            <p>
+              Thank you, <strong>{formData.firstName}</strong>! Your reservation
+              at <strong>{villa.name}</strong> has been received. We'll be in
+              touch shortly.
+            </p>
+            {confirmationId && (
+              <div className="confirm-id">
+                Confirmation # RES-
+                {confirmationId.substring(0, 8).toUpperCase()}
+              </div>
+            )}
+            <button className="btn-home" onClick={() => navigate("/")}>
+              Back to Home
+            </button>
           </div>
         </div>
       </>
@@ -335,8 +425,9 @@ const ReservationPage: React.FC = () => {
       `}</style>
 
       <nav className="rp-nav">
-        <Link to="/" className="rp-nav-logo">Croc<span>odile</span> Lodge</Link>
-        <Link to={`/villa/${villaId}`} className="rp-nav-back">← Back to villa</Link>
+        <Link to="/" className="rp-nav-logo">
+          Croc<span>odile</span> Lodge
+        </Link>
       </nav>
 
       <div className="rp-wrap">
@@ -349,19 +440,77 @@ const ReservationPage: React.FC = () => {
             <div className="rp-row">
               <div className="rp-field">
                 <label>Check In</label>
-                <input type="date" value={checkin} onChange={(e) => setCheckin(e.target.value)} />
+                <input
+                  type="date"
+                  value={checkin}
+                  onChange={(e) => setCheckin(e.target.value)}
+                />
               </div>
               <div className="rp-field">
                 <label>Check Out</label>
-                <input type="date" value={checkout} onChange={(e) => setCheckout(e.target.value)} />
+                <input
+                  type="date"
+                  value={checkout}
+                  onChange={(e) => setCheckout(e.target.value)}
+                />
               </div>
             </div>
             <div className="rp-field">
               <label>Guests</label>
-              <div style={{ display:"flex", alignItems:"center", border:"1px solid rgba(0,0,0,0.15)", borderRadius:6, overflow:"hidden", background:"#fafafa" }}>
-                <button type="button" onClick={() => setGuestCount((g) => Math.max(1, g - 1))} disabled={guestCount <= 1} style={{ width:44, height:44, background:"none", border:"none", fontSize:"1.2rem", cursor:"pointer", color:"#0a0a0a" }}>−</button>
-                <span style={{ flex:1, textAlign:"center", fontFamily:"'Cormorant Garamond', serif", fontSize:"1rem" }}>{guestCount} guest{guestCount !== 1 ? "s" : ""}</span>
-                <button type="button" onClick={() => setGuestCount((g) => Math.min(villa.maxGuests, g + 1))} disabled={guestCount >= villa.maxGuests} style={{ width:44, height:44, background:"none", border:"none", fontSize:"1.2rem", cursor:"pointer", color:"#0a0a0a" }}>+</button>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  border: "1px solid rgba(0,0,0,0.15)",
+                  borderRadius: 6,
+                  overflow: "hidden",
+                  background: "#fafafa",
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setGuestCount((g) => Math.max(1, g - 1))}
+                  disabled={guestCount <= 1}
+                  style={{
+                    width: 44,
+                    height: 44,
+                    background: "none",
+                    border: "none",
+                    fontSize: "1.2rem",
+                    cursor: "pointer",
+                    color: "#0a0a0a",
+                  }}
+                >
+                  −
+                </button>
+                <span
+                  style={{
+                    flex: 1,
+                    textAlign: "center",
+                    fontFamily: "'Cormorant Garamond', serif",
+                    fontSize: "1rem",
+                  }}
+                >
+                  {guestCount} guest{guestCount !== 1 ? "s" : ""}
+                </span>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setGuestCount((g) => Math.min(villa.maxGuests, g + 1))
+                  }
+                  disabled={guestCount >= villa.maxGuests}
+                  style={{
+                    width: 44,
+                    height: 44,
+                    background: "none",
+                    border: "none",
+                    fontSize: "1.2rem",
+                    cursor: "pointer",
+                    color: "#0a0a0a",
+                  }}
+                >
+                  +
+                </button>
               </div>
             </div>
           </div>
@@ -372,22 +521,43 @@ const ReservationPage: React.FC = () => {
             <div className="rp-row">
               <div className="rp-field">
                 <label>First name</label>
-                <input name="firstName" value={formData.firstName} onChange={handleChange} placeholder="First name" />
+                <input
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  placeholder="First name"
+                />
               </div>
               <div className="rp-field">
                 <label>Last name</label>
-                <input name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Last name" />
+                <input
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  placeholder="Last name"
+                />
               </div>
             </div>
             <div className="rp-field">
               <label>Email</label>
-              <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="your@email.com" />
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="your@email.com"
+              />
             </div>
             <div className="rp-field">
               <label>Phone number</label>
               <div className="rp-phone-wrap">
                 <span className="rp-phone-prefix">+254</span>
-                <input name="phone" value={formData.phone} onChange={handleChange} placeholder="712 345 678" />
+                <input
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  placeholder="712 345 678"
+                />
               </div>
             </div>
           </div>
@@ -400,7 +570,11 @@ const ReservationPage: React.FC = () => {
               <button
                 type="button"
                 className={`pm-tab${paymentMethod === "mpesa" ? " active" : ""}`}
-                onClick={() => { setPaymentMethod("mpesa"); setMpesaStatus("idle"); setMpesaMessage(""); }}
+                onClick={() => {
+                  setPaymentMethod("mpesa");
+                  setMpesaStatus("idle");
+                  setMpesaMessage("");
+                }}
               >
                 📱 M-Pesa
               </button>
@@ -416,7 +590,9 @@ const ReservationPage: React.FC = () => {
             {paymentMethod === "mpesa" && (
               <>
                 <p className="mpesa-note">
-                  You'll receive an M-Pesa STK Push prompt on your phone. Enter your PIN to complete payment of <strong>{formatPrice(total)}</strong>.
+                  You'll receive an M-Pesa STK Push prompt on your phone. Enter
+                  your PIN to complete payment of{" "}
+                  <strong>{formatPrice(total)}</strong>.
                 </p>
                 <div className="rp-field">
                   <label>M-Pesa phone (leave blank to use phone above)</label>
@@ -426,14 +602,19 @@ const ReservationPage: React.FC = () => {
                       value={mpesaPhone}
                       onChange={(e) => setMpesaPhone(e.target.value)}
                       placeholder="712 345 678"
-                      disabled={mpesaStatus === "polling" || mpesaStatus === "pending"}
+                      disabled={
+                        mpesaStatus === "polling" || mpesaStatus === "pending"
+                      }
                     />
                   </div>
                 </div>
 
                 {mpesaStatus !== "idle" && (
                   <div className={`mpesa-status ${mpesaStatus}`}>
-                    {(mpesaStatus === "pending" || mpesaStatus === "polling") && <span className="mpesa-spinner" />}
+                    {(mpesaStatus === "pending" ||
+                      mpesaStatus === "polling") && (
+                      <span className="mpesa-spinner" />
+                    )}
                     {mpesaStatus === "success" && "✓"}
                     {mpesaStatus === "failed" && "✗"}
                     <span>{mpesaMessage}</span>
@@ -445,7 +626,12 @@ const ReservationPage: React.FC = () => {
                   className="btn-mpesa"
                   style={{ marginTop: 16 }}
                   onClick={handleMpesaPay}
-                  disabled={mpesaStatus === "pending" || mpesaStatus === "polling" || mpesaStatus === "success" || total <= 0}
+                  disabled={
+                    mpesaStatus === "pending" ||
+                    mpesaStatus === "polling" ||
+                    mpesaStatus === "success" ||
+                    total <= 0
+                  }
                 >
                   {mpesaStatus === "pending" || mpesaStatus === "polling"
                     ? "Waiting for payment..."
@@ -457,7 +643,9 @@ const ReservationPage: React.FC = () => {
             {paymentMethod === "paypal" && (
               <>
                 <p className="paypal-note">
-                  Complete your payment of <strong>{formatPrice(total)}</strong> securely via PayPal. The amount will be converted to USD at the current exchange rate.
+                  Complete your payment of <strong>{formatPrice(total)}</strong>{" "}
+                  securely via PayPal. The amount will be converted to USD at
+                  the current exchange rate.
                 </p>
                 <div id="paypal-btn-container" />
               </>
@@ -474,27 +662,43 @@ const ReservationPage: React.FC = () => {
             <div className="rp-trip">
               <div className="rp-trip-title">Trip details</div>
               <div className="rp-trip-row">
-                <span>{checkin && checkout ? `${formatDate(checkin)} – ${formatDate(checkout)}` : "—"}</span>
+                <span>
+                  {checkin && checkout
+                    ? `${formatDate(checkin)} – ${formatDate(checkout)}`
+                    : "—"}
+                </span>
               </div>
               <div className="rp-trip-row">
-                <span>{guestCount} guest{guestCount !== 1 ? "s" : ""}</span>
+                <span>
+                  {guestCount} guest{guestCount !== 1 ? "s" : ""}
+                </span>
               </div>
             </div>
 
             <div>
               <div className="rp-price-title">Price details</div>
               <div className="rp-price-row">
-                <span>{formatPrice(pricePerNight)} × {nights} night{nights !== 1 ? "s" : ""}</span>
+                <span>
+                  {formatPrice(pricePerNight)} × {nights} night
+                  {nights !== 1 ? "s" : ""}
+                </span>
                 <span>{formatPrice(accommodationTotal)}</span>
               </div>
               {nights > 0 && (
                 <>
                   <div className="rp-price-row">
-                    <span>Laundry ({Math.ceil(nights / 3)} week{Math.ceil(nights / 3) !== 1 ? "s" : ""})</span>
+                    <span>
+                      Laundry ({Math.ceil(nights / 3)} week
+                      {Math.ceil(nights / 3) !== 1 ? "s" : ""})
+                    </span>
                     <span>{formatPrice(laundryFee)}</span>
                   </div>
                   <div className="rp-price-row">
-                    <span>AC ({villa.bedrooms ?? 1} room{(villa.bedrooms ?? 1) > 1 ? "s" : ""} × {nights} night{nights !== 1 ? "s" : ""})</span>
+                    <span>
+                      AC ({villa.bedrooms ?? 1} room
+                      {(villa.bedrooms ?? 1) > 1 ? "s" : ""} × {nights} night
+                      {nights !== 1 ? "s" : ""})
+                    </span>
                     <span>{formatPrice(acFee)}</span>
                   </div>
                 </>
@@ -510,8 +714,18 @@ const ReservationPage: React.FC = () => {
             </div>
 
             <div className="rp-secure">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <rect x="3" y="11" width="18" height="11" rx="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
               </svg>
               <p>Payments processed securely via M-Pesa or PayPal</p>
             </div>

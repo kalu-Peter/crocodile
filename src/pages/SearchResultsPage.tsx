@@ -6,12 +6,19 @@ import { useCurrency } from "../context/CurrencyContext";
 
 function nightsBetween(a: string, b: string) {
   if (!a || !b) return 0;
-  return Math.max(0, Math.round((new Date(b).getTime() - new Date(a).getTime()) / 86400000));
+  return Math.max(
+    0,
+    Math.round((new Date(b).getTime() - new Date(a).getTime()) / 86400000),
+  );
 }
 
 function fmtDate(d: string) {
   if (!d) return "";
-  return new Date(d + "T00:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+  return new Date(d + "T00:00:00").toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 }
 
 interface VillaStatus {
@@ -25,17 +32,20 @@ const SearchResultsPage: React.FC = () => {
   const navigate = useNavigate();
   const { formatPrice } = useCurrency();
 
-  const checkin  = searchParams.get("checkin")  ?? "";
+  const checkin = searchParams.get("checkin") ?? "";
   const checkout = searchParams.get("checkout") ?? "";
-  const guests   = Number(searchParams.get("guests") ?? 1);
-  const nights   = nightsBetween(checkin, checkout);
+  const guests = Number(searchParams.get("guests") ?? 1);
+  const nights = nightsBetween(checkin, checkout);
 
   const [statuses, setStatuses] = useState<Record<string, VillaStatus>>({});
   const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    if (!checkin || !checkout) { setLoading(false); return; }
+    if (!checkin || !checkout) {
+      setLoading(false);
+      return;
+    }
 
     const checkAll = async () => {
       setLoading(true);
@@ -47,27 +57,37 @@ const SearchResultsPage: React.FC = () => {
           let available = villa.isAvailable !== false;
           if (available) {
             try {
-              const params = new URLSearchParams({ property: villa.name, checkin, checkout });
+              const params = new URLSearchParams({
+                property: villa.name,
+                checkin,
+                checkout,
+              });
               const res = await fetch(`/api/availability?${params}`);
               if (res.ok) {
                 const data = await res.json();
                 available = !!data.available;
               }
-            } catch { /* keep available=true on network error */ }
+            } catch {
+              /* keep available=true on network error */
+            }
           }
 
           // Fetch seasonal price
           let price: number | null = null;
           try {
-            const res = await fetch(`/api/seasonal-price?villaId=${encodeURIComponent(villa.id)}&checkin=${checkin}`);
+            const res = await fetch(
+              `/api/seasonal-price?villaId=${encodeURIComponent(villa.id)}&checkin=${checkin}`,
+            );
             if (res.ok) {
               const data = await res.json();
               price = data.price ?? null;
             }
-          } catch { /* fallback to base */ }
+          } catch {
+            /* fallback to base */
+          }
 
           results[villa.id] = { villaId: villa.id, available, price };
-        })
+        }),
       );
 
       setStatuses(results);
@@ -78,7 +98,9 @@ const SearchResultsPage: React.FC = () => {
   }, [checkin, checkout]);
 
   const handleReserve = (villaId: string) => {
-    navigate(`/reservation?villaId=${villaId}&guestCount=${guests}&checkin=${checkin}&checkout=${checkout}`);
+    navigate(
+      `/reservation?villaId=${villaId}&guestCount=${guests}&checkin=${checkin}&checkout=${checkout}`,
+    );
   };
 
   return (
@@ -173,30 +195,51 @@ const SearchResultsPage: React.FC = () => {
 
       {/* NAV */}
       <nav className="sr-nav">
-        <Link to="/" className="sr-nav-logo">Croc<span>odile</span> Lodge</Link>
+        <Link to="/" className="sr-nav-logo">
+          Croc<span>odile</span> Lodge
+        </Link>
         <ul className="sr-nav-links">
-          <li><a href="/#villas">Villas</a></li>
-          <li><Link to="/gallery">Gallery</Link></li>
-          <li><a href="/#contact">Contact</a></li>
+          <li>
+            <a href="/#villas">Villas</a>
+          </li>
+          <li>
+            <Link to="/gallery">Gallery</Link>
+          </li>
+          <li>
+            <a href="/#contact">Contact</a>
+          </li>
         </ul>
         <CurrencySelector />
-        <button className="hamburger" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label="Menu">
-          <span /><span /><span />
+        <button
+          className="hamburger"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Menu"
+        >
+          <span />
+          <span />
+          <span />
         </button>
       </nav>
 
       <div className={`mobile-menu${mobileMenuOpen ? " open" : ""}`}>
-        <a href="/#villas" onClick={() => setMobileMenuOpen(false)}>Villas</a>
-        <Link to="/gallery" onClick={() => setMobileMenuOpen(false)}>Gallery</Link>
-        <a href="/#contact" onClick={() => setMobileMenuOpen(false)}>Contact</a>
+        <a href="/#villas" onClick={() => setMobileMenuOpen(false)}>
+          Villas
+        </a>
+        <Link to="/gallery" onClick={() => setMobileMenuOpen(false)}>
+          Gallery
+        </Link>
+        <a href="/#contact" onClick={() => setMobileMenuOpen(false)}>
+          Contact
+        </a>
       </div>
 
       <div className="sr-wrap">
         <div className="sr-header">
-          <Link to="/" className="sr-back">← Back to Home</Link>
           <h1 className="sr-title">Available Villas</h1>
           <div className="sr-subtitle">
-            {fmtDate(checkin)} — {fmtDate(checkout)} &nbsp;·&nbsp; {nights} night{nights !== 1 ? "s" : ""} &nbsp;·&nbsp; {guests} guest{guests !== 1 ? "s" : ""}
+            {fmtDate(checkin)} — {fmtDate(checkout)} &nbsp;·&nbsp; {nights}{" "}
+            night{nights !== 1 ? "s" : ""} &nbsp;·&nbsp; {guests} guest
+            {guests !== 1 ? "s" : ""}
           </div>
         </div>
 
@@ -207,22 +250,41 @@ const SearchResultsPage: React.FC = () => {
             {VILLAS.map((villa) => {
               const status = statuses[villa.id];
               const available = status?.available ?? true;
-              const pricePerNight = status?.price ?? (villa.pricing[0]?.basePrice ?? 0);
+              const pricePerNight =
+                status?.price ?? villa.pricing[0]?.basePrice ?? 0;
               const totalBase = pricePerNight * nights;
 
               return (
-                <div key={villa.id} className={`sr-card${!available ? " unavailable" : ""}`}>
+                <div
+                  key={villa.id}
+                  className={`sr-card${!available ? " unavailable" : ""}`}
+                >
                   <div className="sr-card-img">
-                    <img src={villa.image} alt={villa.name} loading="lazy" decoding="async" />
-                    <span className={`sr-card-badge ${villa.openingSoon ? "opening-soon" : available ? "available" : "reserved"}`}>
-                      {villa.openingSoon ? "Opening Soon" : available ? "Available" : "Reserved"}
+                    <img
+                      src={villa.image}
+                      alt={villa.name}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <span
+                      className={`sr-card-badge ${villa.openingSoon ? "opening-soon" : available ? "available" : "reserved"}`}
+                    >
+                      {villa.openingSoon
+                        ? "Opening Soon"
+                        : available
+                          ? "Available"
+                          : "Reserved"}
                     </span>
                   </div>
                   <div className="sr-card-body">
                     <div className="sr-card-type">{villa.type}</div>
                     <div className="sr-card-name">{villa.name}</div>
                     <div className="sr-card-meta">
-                      {villa.bedrooms && <span>{villa.bedrooms} Bed{villa.bedrooms > 1 ? "s" : ""}</span>}
+                      {villa.bedrooms && (
+                        <span>
+                          {villa.bedrooms} Bed{villa.bedrooms > 1 ? "s" : ""}
+                        </span>
+                      )}
                       <span>Up to {villa.maxGuests} guests</span>
                     </div>
                     <div className="sr-card-amenities">
@@ -233,16 +295,36 @@ const SearchResultsPage: React.FC = () => {
                       <span className="sr-card-amenity">Laundry</span>
                     </div>
                     <div className="sr-card-price">
-                      <div className="sr-card-price-main">{formatPrice(pricePerNight)}</div>
+                      <div className="sr-card-price-main">
+                        {formatPrice(pricePerNight)}
+                      </div>
                       <div className="sr-card-price-sub">per night</div>
                       {nights > 0 && (
-                        <div className="sr-card-price-total">{formatPrice(totalBase)} for {nights} night{nights !== 1 ? "s" : ""}</div>
+                        <div className="sr-card-price-total">
+                          {formatPrice(totalBase)} for {nights} night
+                          {nights !== 1 ? "s" : ""}
+                        </div>
                       )}
                     </div>
-                    <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginTop:4 }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        marginTop: 4,
+                      }}
+                    >
                       <Link
                         to={`/villa/${villa.id}`}
-                        style={{ fontFamily:"'Josefin Sans',sans-serif", fontSize:"0.65rem", letterSpacing:"0.12em", textTransform:"uppercase", color: villa.color ?? "#0a0a0a", textDecoration:"underline", textUnderlineOffset:3 }}
+                        style={{
+                          fontFamily: "'Josefin Sans',sans-serif",
+                          fontSize: "0.65rem",
+                          letterSpacing: "0.12em",
+                          textTransform: "uppercase",
+                          color: villa.color ?? "#0a0a0a",
+                          textDecoration: "underline",
+                          textUnderlineOffset: 3,
+                        }}
                       >
                         View Details
                       </Link>
@@ -251,21 +333,60 @@ const SearchResultsPage: React.FC = () => {
                           href={`https://wa.me/254715510119?text=${encodeURIComponent(`Hi, I'd like to book ${villa.name} from ${checkin} to ${checkout} for ${guests} guest${guests !== 1 ? "s" : ""}.`)}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"10px 16px", background:"#25d366", color:"#fff", borderRadius:6, fontFamily:"'Josefin Sans',sans-serif", fontSize:"0.65rem", letterSpacing:"0.12em", textTransform:"uppercase", textDecoration:"none", whiteSpace:"nowrap" }}
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 6,
+                            padding: "10px 16px",
+                            background: "#25d366",
+                            color: "#fff",
+                            borderRadius: 6,
+                            fontFamily: "'Josefin Sans',sans-serif",
+                            fontSize: "0.65rem",
+                            letterSpacing: "0.12em",
+                            textTransform: "uppercase",
+                            textDecoration: "none",
+                            whiteSpace: "nowrap",
+                          }}
                         >
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.557 4.126 1.533 5.864L0 24l6.303-1.656A11.954 11.954 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 0 1-5.006-1.371l-.36-.214-3.732.979.996-3.641-.234-.374A9.818 9.818 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/></svg>
+                          <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                          >
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+                            <path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.557 4.126 1.533 5.864L0 24l6.303-1.656A11.954 11.954 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 0 1-5.006-1.371l-.36-.214-3.732.979.996-3.641-.234-.374A9.818 9.818 0 0 1 2.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z" />
+                          </svg>
                           WhatsApp
                         </a>
                       ) : villa.openingSoon ? (
-                        <button className="sr-btn-reserved" style={{ width:"auto", padding:"10px 20px", color:"#7c3aed", borderColor:"#c4b5fd" }} disabled>
+                        <button
+                          className="sr-btn-reserved"
+                          style={{
+                            width: "auto",
+                            padding: "10px 20px",
+                            color: "#7c3aed",
+                            borderColor: "#c4b5fd",
+                          }}
+                          disabled
+                        >
                           Opening Soon
                         </button>
                       ) : available ? (
-                        <button className="sr-btn-reserve" style={{ width:"auto", padding:"10px 20px" }} onClick={() => handleReserve(villa.id)}>
+                        <button
+                          className="sr-btn-reserve"
+                          style={{ width: "auto", padding: "10px 20px" }}
+                          onClick={() => handleReserve(villa.id)}
+                        >
                           Reserve
                         </button>
                       ) : (
-                        <button className="sr-btn-reserved" style={{ width:"auto", padding:"10px 20px" }} disabled>
+                        <button
+                          className="sr-btn-reserved"
+                          style={{ width: "auto", padding: "10px 20px" }}
+                          disabled
+                        >
                           Reserved
                         </button>
                       )}
