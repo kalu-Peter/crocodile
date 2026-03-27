@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 
 const Gallery: React.FC = () => {
@@ -6,6 +6,18 @@ const Gallery: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [viewerOpen, setViewerOpen] = useState(false);
   const [viewerIndex, setViewerIndex] = useState(0);
+  const touchStartX = useRef<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX; };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const diff = touchStartX.current - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) {
+      if (diff > 0) setViewerIndex((i) => Math.min(i + 1, currentImages.length - 1));
+      else setViewerIndex((i) => Math.max(i - 1, 0));
+    }
+    touchStartX.current = null;
+  };
 
   const galleryData = {
     general: [
@@ -566,15 +578,20 @@ const Gallery: React.FC = () => {
         }
         .gallery-item { cursor: zoom-in; }
 
-        /* Full-page image viewer */
+        /* Image viewer — compact panel, not full-screen */
+        .img-viewer-overlay {
+          position: fixed; inset: 0; background: rgba(0,0,0,0.72);
+          backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+          z-index: 9999; display: flex; align-items: center; justify-content: center;
+          padding: 80px 20px 20px;
+        }
         .img-viewer {
-          position: fixed; inset: 0; background: #0a0a0a;
-          display: flex; flex-direction: column;
-          z-index: 9999;
+          width: 100%; max-width: 860px;
+          display: flex; flex-direction: column; gap: 8px;
         }
         .img-viewer-topbar {
           display: flex; align-items: center; justify-content: space-between;
-          padding: 18px 28px; flex-shrink: 0;
+          margin-bottom: 4px;
         }
         .img-viewer-back {
           display: inline-flex; align-items: center; gap: 8px;
@@ -589,34 +606,39 @@ const Gallery: React.FC = () => {
           letter-spacing: 0.15em; color: rgba(255,255,255,0.45);
         }
         .img-viewer-stage {
-          flex: 1; display: flex; align-items: center; justify-content: center;
-          position: relative; overflow: hidden; width: 100%;
+          width: 100%; height: 380px; position: relative; overflow: hidden;
+          background: #111;
         }
         .img-viewer-img {
           width: 100%; height: 100%;
-          object-fit: contain; display: block;
-          user-select: none;
+          object-fit: cover; display: block; user-select: none;
         }
         .img-viewer-arrow {
           position: absolute; top: 50%; transform: translateY(-50%);
-          background: rgba(255,255,255,0.1); border: none; color: #fff;
-          font-size: 2.4rem; width: 52px; height: 52px; border-radius: 50%;
+          background: rgba(0,0,0,0.45); border: none; color: #fff;
+          font-size: 2rem; width: 44px; height: 44px; border-radius: 50%;
           cursor: pointer; display: flex; align-items: center; justify-content: center;
           transition: background 0.2s;
         }
-        .img-viewer-arrow:hover { background: rgba(255,255,255,0.22); }
-        .img-viewer-arrow--prev { left: 14px; }
-        .img-viewer-arrow--next { right: 14px; }
-        .img-viewer-label {
-          text-align: center; padding: 14px 28px; flex-shrink: 0;
-          font-family: 'Josefin Sans', sans-serif; font-size: 0.65rem;
-          letter-spacing: 0.12em; text-transform: uppercase;
-          color: rgba(255,255,255,0.3);
+        .img-viewer-arrow:hover { background: rgba(0,0,0,0.72); }
+        .img-viewer-arrow--prev { left: 10px; }
+        .img-viewer-arrow--next { right: 10px; }
+        .img-viewer-thumbs {
+          display: flex; gap: 6px; overflow-x: auto;
+          scrollbar-width: thin; scrollbar-color: #555 transparent;
+          padding-bottom: 2px;
         }
+        .img-viewer-thumb {
+          flex-shrink: 0; width: 68px; height: 50px; border: 2px solid transparent;
+          border-radius: 3px; overflow: hidden; cursor: pointer; padding: 0;
+          background: none; opacity: 0.5; transition: opacity 0.2s, border-color 0.2s;
+        }
+        .img-viewer-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .img-viewer-thumb:hover, .img-viewer-thumb.active { opacity: 1; border-color: #b8913e; }
         @media (max-width: 600px) {
-          .img-viewer-arrow { width: 40px; height: 40px; font-size: 1.8rem; }
-          .img-viewer-arrow--prev { left: 6px; }
-          .img-viewer-arrow--next { right: 6px; }
+          .img-viewer-overlay { padding: 70px 0 0; align-items: flex-start; }
+          .img-viewer-stage { height: 260px; }
+          .img-viewer-thumb { width: 54px; height: 40px; }
         }
 
         .gallery-item-text {
@@ -742,30 +764,42 @@ const Gallery: React.FC = () => {
         </div>
       </section>
 
-      {/* Full-page image viewer */}
+      {/* Image viewer */}
       {viewerOpen && (
-        <div className="img-viewer">
-          <div className="img-viewer-topbar">
-            <button className="img-viewer-back" onClick={() => setViewerOpen(false)}>
-              ← Back to gallery
-            </button>
-            <span className="img-viewer-counter">{viewerIndex + 1} / {currentImages.length}</span>
+        <div className="img-viewer-overlay" onClick={() => setViewerOpen(false)}>
+          <div className="img-viewer" onClick={(e) => e.stopPropagation()}>
+            <div className="img-viewer-topbar">
+              <button className="img-viewer-back" onClick={() => setViewerOpen(false)}>
+                ← Back to gallery
+              </button>
+              <span className="img-viewer-counter">{viewerIndex + 1} / {currentImages.length}</span>
+            </div>
+            <div
+              className="img-viewer-stage"
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+            >
+              {viewerIndex > 0 && (
+                <button className="img-viewer-arrow img-viewer-arrow--prev" onClick={() => setViewerIndex((i) => i - 1)}>&#8249;</button>
+              )}
+              <img
+                className="img-viewer-img"
+                src={currentImages[viewerIndex]?.src}
+                alt={currentImages[viewerIndex]?.alt}
+                decoding="async"
+              />
+              {viewerIndex < currentImages.length - 1 && (
+                <button className="img-viewer-arrow img-viewer-arrow--next" onClick={() => setViewerIndex((i) => i + 1)}>&#8250;</button>
+              )}
+            </div>
+            <div className="img-viewer-thumbs">
+              {currentImages.map((img, i) => (
+                <button key={i} className={`img-viewer-thumb${i === viewerIndex ? " active" : ""}`} onClick={() => setViewerIndex(i)}>
+                  <img src={img.src} alt={img.alt} loading="lazy" decoding="async" />
+                </button>
+              ))}
+            </div>
           </div>
-          <div className="img-viewer-stage">
-            {viewerIndex > 0 && (
-              <button className="img-viewer-arrow img-viewer-arrow--prev" onClick={() => setViewerIndex((i) => i - 1)}>&#8249;</button>
-            )}
-            <img
-              className="img-viewer-img"
-              src={currentImages[viewerIndex]?.src}
-              alt={currentImages[viewerIndex]?.alt}
-              decoding="async"
-            />
-            {viewerIndex < currentImages.length - 1 && (
-              <button className="img-viewer-arrow img-viewer-arrow--next" onClick={() => setViewerIndex((i) => i + 1)}>&#8250;</button>
-            )}
-          </div>
-          <div className="img-viewer-label">{currentImages[viewerIndex]?.alt}</div>
         </div>
       )}
     </>
