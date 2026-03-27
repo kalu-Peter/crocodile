@@ -731,7 +731,7 @@ const Gallery: React.FC = () => {
         <div className="gallery-grid">
           {currentImages.map((image, index) => (
             <div key={index} className="gallery-item" onClick={() => { setViewerIndex(index); setViewerOpen(true); }}>
-              <img src={image.src} alt={image.alt} className="gallery-item-img" />
+              <img src={image.src} alt={image.alt} className="gallery-item-img" loading="lazy" decoding="async" />
               <div className="gallery-item-overlay">
                 <div className="gallery-item-text">{image.alt}</div>
               </div>
@@ -757,6 +757,7 @@ const Gallery: React.FC = () => {
               className="img-viewer-img"
               src={currentImages[viewerIndex]?.src}
               alt={currentImages[viewerIndex]?.alt}
+              decoding="async"
             />
             {viewerIndex < currentImages.length - 1 && (
               <button className="img-viewer-arrow img-viewer-arrow--next" onClick={() => setViewerIndex((i) => i + 1)}>&#8250;</button>

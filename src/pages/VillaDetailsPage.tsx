@@ -322,7 +322,7 @@ const VillaDetailsPage: React.FC = () => {
             <div className="vdp-thumbs">
               {images.map((src, i) => (
                 <button key={i} className={`vdp-thumb${i === activeImg ? " active" : ""}`} onClick={() => setActiveImg(i)}>
-                  <img src={src} alt={`Thumbnail ${i + 1}`} />
+                  <img src={src} alt={`Thumbnail ${i + 1}`} loading="lazy" decoding="async" />
                 </button>
               ))}
             </div>

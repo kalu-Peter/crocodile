@@ -213,7 +213,7 @@ const SearchResultsPage: React.FC = () => {
               return (
                 <div key={villa.id} className={`sr-card${!available ? " unavailable" : ""}`}>
                   <div className="sr-card-img">
-                    <img src={villa.image} alt={villa.name} />
+                    <img src={villa.image} alt={villa.name} loading="lazy" decoding="async" />
                     <span className={`sr-card-badge ${villa.openingSoon ? "opening-soon" : available ? "available" : "reserved"}`}>
                       {villa.openingSoon ? "Opening Soon" : available ? "Available" : "Reserved"}
                     </span>

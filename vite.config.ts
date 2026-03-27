@@ -21,17 +21,17 @@ export default defineConfig({
     target: 'esnext',
     cssCodeSplit: true,
     minify: 'esbuild',
-    reportCompressedSize: false, // speeds up build output
+    sourcemap: false,
+    reportCompressedSize: false,
+    assetsInlineLimit: 4096, // inline assets < 4 KB as base64 (saves round-trips)
     rollupOptions: {
       output: {
-        // Split vendor libs into their own cached chunk
         manualChunks: {
           'vendor-react': ['react', 'react-dom', 'react-router-dom'],
           'vendor-supabase': ['@supabase/supabase-js'],
         },
       },
     },
-    // Warn only for chunks over 600 kB
     chunkSizeWarningLimit: 600,
   },
 })

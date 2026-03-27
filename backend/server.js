@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import compression from "compression";
 import rateLimit from "express-rate-limit";
 
 import publicRoutes from "./routes/public.js";
@@ -9,6 +10,9 @@ import paymentRoutes from "./routes/payments.js";
 
 const app = express();
 const PORT = process.env.PORT || 4000;
+
+// ─── Gzip compression ─────────────────────────────────────────
+app.use(compression());
 
 // ─── CORS ────────────────────────────────────────────────────
 app.use(

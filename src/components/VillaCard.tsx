@@ -42,7 +42,7 @@ const VillaCard: React.FC<VillaCardProps> = ({ villa, onSelectVilla }) => {
   return (
     <div className="villa-card reveal" onClick={() => onSelectVilla(villa)} style={{ cursor: "pointer" }}>
       <div className="villa-card-image" style={{ position: "relative" }}>
-        <img src={images[imgIndex]} alt={villa.name} />
+        <img src={images[imgIndex]} alt={villa.name} loading="lazy" decoding="async" />
         {images.length > 1 && (
           <>
             <button className="card-img-nav card-img-prev" onClick={prev}>‹</button>
