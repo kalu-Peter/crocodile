@@ -148,6 +148,9 @@ const VillaDetailsPage: React.FC = () => {
         .vdp-thumb:hover, .vdp-thumb.active { opacity: 1; border-color: #b8913e; }
 
         @media(max-width:768px) {
+          nav { padding: 18px 20px; }
+          .nav-links { display: none; }
+          .hamburger { display: flex; }
           .vdp-header { padding: 24px 20px 16px; }
           .vdp-gallery { padding: 0 20px; }
           .vdp-gallery-main { height: 240px; }
@@ -356,9 +359,7 @@ const VillaDetailsPage: React.FC = () => {
 
         {/* BODY */}
         <div className="vdp-body">
-            <Link to="/" className="vdp-back">← All villas</Link>
-
-            <div className="vdp-section">
+<div className="vdp-section">
               {/* Name + stats header */}
               <div className="vdp-info-header">
                 <h2 className="vdp-info-name">{villa.name}</h2>
