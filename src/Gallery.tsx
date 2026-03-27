@@ -291,8 +291,10 @@ const Gallery: React.FC = () => {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          background: linear-gradient(180deg, rgba(10,10,10,0.95) 0%, transparent 100%);
-          backdrop-filter: blur(2px);
+          background: rgba(10,10,10,0.82);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          border-bottom: 1px solid rgba(255,255,255,0.06);
         }
 
         .nav-logo {

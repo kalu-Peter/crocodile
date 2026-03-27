@@ -67,38 +67,39 @@ const VillaDetailsPage: React.FC = () => {
         nav {
           position: fixed; top: 0; left: 0; right: 0; z-index: 100;
           padding: 22px 60px; display: flex; justify-content: space-between; align-items: center;
-          background: #fff; border-bottom: 1px solid rgba(0,0,0,0.08);
+          background: rgba(10,10,10,0.82); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+          border-bottom: 1px solid rgba(255,255,255,0.06);
         }
         .nav-logo {
           font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700;
-          letter-spacing: 0.05em; color: #0a0a0a; text-decoration: none;
+          letter-spacing: 0.05em; color: #f0f0f0; text-decoration: none;
           background: none; border: none; cursor: pointer; padding: 0;
         }
         .nav-logo span { color: #909090; }
         .nav-links { display: flex; gap: 44px; list-style: none; }
         .nav-links a, .nav-links button {
           font-family: 'Josefin Sans', sans-serif; font-size: 0.7rem; font-weight: 300;
-          letter-spacing: 0.2em; text-transform: uppercase; color: #0a0a0a;
+          letter-spacing: 0.2em; text-transform: uppercase; color: #f0f0f0;
           text-decoration: none; opacity: 0.6; transition: opacity 0.3s;
           background: none; border: none; cursor: pointer; padding: 0;
         }
         .nav-links a:hover, .nav-links button:hover { opacity: 1; }
 
         .hamburger { display: none; flex-direction: column; gap: 6px; background: none; border: none; cursor: pointer; padding: 0; z-index: 101; }
-        .hamburger span { width: 24px; height: 2px; background: #0a0a0a; transition: all 0.3s ease; display: block; }
+        .hamburger span { width: 24px; height: 2px; background: #f0f0f0; transition: all 0.3s ease; display: block; }
         .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(8px, 8px); }
         .hamburger.active span:nth-child(2) { opacity: 0; }
         .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(7px, -7px); }
 
         .mobile-menu {
           display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-          background: #fff; z-index: 50; padding-top: 100px;
+          background: rgba(10,10,10,0.97); z-index: 50; padding-top: 100px;
           flex-direction: column; align-items: center; gap: 30px;
         }
         .mobile-menu.active { display: flex; }
         .mobile-menu a, .mobile-menu button {
           font-family: 'Josefin Sans', sans-serif; font-size: 1rem; letter-spacing: 0.2em;
-          text-transform: uppercase; color: #0a0a0a; text-decoration: none;
+          text-transform: uppercase; color: #f0f0f0; text-decoration: none;
           background: none; border: none; cursor: pointer; padding: 0; transition: color 0.3s;
         }
         .mobile-menu a:hover, .mobile-menu button:hover { color: #b8913e; }

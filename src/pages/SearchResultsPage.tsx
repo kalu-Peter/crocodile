@@ -113,18 +113,19 @@ const SearchResultsPage: React.FC = () => {
         .sr-nav {
           position:fixed; top:0; left:0; right:0; z-index:100;
           padding:22px 60px; display:flex; align-items:center; justify-content:space-between;
-          background:#fff; border-bottom:1px solid rgba(0,0,0,0.08);
+          background:rgba(10,10,10,0.82); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+          border-bottom:1px solid rgba(255,255,255,0.06);
         }
-        .sr-nav-logo { font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:700; color:#0a0a0a; text-decoration:none; }
+        .sr-nav-logo { font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:700; color:#f0f0f0; text-decoration:none; }
         .sr-nav-logo span { color:#909090; }
         .sr-nav-links { display:flex; gap:36px; list-style:none; }
-        .sr-nav-links a { font-family:'Josefin Sans',sans-serif; font-size:0.68rem; letter-spacing:0.18em; text-transform:uppercase; color:#0a0a0a; text-decoration:none; opacity:0.6; transition:opacity 0.2s; }
+        .sr-nav-links a { font-family:'Josefin Sans',sans-serif; font-size:0.68rem; letter-spacing:0.18em; text-transform:uppercase; color:#f0f0f0; text-decoration:none; opacity:0.6; transition:opacity 0.2s; }
         .sr-nav-links a:hover { opacity:1; }
         .hamburger { display:none; flex-direction:column; gap:5px; background:none; border:none; cursor:pointer; }
-        .hamburger span { width:22px; height:2px; background:#0a0a0a; display:block; }
-        .mobile-menu { display:none; position:fixed; inset:0; background:#fff; z-index:50; flex-direction:column; align-items:center; justify-content:center; gap:28px; }
+        .hamburger span { width:22px; height:2px; background:#f0f0f0; display:block; }
+        .mobile-menu { display:none; position:fixed; inset:0; background:rgba(10,10,10,0.97); z-index:50; flex-direction:column; align-items:center; justify-content:center; gap:28px; }
         .mobile-menu.open { display:flex; }
-        .mobile-menu a { font-family:'Josefin Sans',sans-serif; font-size:1rem; letter-spacing:0.2em; text-transform:uppercase; color:#0a0a0a; text-decoration:none; }
+        .mobile-menu a { font-family:'Josefin Sans',sans-serif; font-size:1rem; letter-spacing:0.2em; text-transform:uppercase; color:#f0f0f0; text-decoration:none; }
 
         .sr-wrap { max-width:1200px; margin:0 auto; padding:110px 40px 80px; }
 
