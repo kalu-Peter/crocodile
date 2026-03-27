@@ -52,93 +52,101 @@ const VillaDetailsPage: React.FC = () => {
 
         nav {
           position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-          padding: 28px 60px; display: flex; justify-content: space-between; align-items: center;
-          background: linear-gradient(180deg, rgba(10,10,10,0.95) 0%, transparent 100%);
-          backdrop-filter: blur(2px);
+          padding: 22px 60px; display: flex; justify-content: space-between; align-items: center;
+          background: #fff; border-bottom: 1px solid rgba(0,0,0,0.08);
         }
         .nav-logo {
           font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700;
-          letter-spacing: 0.05em; color: #f0f0f0; text-decoration: none;
+          letter-spacing: 0.05em; color: #0a0a0a; text-decoration: none;
           background: none; border: none; cursor: pointer; padding: 0;
         }
         .nav-logo span { color: #909090; }
         .nav-links { display: flex; gap: 44px; list-style: none; }
         .nav-links a, .nav-links button {
           font-family: 'Josefin Sans', sans-serif; font-size: 0.7rem; font-weight: 300;
-          letter-spacing: 0.2em; text-transform: uppercase; color: #f0f0f0;
-          text-decoration: none; opacity: 0.8; transition: opacity 0.3s, color 0.3s;
+          letter-spacing: 0.2em; text-transform: uppercase; color: #0a0a0a;
+          text-decoration: none; opacity: 0.6; transition: opacity 0.3s;
           background: none; border: none; cursor: pointer; padding: 0;
         }
-        .nav-links a:hover, .nav-links button:hover { opacity: 1; color: #909090; }
+        .nav-links a:hover, .nav-links button:hover { opacity: 1; }
 
         .hamburger { display: none; flex-direction: column; gap: 6px; background: none; border: none; cursor: pointer; padding: 0; z-index: 101; }
-        .hamburger span { width: 24px; height: 2px; background: #f0f0f0; transition: all 0.3s ease; display: block; }
+        .hamburger span { width: 24px; height: 2px; background: #0a0a0a; transition: all 0.3s ease; display: block; }
         .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(8px, 8px); }
         .hamburger.active span:nth-child(2) { opacity: 0; }
         .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(7px, -7px); }
 
         .mobile-menu {
           display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-          background: rgba(10,10,10,0.98); z-index: 50; padding-top: 100px;
-          flex-direction: column; align-items: center; gap: 30px; backdrop-filter: blur(4px);
+          background: #fff; z-index: 50; padding-top: 100px;
+          flex-direction: column; align-items: center; gap: 30px;
         }
         .mobile-menu.active { display: flex; }
         .mobile-menu a, .mobile-menu button {
           font-family: 'Josefin Sans', sans-serif; font-size: 1rem; letter-spacing: 0.2em;
-          text-transform: uppercase; color: #f0f0f0; text-decoration: none;
+          text-transform: uppercase; color: #0a0a0a; text-decoration: none;
           background: none; border: none; cursor: pointer; padding: 0; transition: color 0.3s;
         }
-        .mobile-menu a:hover, .mobile-menu button:hover { color: #909090; }
+        .mobile-menu a:hover, .mobile-menu button:hover { color: #b8913e; }
 
         /* ── VILLA DETAILS PAGE ── */
-        .vdp-page { min-height: 100vh; background: #ffffff; padding-top: 90px; }
+        .vdp-page { min-height: 100vh; background: #ffffff; padding-top: 70px; }
 
-        .vdp-hero {
-          width: 100%; height: 62vh; position: relative; overflow: hidden;
-        }
-        .vdp-hero img { width: 100%; height: 100%; object-fit: cover; }
-        .vdp-hero-overlay {
-          position: absolute; inset: 0;
-          background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.72) 100%);
-        }
-        .vdp-hero-content {
-          position: absolute; bottom: 44px; left: 60px; right: 60px;
+        /* ── PAGE HEADER (replaces hero) ── */
+        .vdp-header {
+          max-width: 860px; margin: 0 auto;
+          padding: 36px 40px 20px;
         }
         .vdp-type {
-          font-family: 'Josefin Sans', sans-serif; font-size: 0.62rem;
-          letter-spacing: 0.35em; text-transform: uppercase; color: #c9a84c; margin-bottom: 10px;
+          font-family: 'Josefin Sans', sans-serif; font-size: 0.58rem;
+          letter-spacing: 0.35em; text-transform: uppercase; color: #b8913e; margin-bottom: 8px;
         }
         .vdp-title {
-          font-family: 'Playfair Display', serif; font-size: clamp(2rem, 5vw, 3.8rem);
-          font-weight: 900; color: #ffffff; line-height: 1.05; margin-bottom: 14px;
+          font-family: 'Playfair Display', serif; font-size: clamp(1.6rem, 4vw, 2.4rem);
+          font-weight: 900; color: #0a0a0a; line-height: 1.1; margin-bottom: 10px;
         }
         .vdp-meta {
-          display: flex; gap: 22px; flex-wrap: wrap;
-          font-family: 'Josefin Sans', sans-serif; font-size: 0.7rem;
-          letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.65);
+          display: flex; gap: 16px; flex-wrap: wrap;
+          font-family: 'Josefin Sans', sans-serif; font-size: 0.65rem;
+          letter-spacing: 0.1em; text-transform: uppercase; color: rgba(10,10,10,0.45);
         }
 
         /* ── GALLERY ── */
-        .vdp-gallery { background: #f2f2f2; border-bottom: 1px solid rgba(0,0,0,0.08); }
-        .vdp-gallery-main { width: 100%; height: 500px; position: relative; overflow: hidden; }
+        .vdp-gallery {
+          max-width: 860px; margin: 0 auto 0;
+          padding: 0 40px;
+        }
+        .vdp-gallery-main {
+          width: 100%; height: 380px; position: relative; overflow: hidden;
+          border-radius: 10px; background: #f2f2f2;
+        }
         .vdp-gallery-main img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s; display: block; }
         .vdp-thumbs {
-          display: flex; gap: 6px; padding: 10px 60px; overflow-x: auto;
-          background: #f2f2f2; scrollbar-width: thin; scrollbar-color: #ccc #f2f2f2;
+          display: flex; gap: 6px; padding: 8px 0; overflow-x: auto;
+          scrollbar-width: thin; scrollbar-color: #ccc transparent;
         }
         .vdp-thumb {
-          flex-shrink: 0; width: 84px; height: 60px; border: 2px solid transparent;
-          border-radius: 3px; overflow: hidden; cursor: pointer; padding: 0;
-          background: none; opacity: 0.5; transition: opacity 0.2s, border-color 0.2s;
+          flex-shrink: 0; width: 72px; height: 52px; border: 2px solid transparent;
+          border-radius: 4px; overflow: hidden; cursor: pointer; padding: 0;
+          background: none; opacity: 0.55; transition: opacity 0.2s, border-color 0.2s;
         }
         .vdp-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .vdp-thumb:hover, .vdp-thumb.active { opacity: 1; border-color: #b8913e; }
-        .vdp-gallery-main img { cursor: default; }
+
+        @media(max-width:768px) {
+          .vdp-header { padding: 24px 20px 16px; }
+          .vdp-gallery { padding: 0 20px; }
+          .vdp-gallery-main { height: 240px; border-radius: 8px; }
+          .vdp-thumb { width: 58px; height: 42px; }
+        }
 
         /* ── BODY GRID ── */
         .vdp-body {
           max-width: 860px; margin: 0 auto;
-          padding: 64px 60px 100px;
+          padding: 36px 40px 100px;
+        }
+        @media(max-width:768px) {
+          .vdp-body { padding: 24px 20px 80px; }
         }
 
         /* back link */
@@ -288,37 +296,36 @@ const VillaDetailsPage: React.FC = () => {
 
       <div className="vdp-page">
 
-        {/* HERO */}
-        <div className="vdp-hero">
-          <img src={villa.image} alt={villa.name} />
-          <div className="vdp-hero-overlay" />
-          <div className="vdp-hero-content">
-            <div className="vdp-type">{villa.type}</div>
-            <h1 className="vdp-title">{villa.name}</h1>
-            <div className="vdp-meta">
-              {villa.bedrooms && <span>🛏 {villa.bedrooms} Bedroom{villa.bedrooms > 1 ? "s" : ""}</span>}
-              {villa.bathrooms && <span>🚿 {villa.bathrooms} Bathroom{villa.bathrooms > 1 ? "s" : ""}</span>}
-              <span>👥 Up to {villa.maxGuests} guests</span>
-            </div>
+        {/* PAGE HEADER */}
+        <div className="vdp-header">
+          <div className="vdp-type">{villa.type}</div>
+          <h1 className="vdp-title">{villa.name}</h1>
+          <div className="vdp-meta">
+            {villa.bedrooms && <span>{villa.bedrooms} Bedroom{villa.bedrooms > 1 ? "s" : ""}</span>}
+            {villa.bathrooms && <span>{villa.bathrooms} Bathroom{villa.bathrooms > 1 ? "s" : ""}</span>}
+            <span>Up to {villa.maxGuests} guests</span>
           </div>
         </div>
 
         {/* GALLERY */}
-        {images.length > 1 && (
-          <div className="vdp-gallery">
-            <div className="vdp-gallery-main">
-              <img
-                src={images[activeImg]}
-                alt={`${villa.name} — photo ${activeImg + 1}`}
-              />
-              {activeImg > 0 && (
-                <button className="gallery-arrow gallery-arrow--prev" onClick={() => setActiveImg((i) => i - 1)} aria-label="Previous">&#8249;</button>
-              )}
-              {activeImg < images.length - 1 && (
-                <button className="gallery-arrow gallery-arrow--next" onClick={() => setActiveImg((i) => i + 1)} aria-label="Next">&#8250;</button>
-              )}
+        <div className="vdp-gallery">
+          <div className="vdp-gallery-main">
+            <img
+              src={images[activeImg]}
+              alt={`${villa.name} — photo ${activeImg + 1}`}
+              decoding="async"
+            />
+            {activeImg > 0 && (
+              <button className="gallery-arrow gallery-arrow--prev" onClick={() => setActiveImg((i) => i - 1)} aria-label="Previous">&#8249;</button>
+            )}
+            {activeImg < images.length - 1 && (
+              <button className="gallery-arrow gallery-arrow--next" onClick={() => setActiveImg((i) => i + 1)} aria-label="Next">&#8250;</button>
+            )}
+            {images.length > 1 && (
               <div className="gallery-counter">{activeImg + 1} / {images.length}</div>
-            </div>
+            )}
+          </div>
+          {images.length > 1 && (
             <div className="vdp-thumbs">
               {images.map((src, i) => (
                 <button key={i} className={`vdp-thumb${i === activeImg ? " active" : ""}`} onClick={() => setActiveImg(i)}>
@@ -326,8 +333,8 @@ const VillaDetailsPage: React.FC = () => {
                 </button>
               ))}
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* BODY */}
         <div className="vdp-body">
