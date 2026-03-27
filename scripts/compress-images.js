@@ -1,65 +1,58 @@
 /**
- * One-time image compression script.
- * Install sharp first:  npm install --save-dev sharp
- * Then run:            node scripts/compress-images.js
- *
- * What it does:
- *   - Walks public/images/ recursively
- *   - Compresses JPEG/JPG → 80% quality, max 1920px wide
- *   - Compresses PNG → lossy, max 1920px wide
- *   - Overwrites originals in place (backs up nothing — run on a git-clean tree)
+ * Image compression script — buffer-based (Windows-safe).
+ * Run:  npm run compress-images
  */
 
 import sharp from "sharp";
-import { readdirSync, statSync } from "fs";
+import { readdirSync, statSync, readFileSync, writeFileSync } from "fs";
 import { join, extname } from "path";
 
-const ROOT = new URL("../public/images", import.meta.url).pathname.replace(/^\/([A-Z]:)/, "$1");
-const MAX_WIDTH = 1920;
+const ROOT = join(process.cwd(), "public", "images");
+const MAX_WIDTH = 1280;
 
 let total = 0;
-let saved = 0;
+let savedBytes = 0;
 
-function walk(dir) {
+function collectFiles(dir, result = []) {
   for (const entry of readdirSync(dir)) {
     const full = join(dir, entry);
-    if (statSync(full).isDirectory()) { walk(full); continue; }
+    if (statSync(full).isDirectory()) { collectFiles(full, result); continue; }
     const ext = extname(full).toLowerCase();
-    if (![".jpg", ".jpeg", ".png", ".webp"].includes(ext)) continue;
-    compress(full, ext);
+    if ([".jpg", ".jpeg", ".png", ".webp"].includes(ext)) result.push({ full, ext });
   }
+  return result;
 }
 
 async function compress(filePath, ext) {
   try {
     const before = statSync(filePath).size;
-    const img = sharp(filePath).resize({ width: MAX_WIDTH, withoutEnlargement: true });
+    const inputBuf = readFileSync(filePath); // read as buffer — avoids Windows path issues
 
-    let buf;
-    if (ext === ".png") {
-      buf = await img.png({ compressionLevel: 9, effort: 10 }).toBuffer();
-    } else {
-      buf = await img.jpeg({ quality: 80, mozjpeg: true }).toBuffer();
-    }
+    const img = sharp(inputBuf, { failOn: "none" })
+      .resize({ width: MAX_WIDTH, withoutEnlargement: true });
+
+    const buf = ext === ".png"
+      ? await img.png({ compressionLevel: 9 }).toBuffer()
+      : await img.jpeg({ quality: 72, mozjpeg: true, progressive: true }).toBuffer();
 
     const after = buf.length;
-    const reduction = ((1 - after / before) * 100).toFixed(1);
-
+    const label = filePath.replace(ROOT, "");
     if (after < before) {
-      const { writeFileSync } = await import("fs");
       writeFileSync(filePath, buf);
-      saved += before - after;
-      console.log(`✓ ${filePath.split("public")[1]}  ${(before/1024).toFixed(0)}KB → ${(after/1024).toFixed(0)}KB  (-${reduction}%)`);
+      savedBytes += before - after;
+      console.log(`✓ ${label}  ${(before/1024/1024).toFixed(1)}MB → ${(after/1024/1024).toFixed(1)}MB  (-${((1 - after/before)*100).toFixed(0)}%)`);
     } else {
-      console.log(`– ${filePath.split("public")[1]}  already optimal`);
+      process.stdout.write(`. ${label} already small\n`);
     }
     total++;
   } catch (err) {
-    console.error(`✗ ${filePath}: ${err.message}`);
+    console.error(`✗ ${filePath.replace(ROOT, "")}: ${err.message}`);
   }
 }
 
-walk(ROOT);
-setTimeout(() => {
-  console.log(`\nDone: ${total} images processed, ${(saved / 1024 / 1024).toFixed(2)} MB saved`);
-}, 500);
+const files = collectFiles(ROOT);
+console.log(`Processing ${files.length} images…\n`);
+for (const { full, ext } of files) {
+  await compress(full, ext);
+}
+console.log(`\nDone: ${total} images, ${(savedBytes / 1024 / 1024).toFixed(1)} MB saved`);
