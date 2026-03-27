@@ -89,23 +89,39 @@ const VillaCard: React.FC<VillaCardProps> = ({ villa, onSelectVilla }) => {
 
 
         <div className="villa-card-buttons">
-          <span
-            onClick={() => villa.isAvailable && onSelectVilla(villa)}
-            style={{
-              color: villa.color,
+          {villa.openingSoon ? (
+            <span style={{
               fontFamily: "'Josefin Sans', sans-serif",
-              fontSize: "0.78rem",
-              fontWeight: 700,
-              letterSpacing: "0.1em",
+              fontSize: "0.72rem",
+              fontWeight: 600,
+              letterSpacing: "0.12em",
               textTransform: "uppercase",
-              cursor: villa.isAvailable ? "pointer" : "default",
-              opacity: villa.isAvailable ? 1 : 0.4,
-              textDecoration: "underline",
-              textUnderlineOffset: "3px",
-            }}
-          >
-            View Details
-          </span>
+              color: "#7c3aed",
+              background: "rgba(124,58,237,0.08)",
+              padding: "4px 10px",
+              borderRadius: 4,
+            }}>
+              Opening Soon
+            </span>
+          ) : (
+            <span
+              onClick={() => villa.isAvailable && onSelectVilla(villa)}
+              style={{
+                color: villa.color,
+                fontFamily: "'Josefin Sans', sans-serif",
+                fontSize: "0.78rem",
+                fontWeight: 700,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                cursor: villa.isAvailable ? "pointer" : "default",
+                opacity: villa.isAvailable ? 1 : 0.4,
+                textDecoration: "underline",
+                textUnderlineOffset: "3px",
+              }}
+            >
+              View Details
+            </span>
+          )}
         </div>
       </div>
     </div>

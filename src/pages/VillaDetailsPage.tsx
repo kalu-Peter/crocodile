@@ -133,6 +133,7 @@ const VillaDetailsPage: React.FC = () => {
         }
         .vdp-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .vdp-thumb:hover, .vdp-thumb.active { opacity: 1; border-color: #b8913e; }
+        .vdp-gallery-main img { cursor: default; }
 
         /* ── BODY GRID ── */
         .vdp-body {
@@ -306,7 +307,10 @@ const VillaDetailsPage: React.FC = () => {
         {images.length > 1 && (
           <div className="vdp-gallery">
             <div className="vdp-gallery-main">
-              <img src={images[activeImg]} alt={`${villa.name} — photo ${activeImg + 1}`} />
+              <img
+                src={images[activeImg]}
+                alt={`${villa.name} — photo ${activeImg + 1}`}
+              />
               {activeImg > 0 && (
                 <button className="gallery-arrow gallery-arrow--prev" onClick={() => setActiveImg((i) => i - 1)} aria-label="Previous">&#8249;</button>
               )}
@@ -433,6 +437,7 @@ const VillaDetailsPage: React.FC = () => {
 
         </div>
       </div>
+
     </>
   );
 };

@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 const Gallery: React.FC = () => {
   const [activeSection, setActiveSection] = useState<string>("general");
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [viewerIndex, setViewerIndex] = useState(0);
 
   const galleryData = {
     general: [
@@ -237,6 +239,8 @@ const Gallery: React.FC = () => {
       { src: "/images/mango park/20250731_101142.jpg", alt: "Mango Park" },
     ],
   };
+
+  const currentImages = galleryData[activeSection as keyof typeof galleryData] ?? [];
 
   const sections = [
     { id: "general", label: "General", color: "#c8b89a" },
@@ -558,6 +562,60 @@ const Gallery: React.FC = () => {
         .gallery-item:hover .gallery-item-overlay {
           opacity: 1;
         }
+        .gallery-item { cursor: zoom-in; }
+
+        /* Full-page image viewer */
+        .img-viewer {
+          position: fixed; inset: 0; background: #0a0a0a;
+          display: flex; flex-direction: column;
+          z-index: 9999;
+        }
+        .img-viewer-topbar {
+          display: flex; align-items: center; justify-content: space-between;
+          padding: 18px 28px; flex-shrink: 0;
+        }
+        .img-viewer-back {
+          display: inline-flex; align-items: center; gap: 8px;
+          background: none; border: none; color: rgba(255,255,255,0.75);
+          font-family: 'Josefin Sans', sans-serif; font-size: 0.68rem;
+          letter-spacing: 0.18em; text-transform: uppercase; cursor: pointer;
+          transition: color 0.2s; padding: 0;
+        }
+        .img-viewer-back:hover { color: #fff; }
+        .img-viewer-counter {
+          font-family: 'Josefin Sans', sans-serif; font-size: 0.68rem;
+          letter-spacing: 0.15em; color: rgba(255,255,255,0.45);
+        }
+        .img-viewer-stage {
+          flex: 1; display: flex; align-items: center; justify-content: center;
+          position: relative; overflow: hidden; width: 100%;
+        }
+        .img-viewer-img {
+          width: 100%; height: 100%;
+          object-fit: contain; display: block;
+          user-select: none;
+        }
+        .img-viewer-arrow {
+          position: absolute; top: 50%; transform: translateY(-50%);
+          background: rgba(255,255,255,0.1); border: none; color: #fff;
+          font-size: 2.4rem; width: 52px; height: 52px; border-radius: 50%;
+          cursor: pointer; display: flex; align-items: center; justify-content: center;
+          transition: background 0.2s;
+        }
+        .img-viewer-arrow:hover { background: rgba(255,255,255,0.22); }
+        .img-viewer-arrow--prev { left: 14px; }
+        .img-viewer-arrow--next { right: 14px; }
+        .img-viewer-label {
+          text-align: center; padding: 14px 28px; flex-shrink: 0;
+          font-family: 'Josefin Sans', sans-serif; font-size: 0.65rem;
+          letter-spacing: 0.12em; text-transform: uppercase;
+          color: rgba(255,255,255,0.3);
+        }
+        @media (max-width: 600px) {
+          .img-viewer-arrow { width: 40px; height: 40px; font-size: 1.8rem; }
+          .img-viewer-arrow--prev { left: 6px; }
+          .img-viewer-arrow--next { right: 6px; }
+        }
 
         .gallery-item-text {
           font-family: 'Playfair Display', serif;
@@ -671,22 +729,42 @@ const Gallery: React.FC = () => {
 
         {/* Gallery Grid */}
         <div className="gallery-grid">
-          {galleryData[activeSection as keyof typeof galleryData]?.map(
-            (image, index) => (
-              <div key={index} className="gallery-item">
-                <img
-                  src={image.src}
-                  alt={image.alt}
-                  className="gallery-item-img"
-                />
-                <div className="gallery-item-overlay">
-                  <div className="gallery-item-text">{image.alt}</div>
-                </div>
+          {currentImages.map((image, index) => (
+            <div key={index} className="gallery-item" onClick={() => { setViewerIndex(index); setViewerOpen(true); }}>
+              <img src={image.src} alt={image.alt} className="gallery-item-img" />
+              <div className="gallery-item-overlay">
+                <div className="gallery-item-text">{image.alt}</div>
               </div>
-            ),
-          )}
+            </div>
+          ))}
         </div>
       </section>
+
+      {/* Full-page image viewer */}
+      {viewerOpen && (
+        <div className="img-viewer">
+          <div className="img-viewer-topbar">
+            <button className="img-viewer-back" onClick={() => setViewerOpen(false)}>
+              ← Back to gallery
+            </button>
+            <span className="img-viewer-counter">{viewerIndex + 1} / {currentImages.length}</span>
+          </div>
+          <div className="img-viewer-stage">
+            {viewerIndex > 0 && (
+              <button className="img-viewer-arrow img-viewer-arrow--prev" onClick={() => setViewerIndex((i) => i - 1)}>&#8249;</button>
+            )}
+            <img
+              className="img-viewer-img"
+              src={currentImages[viewerIndex]?.src}
+              alt={currentImages[viewerIndex]?.alt}
+            />
+            {viewerIndex < currentImages.length - 1 && (
+              <button className="img-viewer-arrow img-viewer-arrow--next" onClick={() => setViewerIndex((i) => i + 1)}>&#8250;</button>
+            )}
+          </div>
+          <div className="img-viewer-label">{currentImages[viewerIndex]?.alt}</div>
+        </div>
+      )}
     </>
   );
 };

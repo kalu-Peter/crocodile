@@ -20,6 +20,7 @@ export interface Villa {
   bedrooms?: number;
   bathrooms?: number;
   contactOnly?: boolean; // if true, show WhatsApp contact instead of online reservation
+  openingSoon?: boolean; // if true, show "Opening Soon" instead of Reserved/unavailable
 }
 
 export interface Reservation {
@@ -219,6 +220,44 @@ export const VILLAS: Villa[] = [
       "Daily Housekeeping",
     ],
     pricing: [{ baseGuests: 4, basePrice: 6000, extraPersonFee: 0 }],
+  },
+  {
+    id: "paradise-villa",
+    name: "Paradise Villa",
+    type: "Villa",
+    maxGuests: 4,
+    bedrooms: 2,
+    bathrooms: 2,
+    openingSoon: true,
+    description:
+      "A stunning villa nestled in a private tropical setting. Two spacious bedrooms, lush garden surroundings, and premium finishes make Paradise Villa the ultimate retreat for couples or small families seeking an unforgettable Diani experience.",
+    isAvailable: false,
+    color: "#7c3aed",
+    image: "/images/paradise/IMG_20260223_151803.jpg",
+    gallery: [
+      "/images/paradise/IMG_20260223_151803.jpg",
+      "/images/paradise/IMG_20260223_151823.jpg",
+      "/images/paradise/IMG_20260223_151836.jpg",
+      "/images/paradise/IMG_20260223_151847.jpg",
+      "/images/paradise/IMG_20260223_151927.jpg",
+      "/images/paradise/IMG_20260223_151930.jpg",
+      "/images/paradise/IMG_20260223_151951.jpg",
+      "/images/paradise/IMG_20260223_151959.jpg",
+      "/images/paradise/IMG_20260223_152031.jpg",
+      "/images/paradise/IMG_20260223_154754.jpg",
+      "/images/paradise/IMG_20260223_154913.jpg",
+    ],
+    amenities: [
+      "2 Bedrooms",
+      "2 Bathrooms",
+      "Private Garden",
+      "Swimming Pool",
+      "Fully Equipped Kitchen",
+      "Air Conditioning",
+      "Free Wi-Fi",
+      "Daily Housekeeping",
+    ],
+    pricing: [{ baseGuests: 4, basePrice: 15000, extraPersonFee: 2000 }],
   },
 ];
 
