@@ -29,6 +29,7 @@ async function compress(filePath, ext) {
     const inputBuf = readFileSync(filePath); // read as buffer — avoids Windows path issues
 
     const img = sharp(inputBuf, { failOn: "none" })
+      .rotate() // auto-rotate based on EXIF orientation, then strip EXIF
       .resize({ width: MAX_WIDTH, withoutEnlargement: true });
 
     const buf = ext === ".png"
