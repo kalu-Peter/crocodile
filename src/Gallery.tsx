@@ -250,7 +250,32 @@ const Gallery: React.FC = () => {
       { src: "/images/mango park/20250731_100905.jpg", alt: "Mango Park" },
       { src: "/images/mango park/20250731_101142.jpg", alt: "Mango Park" },
     ],
+    paradise: [
+      { src: "/images/paradise/IMG_20260223_151803.jpg", alt: "Paradise Villa" },
+      { src: "/images/paradise/IMG_20260223_151823.jpg", alt: "Paradise Villa" },
+      { src: "/images/paradise/IMG_20260223_151836.jpg", alt: "Paradise Villa" },
+      { src: "/images/paradise/IMG_20260223_151847.jpg", alt: "Paradise Villa" },
+      { src: "/images/paradise/IMG_20260223_151927.jpg", alt: "Paradise Villa" },
+      { src: "/images/paradise/IMG_20260223_151930.jpg", alt: "Paradise Villa" },
+      { src: "/images/paradise/IMG_20260223_151951.jpg", alt: "Paradise Villa" },
+      { src: "/images/paradise/IMG_20260223_151959.jpg", alt: "Paradise Villa" },
+      { src: "/images/paradise/IMG_20260223_152031.jpg", alt: "Paradise Villa" },
+      { src: "/images/paradise/IMG_20260223_154754.jpg", alt: "Paradise Villa" },
+      { src: "/images/paradise/IMG_20260223_154913.jpg", alt: "Paradise Villa" },
+    ],
   };
+
+  const videos = [
+    { src: "/videos/VID-20260309-WA0002.mp4", label: "Crocodile Lodge" },
+    { src: "/videos/VID-20260309-WA0004.mp4", label: "Crocodile Lodge" },
+    { src: "/videos/VID-20260309-WA0006.mp4", label: "Crocodile Lodge" },
+    { src: "/videos/VID-20260309-WA0007.mp4", label: "Crocodile Lodge" },
+    { src: "/videos/VID-20260309-WA0008.mp4", label: "Crocodile Lodge" },
+    { src: "/videos/VID-20260309-WA0019.mp4", label: "Crocodile Lodge" },
+    { src: "/videos/VID-20260309-WA0021.mp4", label: "Crocodile Lodge" },
+    { src: "/videos/VID-20260309-WA0026.mp4", label: "Crocodile Lodge" },
+    { src: "/videos/VID-20260309-WA0027.mp4", label: "Crocodile Lodge" },
+  ];
 
   const currentImages = galleryData[activeSection as keyof typeof galleryData] ?? [];
 
@@ -259,8 +284,10 @@ const Gallery: React.FC = () => {
     { id: "blue", label: "Blue Villa", color: "#3b82f6" },
     { id: "green", label: "Green Villa", color: "#10b981" },
     { id: "gold", label: "Gold Lodge", color: "#eab308" },
-    { id: "mango1stfloor", label: "Mango Villas 1st Floor", color: "#f97316" },
+    { id: "mango1stfloor", label: "Mango 1st Floor", color: "#f97316" },
     { id: "mangopark", label: "Mango Villas", color: "#84cc16" },
+    { id: "paradise", label: "Paradise Villa", color: "#7c3aed" },
+    { id: "videos", label: "Videos", color: "#ef4444" },
   ];
 
   return (
@@ -649,16 +676,41 @@ const Gallery: React.FC = () => {
           font-weight: 700;
         }
 
+        /* VIDEO GRID */
+        .video-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+          gap: 24px;
+          max-width: 1400px;
+          margin: 0 auto;
+          padding: 0 60px;
+        }
+        .video-card {
+          background: #0a0a0a;
+          border-radius: 6px;
+          overflow: hidden;
+        }
+        .video-card video {
+          width: 100%; display: block;
+          max-height: 280px; object-fit: cover;
+        }
+        .video-card-label {
+          font-family: 'Josefin Sans', sans-serif;
+          font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase;
+          color: rgba(255,255,255,0.4); padding: 10px 14px;
+        }
+
         @media (max-width: 900px) {
-          .gallery-grid { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+          .gallery-grid { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); padding: 0 30px; }
+          .video-grid { grid-template-columns: 1fr 1fr; padding: 0 30px; }
           .gallery-header { padding: 0 30px; }
           .section-tabs { padding: 0 30px; }
-          .gallery-grid { padding: 0 30px; }
           nav { padding: 24px 30px; }
         }
 
         @media (max-width: 600px) {
           .gallery-grid { grid-template-columns: 1fr; }
+          .video-grid { grid-template-columns: 1fr; padding: 0 20px; }
           .gallery-title { font-size: 2rem; }
           .section-tabs { gap: 10px; }
           .section-tab { padding: 10px 16px; font-size: 0.65rem; }
@@ -751,17 +803,30 @@ const Gallery: React.FC = () => {
           ))}
         </div>
 
-        {/* Gallery Grid */}
-        <div className="gallery-grid">
-          {currentImages.map((image, index) => (
-            <div key={index} className="gallery-item" onClick={() => { setViewerIndex(index); setViewerOpen(true); }}>
-              <img src={image.src} alt={image.alt} className="gallery-item-img" loading="lazy" decoding="async" />
-              <div className="gallery-item-overlay">
-                <div className="gallery-item-text">{image.alt}</div>
+        {/* Gallery Grid / Video Grid */}
+        {activeSection === "videos" ? (
+          <div className="video-grid">
+            {videos.map((video, index) => (
+              <div key={index} className="video-card">
+                <video controls preload="metadata" playsInline>
+                  <source src={video.src} type="video/mp4" />
+                </video>
+                <div className="video-card-label">{video.label}</div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="gallery-grid">
+            {currentImages.map((image, index) => (
+              <div key={index} className="gallery-item" onClick={() => { setViewerIndex(index); setViewerOpen(true); }}>
+                <img src={image.src} alt={image.alt} className="gallery-item-img" loading="lazy" decoding="async" />
+                <div className="gallery-item-overlay">
+                  <div className="gallery-item-text">{image.alt}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Image viewer */}
