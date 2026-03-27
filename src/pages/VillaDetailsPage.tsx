@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { VILLAS } from "../types";
 import CurrencySelector from "../components/CurrencySelector";
@@ -12,6 +12,20 @@ const VillaDetailsPage: React.FC = () => {
 
   const [activeImg, setActiveImg] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const touchStartX = useRef<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const diff = touchStartX.current - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) {
+      if (diff > 0) setActiveImg((i) => Math.min(i + 1, images.length - 1));
+      else setActiveImg((i) => Math.max(i - 1, 0));
+    }
+    touchStartX.current = null;
+  };
 
   if (!villa) {
     return (
@@ -118,7 +132,7 @@ const VillaDetailsPage: React.FC = () => {
         }
         .vdp-gallery-main {
           width: 100%; height: 380px; position: relative; overflow: hidden;
-          border-radius: 10px; background: #f2f2f2;
+          background: #f2f2f2;
         }
         .vdp-gallery-main img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s; display: block; }
         .vdp-thumbs {
@@ -136,7 +150,7 @@ const VillaDetailsPage: React.FC = () => {
         @media(max-width:768px) {
           .vdp-header { padding: 24px 20px 16px; }
           .vdp-gallery { padding: 0 20px; }
-          .vdp-gallery-main { height: 240px; border-radius: 8px; }
+          .vdp-gallery-main { height: 240px; }
           .vdp-thumb { width: 58px; height: 42px; }
         }
 
@@ -309,7 +323,11 @@ const VillaDetailsPage: React.FC = () => {
 
         {/* GALLERY */}
         <div className="vdp-gallery">
-          <div className="vdp-gallery-main">
+          <div
+            className="vdp-gallery-main"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
             <img
               src={images[activeImg]}
               alt={`${villa.name} — photo ${activeImg + 1}`}
