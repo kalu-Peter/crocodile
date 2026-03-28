@@ -159,7 +159,7 @@ const AdminDashboardPage: React.FC = () => {
 
   const deleteUser = async (id: string, username: string) => {
     if (!window.confirm(`Delete user "${username}"?`)) return;
-    await api(`/users/${id}`, { method: "DELETE" });
+    await api(`/users?id=${id}`, { method: "DELETE" });
     await fetchUsers();
   };
 
