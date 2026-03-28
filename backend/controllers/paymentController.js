@@ -13,7 +13,16 @@ async function getMpesaToken() {
   const res = await fetch(`${MPESA_BASE}/oauth/v1/generate?grant_type=client_credentials`, {
     headers: { Authorization: `Basic ${auth}` },
   });
-  const data = await res.json();
+  const text = await res.text();
+  let data;
+  try { data = JSON.parse(text); } catch {
+    console.error("[M-Pesa] Token response not JSON:", text);
+    throw new Error("M-Pesa auth failed – unexpected response from Safaricom");
+  }
+  if (!data.access_token) {
+    console.error("[M-Pesa] Token error:", JSON.stringify(data));
+    throw new Error(data.errorMessage || data.error_description || "Failed to get M-Pesa token");
+  }
   return data.access_token;
 }
 
@@ -60,11 +69,17 @@ export async function initiateMpesa(req, res) {
       }),
     });
 
-    const data = await stkRes.json();
+    const stkText = await stkRes.text();
+    let data;
+    try { data = JSON.parse(stkText); } catch {
+      console.error("[M-Pesa] STK response not JSON:", stkText);
+      return res.status(500).json({ error: "Invalid response from Safaricom" });
+    }
+    console.log("[M-Pesa] STK response:", JSON.stringify(data));
     if (data.ResponseCode === "0") {
       return res.json({ success: true, checkoutRequestId: data.CheckoutRequestID });
     }
-    return res.status(400).json({ error: data.ResponseDescription || "STK Push failed" });
+    return res.status(400).json({ error: data.ResponseDescription || data.errorMessage || "STK Push failed" });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }

@@ -21,6 +21,27 @@ function nightsBetween(a: string, b: string) {
   );
 }
 
+const MIN_NIGHTS: Record<string, number> = {
+  "gold-lodge": 2,
+  "blue-villa": 5,
+  "green-villa": 5,
+  "apartment-1": 5,
+  "mango-park-bungalow": 5,
+  "mango-park-1st-floor": 5,
+};
+
+function getMinNights(villaId: string) {
+  return MIN_NIGHTS[villaId] ?? 1;
+}
+
+/** Returns the earliest valid checkout date string given a checkin date and villaId */
+function minCheckout(checkin: string, villaId: string) {
+  if (!checkin) return "";
+  const d = new Date(checkin);
+  d.setDate(d.getDate() + getMinNights(villaId));
+  return d.toISOString().split("T")[0];
+}
+
 function formatDate(d: string) {
   if (!d) return "";
   return new Date(d + "T00:00:00").toLocaleDateString("en-GB", {
@@ -83,6 +104,7 @@ const ReservationPage: React.FC = () => {
 
   if (!villa) return null;
 
+  const minNights = getMinNights(villa.id);
   const basePricePerNight = getVillaPrice(villa.id, guestCount) ?? 0;
   const pricePerNight = seasonalPrice ?? basePricePerNight;
   const nights = nightsBetween(checkin, checkout);
@@ -189,6 +211,10 @@ const ReservationPage: React.FC = () => {
   const validateForm = () => {
     if (!checkin || !checkout || nights <= 0) {
       alert("Please select valid check-in and check-out dates.");
+      return false;
+    }
+    if (nights < minNights) {
+      alert(`${villa.name} requires a minimum stay of ${minNights} nights.`);
       return false;
     }
     if (!formData.firstName.trim() || !formData.lastName.trim()) {
@@ -443,14 +469,22 @@ const ReservationPage: React.FC = () => {
                 <input
                   type="date"
                   value={checkin}
-                  onChange={(e) => setCheckin(e.target.value)}
+                  min={new Date().toISOString().split("T")[0]}
+                  onChange={(e) => {
+                    setCheckin(e.target.value);
+                    // push checkout forward if it no longer satisfies minimum stay
+                    if (checkout && nightsBetween(e.target.value, checkout) < minNights) {
+                      setCheckout(minCheckout(e.target.value, villa.id));
+                    }
+                  }}
                 />
               </div>
               <div className="rp-field">
-                <label>Check Out</label>
+                <label>Check Out {minNights > 1 && <span style={{ color: "#888", fontSize: "0.75em" }}>({minNights}-night min)</span>}</label>
                 <input
                   type="date"
                   value={checkout}
+                  min={minCheckout(checkin, villa.id)}
                   onChange={(e) => setCheckout(e.target.value)}
                 />
               </div>
