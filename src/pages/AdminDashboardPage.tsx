@@ -686,7 +686,7 @@ const AdminDashboardPage: React.FC = () => {
                       {f.charAt(0).toUpperCase() + f.slice(1)}
                     </button>
                   ))}
-                  <button className="adm-filter-btn" onClick={fetchReservations}>↺ Refresh</button>
+                  <button className="adm-filter-btn" onClick={() => fetchReservations()}>↺ Refresh</button>
                 </div>
               </div>
 
