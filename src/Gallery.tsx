@@ -8,12 +8,15 @@ const Gallery: React.FC = () => {
   const [viewerIndex, setViewerIndex] = useState(0);
   const touchStartX = useRef<number | null>(null);
 
-  const handleTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX; };
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (touchStartX.current === null) return;
     const diff = touchStartX.current - e.changedTouches[0].clientX;
     if (Math.abs(diff) > 40) {
-      if (diff > 0) setViewerIndex((i) => Math.min(i + 1, currentImages.length - 1));
+      if (diff > 0)
+        setViewerIndex((i) => Math.min(i + 1, currentImages.length - 1));
       else setViewerIndex((i) => Math.max(i - 1, 0));
     }
     touchStartX.current = null;
@@ -25,8 +28,6 @@ const Gallery: React.FC = () => {
         src: "/images/crocodile/Maisons Diani-photos-Pierre_Rich-2.jpg",
         alt: "Crocodile Lodge",
       },
-      { src: "/images/crocodile/FB_IMG_1734527214582.jpg", alt: "Lodge View" },
-      { src: "/images/crocodile/20250318_171046.jpg", alt: "Property Grounds" },
       {
         src: "/images/crocodile/IMG_20241121_135225.jpg",
         alt: "Lodge Exterior",
@@ -228,40 +229,118 @@ const Gallery: React.FC = () => {
       },
     ],
     mango1stfloor: [
-      { src: "/images/mango 1st floor/1st floor 1.jpg", alt: "Mango 1st Floor" },
-      { src: "/images/mango 1st floor/1st floor 2.jpg", alt: "Mango 1st Floor" },
-      { src: "/images/mango 1st floor/1st floor 3.jpg", alt: "Mango 1st Floor" },
-      { src: "/images/mango 1st floor/1st floor 4.jpg", alt: "Mango 1st Floor" },
-      { src: "/images/mango 1st floor/1st floor 5.jpg", alt: "Mango 1st Floor" },
-      { src: "/images/mango 1st floor/1st floor 6.jpg", alt: "Mango 1st Floor" },
-      { src: "/images/mango 1st floor/1st floor 7.jpg", alt: "Mango 1st Floor" },
-      { src: "/images/mango 1st floor/1st floor 8.jpg", alt: "Mango 1st Floor" },
-      { src: "/images/mango 1st floor/1st floor 9.jpg", alt: "Mango 1st Floor" },
-      { src: "/images/mango 1st floor/1st floor 10.jpg", alt: "Mango 1st Floor" },
+      {
+        src: "/images/mango 1st floor/1st floor 1.jpg",
+        alt: "Mango 1st Floor",
+      },
+      {
+        src: "/images/mango 1st floor/1st floor 2.jpg",
+        alt: "Mango 1st Floor",
+      },
+      {
+        src: "/images/mango 1st floor/1st floor 3.jpg",
+        alt: "Mango 1st Floor",
+      },
+      {
+        src: "/images/mango 1st floor/1st floor 4.jpg",
+        alt: "Mango 1st Floor",
+      },
+      {
+        src: "/images/mango 1st floor/1st floor 5.jpg",
+        alt: "Mango 1st Floor",
+      },
+      {
+        src: "/images/mango 1st floor/1st floor 6.jpg",
+        alt: "Mango 1st Floor",
+      },
+      {
+        src: "/images/mango 1st floor/1st floor 7.jpg",
+        alt: "Mango 1st Floor",
+      },
+      {
+        src: "/images/mango 1st floor/1st floor 8.jpg",
+        alt: "Mango 1st Floor",
+      },
+      {
+        src: "/images/mango 1st floor/1st floor 9.jpg",
+        alt: "Mango 1st Floor",
+      },
+      {
+        src: "/images/mango 1st floor/1st floor 10.jpg",
+        alt: "Mango 1st Floor",
+      },
     ],
     mangopark: [
-      { src: "/images/mango park/Maisons Diani-photos-Pierre_Rich-55.jpg", alt: "Mango Park" },
-      { src: "/images/mango park/Maisons Diani-photos-Pierre_Rich-52.jpg", alt: "Mango Park" },
-      { src: "/images/mango park/Maisons Diani-photos-Pierre_Rich-61_BD.jpg", alt: "Mango Park" },
-      { src: "/images/mango park/Maisons Diani-photos-Pierre_Rich-58.jpg", alt: "Mango Park" },
-      { src: "/images/mango park/Maisons Diani-photos-Pierre_Rich-57.jpg", alt: "Mango Park" },
+      {
+        src: "/images/mango park/Maisons Diani-photos-Pierre_Rich-55.jpg",
+        alt: "Mango Park",
+      },
+      {
+        src: "/images/mango park/Maisons Diani-photos-Pierre_Rich-52.jpg",
+        alt: "Mango Park",
+      },
+      {
+        src: "/images/mango park/Maisons Diani-photos-Pierre_Rich-61_BD.jpg",
+        alt: "Mango Park",
+      },
+      {
+        src: "/images/mango park/Maisons Diani-photos-Pierre_Rich-58.jpg",
+        alt: "Mango Park",
+      },
+      {
+        src: "/images/mango park/Maisons Diani-photos-Pierre_Rich-57.jpg",
+        alt: "Mango Park",
+      },
       { src: "/images/mango park/20250731_100752.jpg", alt: "Mango Park" },
       { src: "/images/mango park/20250731_100808.jpg", alt: "Mango Park" },
       { src: "/images/mango park/20250731_100905.jpg", alt: "Mango Park" },
       { src: "/images/mango park/20250731_101142.jpg", alt: "Mango Park" },
     ],
     paradise: [
-      { src: "/images/paradise/IMG_20260223_151803.jpg", alt: "Paradise Villa" },
-      { src: "/images/paradise/IMG_20260223_151823.jpg", alt: "Paradise Villa" },
-      { src: "/images/paradise/IMG_20260223_151836.jpg", alt: "Paradise Villa" },
-      { src: "/images/paradise/IMG_20260223_151847.jpg", alt: "Paradise Villa" },
-      { src: "/images/paradise/IMG_20260223_151927.jpg", alt: "Paradise Villa" },
-      { src: "/images/paradise/IMG_20260223_151930.jpg", alt: "Paradise Villa" },
-      { src: "/images/paradise/IMG_20260223_151951.jpg", alt: "Paradise Villa" },
-      { src: "/images/paradise/IMG_20260223_151959.jpg", alt: "Paradise Villa" },
-      { src: "/images/paradise/IMG_20260223_152031.jpg", alt: "Paradise Villa" },
-      { src: "/images/paradise/IMG_20260223_154754.jpg", alt: "Paradise Villa" },
-      { src: "/images/paradise/IMG_20260223_154913.jpg", alt: "Paradise Villa" },
+      {
+        src: "/images/paradise/IMG_20260223_151803.jpg",
+        alt: "Paradise Villa",
+      },
+      {
+        src: "/images/paradise/IMG_20260223_151823.jpg",
+        alt: "Paradise Villa",
+      },
+      {
+        src: "/images/paradise/IMG_20260223_151836.jpg",
+        alt: "Paradise Villa",
+      },
+      {
+        src: "/images/paradise/IMG_20260223_151847.jpg",
+        alt: "Paradise Villa",
+      },
+      {
+        src: "/images/paradise/IMG_20260223_151927.jpg",
+        alt: "Paradise Villa",
+      },
+      {
+        src: "/images/paradise/IMG_20260223_151930.jpg",
+        alt: "Paradise Villa",
+      },
+      {
+        src: "/images/paradise/IMG_20260223_151951.jpg",
+        alt: "Paradise Villa",
+      },
+      {
+        src: "/images/paradise/IMG_20260223_151959.jpg",
+        alt: "Paradise Villa",
+      },
+      {
+        src: "/images/paradise/IMG_20260223_152031.jpg",
+        alt: "Paradise Villa",
+      },
+      {
+        src: "/images/paradise/IMG_20260223_154754.jpg",
+        alt: "Paradise Villa",
+      },
+      {
+        src: "/images/paradise/IMG_20260223_154913.jpg",
+        alt: "Paradise Villa",
+      },
     ],
   };
 
@@ -277,7 +356,8 @@ const Gallery: React.FC = () => {
     { src: "/videos/VID-20260309-WA0027.mp4", label: "Crocodile Lodge" },
   ];
 
-  const currentImages = galleryData[activeSection as keyof typeof galleryData] ?? [];
+  const currentImages =
+    galleryData[activeSection as keyof typeof galleryData] ?? [];
 
   const sections = [
     { id: "general", label: "General", color: "#c8b89a" },
@@ -563,7 +643,7 @@ const Gallery: React.FC = () => {
         /* GALLERY ITEMS */
         .gallery-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+          grid-template-columns: repeat(4, 1fr);
           gap: 30px;
           max-width: 1400px;
           margin: 0 auto;
@@ -701,7 +781,7 @@ const Gallery: React.FC = () => {
         }
 
         @media (max-width: 900px) {
-          .gallery-grid { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); padding: 0 30px; }
+          .gallery-grid { grid-template-columns: repeat(2, 1fr); padding: 0 30px; }
           .video-grid { grid-template-columns: 1fr 1fr; padding: 0 30px; }
           .gallery-header { padding: 0 30px; }
           .section-tabs { padding: 0 30px; }
@@ -818,8 +898,21 @@ const Gallery: React.FC = () => {
         ) : (
           <div className="gallery-grid">
             {currentImages.map((image, index) => (
-              <div key={index} className="gallery-item" onClick={() => { setViewerIndex(index); setViewerOpen(true); }}>
-                <img src={image.src} alt={image.alt} className="gallery-item-img" loading="lazy" decoding="async" />
+              <div
+                key={index}
+                className="gallery-item"
+                onClick={() => {
+                  setViewerIndex(index);
+                  setViewerOpen(true);
+                }}
+              >
+                <img
+                  src={image.src}
+                  alt={image.alt}
+                  className="gallery-item-img"
+                  loading="lazy"
+                  decoding="async"
+                />
                 <div className="gallery-item-overlay">
                   <div className="gallery-item-text">{image.alt}</div>
                 </div>
@@ -831,13 +924,21 @@ const Gallery: React.FC = () => {
 
       {/* Image viewer */}
       {viewerOpen && (
-        <div className="img-viewer-overlay" onClick={() => setViewerOpen(false)}>
+        <div
+          className="img-viewer-overlay"
+          onClick={() => setViewerOpen(false)}
+        >
           <div className="img-viewer" onClick={(e) => e.stopPropagation()}>
             <div className="img-viewer-topbar">
-              <button className="img-viewer-back" onClick={() => setViewerOpen(false)}>
+              <button
+                className="img-viewer-back"
+                onClick={() => setViewerOpen(false)}
+              >
                 ← Back to gallery
               </button>
-              <span className="img-viewer-counter">{viewerIndex + 1} / {currentImages.length}</span>
+              <span className="img-viewer-counter">
+                {viewerIndex + 1} / {currentImages.length}
+              </span>
             </div>
             <div
               className="img-viewer-stage"
@@ -845,7 +946,12 @@ const Gallery: React.FC = () => {
               onTouchEnd={handleTouchEnd}
             >
               {viewerIndex > 0 && (
-                <button className="img-viewer-arrow img-viewer-arrow--prev" onClick={() => setViewerIndex((i) => i - 1)}>&#8249;</button>
+                <button
+                  className="img-viewer-arrow img-viewer-arrow--prev"
+                  onClick={() => setViewerIndex((i) => i - 1)}
+                >
+                  &#8249;
+                </button>
               )}
               <img
                 className="img-viewer-img"
@@ -854,13 +960,27 @@ const Gallery: React.FC = () => {
                 decoding="async"
               />
               {viewerIndex < currentImages.length - 1 && (
-                <button className="img-viewer-arrow img-viewer-arrow--next" onClick={() => setViewerIndex((i) => i + 1)}>&#8250;</button>
+                <button
+                  className="img-viewer-arrow img-viewer-arrow--next"
+                  onClick={() => setViewerIndex((i) => i + 1)}
+                >
+                  &#8250;
+                </button>
               )}
             </div>
             <div className="img-viewer-thumbs">
               {currentImages.map((img, i) => (
-                <button key={i} className={`img-viewer-thumb${i === viewerIndex ? " active" : ""}`} onClick={() => setViewerIndex(i)}>
-                  <img src={img.src} alt={img.alt} loading="lazy" decoding="async" />
+                <button
+                  key={i}
+                  className={`img-viewer-thumb${i === viewerIndex ? " active" : ""}`}
+                  onClick={() => setViewerIndex(i)}
+                >
+                  <img
+                    src={img.src}
+                    alt={img.alt}
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </button>
               ))}
             </div>
