@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { VILLAS } from "../types";
 import type { AdminReservation, BlockedDate, SeasonalPricingRule } from "../types";
 
-type Tab = "reservations" | "blocked-dates" | "seasonal-pricing";
+type Tab = "reservations" | "blocked-dates" | "seasonal-pricing" | "users";
 type ResFilter = "all" | "pending" | "confirmed" | "cancelled";
 
 const PROPERTY_NAMES = VILLAS.map((v) => v.name);
@@ -121,12 +121,55 @@ const AdminDashboardPage: React.FC = () => {
     await fetchSeasonalPricing(seasonalVilla);
   };
 
+  // ── Users ─────────────────────────────────────────────────────────────────
+  type AdminUser = { id: string; username: string; created_at: string };
+  const [users, setUsers] = useState<AdminUser[]>([]);
+  const [usersLoading, setUsersLoading] = useState(false);
+  const [userForm, setUserForm] = useState({ username: "", password: "" });
+  const [userError, setUserError] = useState("");
+  const [userSuccess, setUserSuccess] = useState("");
+  const [userSaving, setUserSaving] = useState(false);
+
+  const fetchUsers = useCallback(async () => {
+    setUsersLoading(true);
+    try {
+      const res = await api("/users");
+      if (res.ok) setUsers(await res.json());
+    } finally {
+      setUsersLoading(false);
+    }
+  }, [api]);
+
+  const createUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setUserError(""); setUserSuccess("");
+    if (!userForm.username || !userForm.password) { setUserError("Both fields are required."); return; }
+    setUserSaving(true);
+    try {
+      const res = await api("/users", { method: "POST", body: JSON.stringify(userForm) });
+      const data = await res.json();
+      if (!res.ok) { setUserError(data.error ?? "Failed to create user."); return; }
+      setUserSuccess(`User "${data.user.username}" created.`);
+      setUserForm({ username: "", password: "" });
+      await fetchUsers();
+    } finally {
+      setUserSaving(false);
+    }
+  };
+
+  const deleteUser = async (id: string, username: string) => {
+    if (!window.confirm(`Delete user "${username}"?`)) return;
+    await api(`/users/${id}`, { method: "DELETE" });
+    await fetchUsers();
+  };
+
   // ── Load on tab switch ────────────────────────────────────────────────────
   useEffect(() => {
     if (activeTab === "reservations") fetchReservations();
     if (activeTab === "blocked-dates") fetchBlockedDates();
     if (activeTab === "seasonal-pricing") fetchSeasonalPricing(seasonalVilla);
-  }, [activeTab, fetchReservations, fetchBlockedDates, fetchSeasonalPricing, seasonalVilla]);
+    if (activeTab === "users") fetchUsers();
+  }, [activeTab, fetchReservations, fetchBlockedDates, fetchSeasonalPricing, fetchUsers, seasonalVilla]);
 
   useEffect(() => {
     if (activeTab === "blocked-dates") fetchBlockedDates();
@@ -563,7 +606,7 @@ const AdminDashboardPage: React.FC = () => {
 
         {/* Tabs */}
         <div className="adm-tabs">
-          {(["reservations", "blocked-dates", "seasonal-pricing"] as Tab[]).map((t) => (
+          {(["reservations", "blocked-dates", "seasonal-pricing", "users"] as Tab[]).map((t) => (
             <button
               key={t}
               className={`adm-tab${activeTab === t ? " active" : ""}`}
@@ -571,7 +614,8 @@ const AdminDashboardPage: React.FC = () => {
             >
               {t === "reservations" ? "Reservations"
                 : t === "blocked-dates" ? "Blocked Dates"
-                : "Pricing"}
+                : t === "seasonal-pricing" ? "Pricing"
+                : "Users"}
             </button>
           ))}
         </div>
@@ -899,6 +943,80 @@ const AdminDashboardPage: React.FC = () => {
                   {seasonalError   && <div className="adm-form-msg error">{seasonalError}</div>}
                   {seasonalSuccess && <div className="adm-form-msg success">{seasonalSuccess}</div>}
                 </form>
+              </div>
+            </>
+          )}
+
+          {activeTab === "users" && (
+            <>
+              <div className="adm-section">
+                <div className="adm-section-title">Create Admin User</div>
+                <form onSubmit={createUser}>
+                  <div className="adm-form-row">
+                    <div className="adm-form-field">
+                      <label>Username</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. manager"
+                        value={userForm.username}
+                        onChange={(e) => setUserForm((f) => ({ ...f, username: e.target.value }))}
+                        required
+                      />
+                    </div>
+                    <div className="adm-form-field">
+                      <label>Password (min 8 chars)</label>
+                      <input
+                        type="password"
+                        placeholder="••••••••"
+                        value={userForm.password}
+                        onChange={(e) => setUserForm((f) => ({ ...f, password: e.target.value }))}
+                        required
+                      />
+                    </div>
+                    <button className="adm-btn adm-btn-save" type="submit" disabled={userSaving} style={{ padding: "10px 24px", alignSelf: "flex-end" }}>
+                      {userSaving ? "…" : "Create User"}
+                    </button>
+                  </div>
+                  {userError   && <div className="adm-form-msg error">{userError}</div>}
+                  {userSuccess && <div className="adm-form-msg success">{userSuccess}</div>}
+                </form>
+              </div>
+
+              <div className="adm-section">
+                <div className="adm-section-title">Admin Users</div>
+                {usersLoading ? (
+                  <div className="adm-empty">Loading…</div>
+                ) : users.length === 0 ? (
+                  <div className="adm-empty">No users yet.</div>
+                ) : (
+                  <div className="adm-table-wrap">
+                    <table className="adm-table">
+                      <thead>
+                        <tr>
+                          <th>Username</th>
+                          <th>Created</th>
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {users.map((u) => (
+                          <tr key={u.id}>
+                            <td>{u.username}</td>
+                            <td>{fmt(u.created_at)}</td>
+                            <td>
+                              <button
+                                className="adm-btn adm-btn-cancel"
+                                onClick={() => deleteUser(u.id, u.username)}
+                              >
+                                Delete
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
             </>
           )}

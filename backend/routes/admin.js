@@ -1,6 +1,10 @@
 import { Router } from "express";
 import { adminAuth } from "../middleware/adminAuth.js";
 import {
+  login,
+  listUsers,
+  createUser,
+  deleteUser,
   getAllReservations,
   confirmReservation,
   cancelReservation,
@@ -17,8 +21,16 @@ import {
 
 const router = Router();
 
-// All admin routes require the secret header
+// Public — no secret required
+router.post("/login", login);
+
+// All routes below require the secret header
 router.use(adminAuth);
+
+// User management
+router.get("/users",        listUsers);
+router.post("/users",       createUser);
+router.delete("/users/:id", deleteUser);
 
 // Reservations
 router.get("/reservations",            getAllReservations);

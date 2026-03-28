@@ -23,15 +23,18 @@ const AdminLoginPage: React.FC = () => {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("/api/admin/reservations", {
-        headers: { "x-admin-secret": password },
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: username.trim(), password }),
       });
+      const data = await res.json();
       if (res.ok) {
-        sessionStorage.setItem("adminSecret", password);
-        sessionStorage.setItem("adminUser", username);
+        sessionStorage.setItem("adminSecret", data.secret);
+        sessionStorage.setItem("adminUser", data.username);
         navigate("/crocodile-admin/dashboard", { replace: true });
       } else {
-        setError("Invalid credentials. Please try again.");
+        setError(data.error ?? "Invalid credentials. Please try again.");
       }
     } catch {
       setError("Connection error. Is the server running?");

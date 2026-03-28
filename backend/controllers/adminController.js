@@ -1,4 +1,66 @@
 import supabase from "../db/supabase.js";
+import bcrypt from "bcryptjs";
+
+// ─── Auth / Users ────────────────────────────────────────────
+
+export async function login(req, res) {
+  const { username, password } = req.body ?? {};
+  if (!username || !password)
+    return res.status(400).json({ error: "username and password required" });
+
+  const { data: user, error } = await supabase
+    .from("admin_users")
+    .select("id, username, password_hash")
+    .eq("username", username.trim().toLowerCase())
+    .single();
+
+  if (error || !user)
+    return res.status(401).json({ error: "Invalid credentials" });
+
+  const valid = await bcrypt.compare(password, user.password_hash);
+  if (!valid)
+    return res.status(401).json({ error: "Invalid credentials" });
+
+  return res.json({ secret: process.env.ADMIN_SECRET, username: user.username });
+}
+
+export async function listUsers(req, res) {
+  const { data, error } = await supabase
+    .from("admin_users")
+    .select("id, username, created_at")
+    .order("created_at");
+  if (error) return res.status(500).json({ error: error.message });
+  res.json(data);
+}
+
+export async function createUser(req, res) {
+  const { username, password } = req.body ?? {};
+  if (!username || !password)
+    return res.status(400).json({ error: "username and password required" });
+  if (password.length < 8)
+    return res.status(400).json({ error: "password must be at least 8 characters" });
+
+  const hash = await bcrypt.hash(password, 12);
+  const { data, error } = await supabase
+    .from("admin_users")
+    .insert({ username: username.trim().toLowerCase(), password_hash: hash })
+    .select("id, username, created_at")
+    .single();
+
+  if (error) {
+    if (error.code === "23505")
+      return res.status(409).json({ error: "Username already exists" });
+    return res.status(500).json({ error: error.message });
+  }
+  res.status(201).json({ message: "User created", user: data });
+}
+
+export async function deleteUser(req, res) {
+  const { id } = req.params;
+  const { error } = await supabase.from("admin_users").delete().eq("id", id);
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ message: "User deleted" });
+}
 
 // ─── Reservations ────────────────────────────────────────────
 
