@@ -33,6 +33,17 @@ const AdminDashboardPage: React.FC = () => {
   // ── Tab ──────────────────────────────────────────────────────────────────
   const [activeTab, setActiveTab] = useState<Tab>("reservations");
 
+  // ── Notifications ─────────────────────────────────────────────────────────
+  const [lastSeenAt, setLastSeenAt] = useState<string>(
+    () => localStorage.getItem("adminLastSeenAt") ?? new Date(0).toISOString()
+  );
+
+  const markReservationsSeen = () => {
+    const now = new Date().toISOString();
+    localStorage.setItem("adminLastSeenAt", now);
+    setLastSeenAt(now);
+  };
+
   // ── Reservations ─────────────────────────────────────────────────────────
   const [reservations, setReservations] = useState<AdminReservation[]>([]);
   const [resLoading, setResLoading] = useState(false);
@@ -40,15 +51,18 @@ const AdminDashboardPage: React.FC = () => {
   const [resPropFilter, setResPropFilter] = useState("all");
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  const fetchReservations = useCallback(async () => {
+  const fetchReservations = useCallback(async (markSeen = false) => {
     setResLoading(true);
     try {
       const res = await api("/reservations");
-      if (res.ok) setReservations(await res.json());
+      if (res.ok) {
+        setReservations(await res.json());
+        if (markSeen) markReservationsSeen();
+      }
     } finally {
       setResLoading(false);
     }
-  }, [api]);
+  }, [api]); // eslint-disable-line
 
   // ── Blocked Dates ─────────────────────────────────────────────────────────
   const [blockedDates, setBlockedDates] = useState<BlockedDate[]>([]);
@@ -165,7 +179,7 @@ const AdminDashboardPage: React.FC = () => {
 
   // ── Load on tab switch ────────────────────────────────────────────────────
   useEffect(() => {
-    if (activeTab === "reservations") fetchReservations();
+    if (activeTab === "reservations") fetchReservations(true);
     if (activeTab === "blocked-dates") fetchBlockedDates();
     if (activeTab === "seasonal-pricing") fetchSeasonalPricing(seasonalVilla);
     if (activeTab === "users") fetchUsers();
@@ -229,6 +243,10 @@ const AdminDashboardPage: React.FC = () => {
       (resFilter === "pending" && !r.confirmed && !r.cancelled);
     return matchProp && matchStatus;
   });
+
+  const newCount = reservations.filter(
+    (r) => new Date(r.created_at) > new Date(lastSeenAt)
+  ).length;
 
   const stats = {
     total: reservations.length,
@@ -363,6 +381,21 @@ const AdminDashboardPage: React.FC = () => {
         }
         .adm-tab:hover { color: #333333; }
         .adm-tab.active { color: #0a0a0a; border-bottom-color: #0a0a0a; }
+        .adm-tab-wrap { display: inline-flex; align-items: center; gap: 7px; }
+        .adm-badge {
+          background: #ef4444;
+          color: #fff;
+          font-size: 0.55rem;
+          font-weight: 600;
+          min-width: 18px;
+          height: 18px;
+          border-radius: 9px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0 5px;
+          letter-spacing: 0;
+        }
 
         /* ── Content area ── */
         .adm-body { flex: 1; padding: 36px 40px; }
@@ -610,12 +643,20 @@ const AdminDashboardPage: React.FC = () => {
             <button
               key={t}
               className={`adm-tab${activeTab === t ? " active" : ""}`}
-              onClick={() => setActiveTab(t)}
+              onClick={() => {
+                setActiveTab(t);
+                if (t === "reservations") markReservationsSeen();
+              }}
             >
-              {t === "reservations" ? "Reservations"
-                : t === "blocked-dates" ? "Blocked Dates"
-                : t === "seasonal-pricing" ? "Pricing"
-                : "Users"}
+              <span className="adm-tab-wrap">
+                {t === "reservations" ? "Reservations"
+                  : t === "blocked-dates" ? "Blocked Dates"
+                  : t === "seasonal-pricing" ? "Pricing"
+                  : "Users"}
+                {t === "reservations" && newCount > 0 && (
+                  <span className="adm-badge">{newCount}</span>
+                )}
+              </span>
             </button>
           ))}
         </div>

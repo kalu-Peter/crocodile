@@ -20,3 +20,23 @@ export function adminAuth(req, res) {
   }
   return true;
 }
+
+/**
+ * Send an email via Resend.
+ * Requires RESEND_API_KEY and RESEND_FROM env vars.
+ * Silently fails if key is missing (so bookings still work without email config).
+ */
+export async function sendEmail({ to, subject, html }) {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) return;
+  await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      from: process.env.RESEND_FROM || "Crocodile Lodge <noreply@crocodilelodge.co.ke>",
+      to,
+      subject,
+      html,
+    }),
+  });
+}
