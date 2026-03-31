@@ -6,7 +6,7 @@ import { useCurrency } from "../context/CurrencyContext";
 declare global {
   interface Window {
     paypal?: {
-      Buttons: (config: Record<string, unknown>) => {
+      HostedButtons: (config: Record<string, unknown>) => {
         render: (selector: string) => void;
       };
     };
@@ -126,62 +126,25 @@ const ReservationPage: React.FC = () => {
       .catch(() => setSeasonalPrice(null));
   }, [checkin, villa]);
 
-  // Re-render PayPal buttons when method or total changes
+  // Render PayPal hosted button when tab is selected
   useEffect(() => {
     if (paymentMethod !== "paypal") return;
-    const clientId = import.meta.env.VITE_PAYPAL_CLIENT_ID;
-    if (!clientId) return;
+
+    const HOSTED_BUTTON_ID = "68VNHVZRR95SU";
+    const containerId = `paypal-container-${HOSTED_BUTTON_ID}`;
 
     const renderButtons = () => {
-      const container = document.getElementById("paypal-btn-container");
+      const container = document.getElementById(containerId);
       if (!container || !window.paypal) return;
       container.innerHTML = "";
       window.paypal
-        .Buttons({
-          createOrder: async () => {
-            if (!validateForm())
-              throw new Error("Please fill in all required fields.");
-            const res = await fetch("/api/payments", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                action: "paypal-create",
-                amountKES: total,
-                description: `${villa.name} – ${nights} nights`,
-              }),
-            });
-            const data = (await res.json()) as {
-              orderId?: string;
-              error?: string;
-            };
-            if (!res.ok) throw new Error(data.error ?? "PayPal order failed");
-            return data.orderId;
-          },
-          onApprove: async (data: { orderID: string }) => {
-            const res = await fetch("/api/payments", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                action: "paypal-capture",
-                orderId: data.orderID,
-              }),
-            });
-            const result = (await res.json()) as {
-              success?: boolean;
-              transactionId?: string;
-              error?: string;
-            };
-            if (result.success) {
-              await createReservation("paypal", result.transactionId);
-            } else {
-              alert(result.error ?? "PayPal capture failed. Please try again.");
-            }
-          },
-          onError: () => {
-            alert("PayPal encountered an error. Please try again.");
+        .HostedButtons({
+          hostedButtonId: HOSTED_BUTTON_ID,
+          onApprove: async (data: { orderID?: string }) => {
+            await createReservation("paypal", data.orderID);
           },
         })
-        .render("#paypal-btn-container");
+        .render(`#${containerId}`);
     };
 
     if (window.paypal) {
@@ -197,7 +160,10 @@ const ReservationPage: React.FC = () => {
 
     const script = document.createElement("script");
     script.id = "paypal-sdk-script";
-    script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=USD`;
+    script.src =
+      "https://www.paypal.com/sdk/js?client-id=BAAdPWwfkvCuTcdFkWRkprtsqZrpr2gb6WS3bZ5S1a7usAD0WHrFBbPrxcK9-bHVlEMBXzm7x-9r9B1x7s&components=hosted-buttons&disable-funding=venmo&currency=EUR";
+    script.crossOrigin = "anonymous";
+    script.async = true;
     script.addEventListener("load", renderButtons, { once: true });
     document.head.appendChild(script);
     return () => script.removeEventListener("load", renderButtons);
@@ -427,7 +393,7 @@ const ReservationPage: React.FC = () => {
 
         /* PayPal section */
         .paypal-note { font-size:0.88rem; color:rgba(10,10,10,0.55); margin-bottom:18px; line-height:1.6; }
-        #paypal-btn-container { min-height:45px; }
+        #paypal-container-68VNHVZRR95SU { min-height:45px; }
 
         /* Summary */
         .rp-summary { position:sticky; top:110px; border:1px solid rgba(0,0,0,0.12); border-radius:12px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,0.06); }
@@ -677,11 +643,9 @@ const ReservationPage: React.FC = () => {
             {paymentMethod === "paypal" && (
               <>
                 <p className="paypal-note">
-                  Complete your payment of <strong>{formatPrice(total)}</strong>{" "}
-                  securely via PayPal. The amount will be converted to USD at
-                  the current exchange rate.
+                  Complete your payment securely via PayPal in EUR.
                 </p>
-                <div id="paypal-btn-container" />
+                <div id="paypal-container-68VNHVZRR95SU" />
               </>
             )}
           </div>
