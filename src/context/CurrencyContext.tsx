@@ -38,7 +38,9 @@ interface CurrencyContextValue {
 const CurrencyContext = createContext<CurrencyContextValue | null>(null);
 
 export function CurrencyProvider({ children }: { children: React.ReactNode }) {
-  const [currency, setCurrency] = useState<Currency>(SUPPORTED_CURRENCIES[0]);
+  const [currency, setCurrency] = useState<Currency>(
+    SUPPORTED_CURRENCIES.find((c) => c.code === "EUR") ?? SUPPORTED_CURRENCIES[0]
+  );
   const [rates, setRates] = useState<Record<string, number>>({ KES: 1 });
   const [loading, setLoading] = useState(false);
 

@@ -75,3 +75,42 @@ CREATE TABLE IF NOT EXISTS blocked_dates (
 
 CREATE INDEX IF NOT EXISTS idx_blocked_dates_property
   ON blocked_dates (property_name, blocked_date);
+
+
+-- 5. SEASONAL PRICING (date-range price overrides per villa)
+CREATE TABLE IF NOT EXISTS seasonal_pricing (
+  id               SERIAL PRIMARY KEY,
+  villa_id         TEXT NOT NULL,
+  label            TEXT NOT NULL DEFAULT 'Custom Rate',
+  start_date       DATE NOT NULL,
+  end_date         DATE NOT NULL,
+  price_per_night  NUMERIC(10,2) NOT NULL CHECK (price_per_night > 0),
+  created_at       TIMESTAMPTZ DEFAULT NOW(),
+  CONSTRAINT seasonal_end_after_start CHECK (end_date >= start_date)
+);
+
+CREATE INDEX IF NOT EXISTS idx_seasonal_pricing_villa_dates
+  ON seasonal_pricing (villa_id, start_date, end_date);
+
+
+-- 6. ADMIN USERS (username/password login for the admin panel)
+CREATE TABLE IF NOT EXISTS admin_users (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  username      TEXT NOT NULL UNIQUE,
+  password_hash TEXT NOT NULL,
+  created_at    TIMESTAMPTZ DEFAULT NOW()
+);
+
+
+-- ── Additional properties (Mango & Paradise) ─────────────────────────────────
+INSERT INTO properties (name, description, max_guests) VALUES
+  ('Mango Villa',           'Spacious mango park villa',              8),
+  ('Mango Villa 1st Floor', 'Upper-floor unit in the mango park',     4),
+  ('Paradise Villa',        'Premium beachside paradise villa',       8)
+ON CONFLICT (name) DO NOTHING;
+
+INSERT INTO pricing (property_name, min_guests, max_guests, price) VALUES
+  ('Mango Villa',           1, 8, 6000),
+  ('Mango Villa 1st Floor', 1, 4, 6000),
+  ('Paradise Villa',        1, 8, 6000)
+ON CONFLICT DO NOTHING;
