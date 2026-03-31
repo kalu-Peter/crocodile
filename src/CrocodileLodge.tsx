@@ -160,15 +160,15 @@ const CrocodileLodge: React.FC = () => {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          background: rgba(10,10,10,0.82);
+          background: rgba(201,168,76,0.92);
           backdrop-filter: blur(10px);
           -webkit-backdrop-filter: blur(10px);
-          border-bottom: 1px solid rgba(255,255,255,0.06);
+          border-bottom: 1px solid rgba(255,255,255,0.15);
           transition: transform 0.35s ease, background 0.35s ease, padding 0.35s ease;
         }
         nav.nav-hidden { transform: translateY(-100%); }
         nav.nav-scrolled {
-          background: rgba(12,12,12,0.97);
+          background: rgba(201,168,76,0.98);
           backdrop-filter: blur(12px);
           padding: 18px 60px;
           box-shadow: 0 2px 24px rgba(0,0,0,0.4);
@@ -333,7 +333,7 @@ const CrocodileLodge: React.FC = () => {
           align-items: center;
           justify-content: center;
           overflow: hidden;
-          background: url('/images/goldvilla.jpg') center center / cover no-repeat;
+          background: url('/images/landscape.jpeg') center center / cover no-repeat;
         }
 
         .hero-gate-overlay {
@@ -383,14 +383,14 @@ const CrocodileLodge: React.FC = () => {
           font-size: clamp(3rem, 6vw, 6rem);
           font-weight: 900;
           line-height: 1.05;
-          color: var(--croc-cream);
+          color: #ffffff;
           opacity: 0;
           animation: fade-up 1s ease 0.5s forwards;
           margin-bottom: 0;
         }
         .hero-title em {
           font-style: italic;
-          color: var(--croc-gold);
+          color: #ffffff;
           display: block;
         }
 
@@ -1866,6 +1866,7 @@ const CrocodileLodge: React.FC = () => {
         }
 
         @media (max-width: 600px) {
+          .hero { background-image: url('/images/portrait.jpeg'); }
           .amenities-grid, .amenities-row2 { grid-template-columns: repeat(2, 1fr); }
           .testimonials-grid { grid-template-columns: 1fr; }
           .hero-stats { display: none; }
