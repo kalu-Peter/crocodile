@@ -75,8 +75,8 @@ const VillaDetailsPage: React.FC = () => {
         nav {
           position: fixed; top: 0; left: 0; right: 0; z-index: 100;
           padding: 22px 60px; display: flex; justify-content: space-between; align-items: center;
-          background: rgba(10,10,10,0.82); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-          border-bottom: 1px solid rgba(255,255,255,0.06);
+          background: rgba(201,168,76,0.92); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+          border-bottom: 1px solid rgba(255,255,255,0.15);
         }
         .nav-logo {
           font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700;
@@ -206,7 +206,7 @@ const VillaDetailsPage: React.FC = () => {
 
         .vdp-description {
           font-family: 'Cormorant Garamond', serif; font-size: 1.12rem;
-          color: rgba(10,10,10,0.72); line-height: 1.9; margin-bottom: 32px;
+          color: rgba(10,10,10,0.72); line-height: 1.55; margin-bottom: 32px;
         }
 
         /* amenities grid */
@@ -298,7 +298,6 @@ const VillaDetailsPage: React.FC = () => {
         <Link to="/" className="nav-logo">Croc<span>odile</span> Lodge</Link>
         <ul className="nav-links">
           <li><a href="/#villas">Villas</a></li>
-          <li><a href="/#amenities">Amenities</a></li>
           <li><Link to="/gallery">Gallery</Link></li>
           <li><a href="/#contact">Contact</a></li>
         </ul>
@@ -315,7 +314,6 @@ const VillaDetailsPage: React.FC = () => {
       {/* MOBILE MENU */}
       <div className={`mobile-menu ${mobileMenuOpen ? "active" : ""}`}>
         <a href="/#villas" onClick={() => setMobileMenuOpen(false)}>Villas</a>
-        <a href="/#amenities" onClick={() => setMobileMenuOpen(false)}>Amenities</a>
         <Link to="/gallery" onClick={() => setMobileMenuOpen(false)}>Gallery</Link>
         <a href="/#contact" onClick={() => setMobileMenuOpen(false)}>Contact</a>
       </div>

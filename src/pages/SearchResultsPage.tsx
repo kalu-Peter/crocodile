@@ -113,8 +113,8 @@ const SearchResultsPage: React.FC = () => {
         .sr-nav {
           position:fixed; top:0; left:0; right:0; z-index:100;
           padding:22px 60px; display:flex; align-items:center; justify-content:space-between;
-          background:rgba(10,10,10,0.82); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
-          border-bottom:1px solid rgba(255,255,255,0.06);
+          background:rgba(201,168,76,0.92); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+          border-bottom:1px solid rgba(255,255,255,0.15);
         }
         .sr-nav-logo { font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:700; color:#f0f0f0; text-decoration:none; }
         .sr-nav-logo span { color:#909090; }

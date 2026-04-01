@@ -1923,9 +1923,6 @@ const CrocodileLodge: React.FC = () => {
             <a href="#villas">Villas</a>
           </li>
           <li>
-            <a href="#amenities">Amenities</a>
-          </li>
-          <li>
             <Link to="/gallery">Gallery</Link>
           </li>
           <li>
@@ -1948,9 +1945,6 @@ const CrocodileLodge: React.FC = () => {
       <div className={`mobile-menu ${mobileMenuOpen ? "active" : ""}`}>
         <a href="#villas" onClick={() => setMobileMenuOpen(false)}>
           Villas
-        </a>
-        <a href="#amenities" onClick={() => setMobileMenuOpen(false)}>
-          Amenities
         </a>
         <Link to="/gallery" onClick={() => setMobileMenuOpen(false)}>
           Gallery
@@ -2028,7 +2022,7 @@ const CrocodileLodge: React.FC = () => {
             fontFamily: "'Cormorant Garamond', serif",
             fontSize: "clamp(1rem, 1.5vw, 1.2rem)",
             color: "rgba(10,10,10,0.65)",
-            lineHeight: 1.85,
+            lineHeight: 1.55,
             maxWidth: "680px",
             margin: "28px auto 0",
             textAlign: "center",

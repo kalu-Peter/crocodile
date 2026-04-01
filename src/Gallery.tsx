@@ -416,10 +416,10 @@ const Gallery: React.FC = () => {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          background: rgba(10,10,10,0.82);
+          background: rgba(201,168,76,0.92);
           backdrop-filter: blur(10px);
           -webkit-backdrop-filter: blur(10px);
-          border-bottom: 1px solid rgba(255,255,255,0.06);
+          border-bottom: 1px solid rgba(255,255,255,0.15);
         }
 
         .nav-logo {
@@ -816,9 +816,6 @@ const Gallery: React.FC = () => {
         <ul className="nav-links">
           <li>
             <a href="/">Villas</a>
-          </li>
-          <li>
-            <a href="#amenities">Amenities</a>
           </li>
           <li>
             <Link to="/gallery">Gallery</Link>
