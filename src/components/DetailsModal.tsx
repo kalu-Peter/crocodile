@@ -115,7 +115,7 @@ const DetailsModal: React.FC<DetailsModalProps> = ({
           {/* Description */}
           <div className="modal-section">
             <h4>About this property</h4>
-            <p>{villa.description}</p>
+            <p style={{ whiteSpace: "pre-line" }}>{villa.description}</p>
           </div>
 
           {/* Amenities */}

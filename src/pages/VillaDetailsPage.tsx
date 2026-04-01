@@ -384,7 +384,7 @@ const VillaDetailsPage: React.FC = () => {
               </div>
 
               {/* Description */}
-              <p className="vdp-description">{villa.description}</p>
+              <p className="vdp-description" style={{ whiteSpace: "pre-line" }}>{villa.description}</p>
 
               {/* Amenities */}
               <div className="vdp-amenities">
