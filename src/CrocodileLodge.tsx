@@ -2020,8 +2020,18 @@ const CrocodileLodge: React.FC = () => {
 
       {/* VILLAS */}
       <section className="villas-section" id="villas">
-        <div className="section-header reveal" style={{ marginBottom: "60px" }}>
+        <div className="section-header reveal" style={{ marginBottom: "40px" }}>
           <h2 className="section-title">Crocodile Stay</h2>
+          <p style={{
+            fontFamily: "'Cormorant Garamond', serif",
+            fontSize: "clamp(1rem, 1.5vw, 1.2rem)",
+            color: "rgba(10,10,10,0.65)",
+            lineHeight: 1.85,
+            maxWidth: "680px",
+            margin: "28px auto 0",
+            textAlign: "center",
+            whiteSpace: "pre-line",
+          }}>{"The Indian Ocean is calling you, just steps from Diani Beach in Kenya...\nThe Lodge, a dreamy oasis just minutes from the sea, invites you to experience an unforgettable vacation.\n\nKite surfing, scuba diving, safaris... Adventure awaits, set to the rhythm of the savannah and turquoise waves.\n\nSend me a message, and I'll reveal the secrets of this little corner of paradise."}</p>
         </div>
 
         <div className="villas-grid">
