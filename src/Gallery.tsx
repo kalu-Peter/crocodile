@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import { Link } from "react-router-dom";
+import SEO from "./components/SEO";
 
 const Gallery: React.FC = () => {
   const [activeSection, setActiveSection] = useState<string>("general");
@@ -372,6 +373,11 @@ const Gallery: React.FC = () => {
 
   return (
     <>
+      <SEO
+        title="Photo Gallery"
+        description="Browse photos of Crocodile Lodge — our Blue Villa, Green Villa, Gold Lodge, pool, and tropical gardens in Diani Beach, Kenya."
+        url="/gallery"
+      />
       <style>{`
 
 

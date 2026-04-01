@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import VillaCard from "./components/VillaCard";
 import CurrencySelector from "./components/CurrencySelector";
+import SEO from "./components/SEO";
 import type { Villa } from "./types";
 import { VILLAS } from "./types";
 
@@ -84,6 +85,7 @@ const CrocodileLodge: React.FC = () => {
 
   return (
     <>
+      <SEO url="/" />
       <style>{`
 
 

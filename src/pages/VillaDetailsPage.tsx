@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { VILLAS } from "../types";
 import CurrencySelector from "../components/CurrencySelector";
+import SEO from "../components/SEO";
 
 const WA_NUMBER = "254715510119";
 
@@ -46,6 +47,13 @@ const VillaDetailsPage: React.FC = () => {
 
   return (
     <>
+      <SEO
+        title={villa.name}
+        description={`${villa.name} at Crocodile Lodge, Diani Beach — sleeps up to ${villa.maxGuests} guests. Private pool, tropical garden, steps from the Indian Ocean.`}
+        image={villa.image}
+        url={`/villa/${villa.id}`}
+        type="article"
+      />
       <style>{`
 
 

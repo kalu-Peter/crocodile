@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 import { CurrencyProvider } from "./context/CurrencyContext";
 import PageTransition from "./components/PageTransition";
 import WhatsAppFloat from "./components/WhatsAppFloat";
@@ -15,6 +16,7 @@ const AdminDashboardPage = lazy(() => import("./pages/AdminDashboardPage"));
 
 function App() {
   return (
+    <HelmetProvider>
     <CurrencyProvider>
       <Router>
         <Suspense fallback={null}>
@@ -33,6 +35,7 @@ function App() {
         <WhatsAppFloat />
       </Router>
     </CurrencyProvider>
+    </HelmetProvider>
   );
 }
 
