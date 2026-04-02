@@ -362,6 +362,10 @@ const CrocodileLodge: React.FC = () => {
           text-align: center;
           max-width: 900px;
           padding: 0 40px;
+          margin-top: 80px;
+        }
+        @media (max-width: 768px) {
+          .hero-title-wrap { margin-top: 0; }
         }
 
         .booking-bar-hero {
@@ -380,7 +384,7 @@ const CrocodileLodge: React.FC = () => {
         }
         .hero-tagline p {
           font-family: 'Cormorant Garamond', serif;
-          font-size: clamp(0.95rem, 1.6vw, 1.18rem);
+          font-size: clamp(1.1rem, 1.9vw, 1.4rem);
           font-style: italic;
           color: rgba(255,255,255,0.82);
           line-height: 1.7;
@@ -390,10 +394,10 @@ const CrocodileLodge: React.FC = () => {
         .hero-tagline p + p { margin-top: 10px; }
         @media (max-width: 768px) {
           .hero-tagline { padding: 0 20px; }
-          .hero-tagline p { font-size: 0.9rem; line-height: 1.65; }
+          .hero-tagline p { font-size: 1.05rem; line-height: 1.65; }
         }
         @media (max-width: 480px) {
-          .hero-tagline p { font-size: 0.85rem; }
+          .hero-tagline p { font-size: 0.98rem; }
         }
 
         .hero-eyebrow {
