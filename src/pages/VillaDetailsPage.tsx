@@ -68,15 +68,17 @@ const VillaDetailsPage: React.FC = () => {
           --croc-amber: #e0e0e0;
         }
 
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
-        body { font-family: 'Cormorant Garamond', serif; background: #ffffff; color: #0a0a0a; overflow-x: hidden; }
+        body { font-family: 'Cormorant Garamond', serif; background: #f5f6fa; color: #1a1a2e; overflow-x: hidden; }
 
         nav {
           position: fixed; top: 0; left: 0; right: 0; z-index: 100;
           padding: 22px 60px; display: flex; justify-content: space-between; align-items: center;
-          background: rgba(201,168,76,0.92); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-          border-bottom: 1px solid rgba(255,255,255,0.15);
+          background: rgba(201,168,76,0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+          border-bottom: 1px solid rgba(255,255,255,0.18);
+          box-shadow: 0 2px 16px rgba(0,0,0,0.08);
         }
         .nav-logo {
           font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700;
@@ -86,9 +88,9 @@ const VillaDetailsPage: React.FC = () => {
         .nav-logo span { color: #909090; }
         .nav-links { display: flex; gap: 44px; list-style: none; }
         .nav-links a, .nav-links button {
-          font-family: 'Josefin Sans', sans-serif; font-size: 0.7rem; font-weight: 300;
-          letter-spacing: 0.2em; text-transform: uppercase; color: #f0f0f0;
-          text-decoration: none; opacity: 0.6; transition: opacity 0.3s;
+          font-family: 'Inter', sans-serif; font-size: 0.72rem; font-weight: 500;
+          letter-spacing: 0.06em; text-transform: uppercase; color: #fff;
+          text-decoration: none; opacity: 0.75; transition: opacity 0.2s;
           background: none; border: none; cursor: pointer; padding: 0;
         }
         .nav-links a:hover, .nav-links button:hover { opacity: 1; }
@@ -113,7 +115,7 @@ const VillaDetailsPage: React.FC = () => {
         .mobile-menu a:hover, .mobile-menu button:hover { color: #b8913e; }
 
         /* ── VILLA DETAILS PAGE ── */
-        .vdp-page { min-height: 100vh; background: #ffffff; padding-top: 70px; }
+        .vdp-page { min-height: 100vh; background: #f5f6fa; padding-top: 70px; }
 
         /* ── PAGE HEADER (replaces hero) ── */
         .vdp-header {
@@ -121,17 +123,17 @@ const VillaDetailsPage: React.FC = () => {
           padding: 36px 40px 20px;
         }
         .vdp-type {
-          font-family: 'Josefin Sans', sans-serif; font-size: 0.58rem;
-          letter-spacing: 0.35em; text-transform: uppercase; color: #b8913e; margin-bottom: 8px;
+          font-family: 'Inter', sans-serif; font-size: 0.65rem; font-weight: 700;
+          letter-spacing: 0.1em; text-transform: uppercase; color: #c9a84c; margin-bottom: 8px;
         }
         .vdp-title {
           font-family: 'Playfair Display', serif; font-size: clamp(1.6rem, 4vw, 2.4rem);
-          font-weight: 900; color: #0a0a0a; line-height: 1.1; margin-bottom: 10px;
+          font-weight: 900; color: #1a1a2e; line-height: 1.1; margin-bottom: 10px;
         }
         .vdp-meta {
           display: flex; gap: 16px; flex-wrap: wrap;
-          font-family: 'Josefin Sans', sans-serif; font-size: 0.65rem;
-          letter-spacing: 0.1em; text-transform: uppercase; color: rgba(10,10,10,0.45);
+          font-family: 'Inter', sans-serif; font-size: 0.68rem; font-weight: 500;
+          letter-spacing: 0.04em; text-transform: uppercase; color: #9098a9;
         }
 
         /* ── GALLERY ── */
@@ -178,12 +180,12 @@ const VillaDetailsPage: React.FC = () => {
         /* back link */
         .vdp-back {
           display: inline-flex; align-items: center; gap: 8px; margin-bottom: 32px;
-          font-family: 'Josefin Sans', sans-serif; font-size: 0.62rem;
-          letter-spacing: 0.18em; text-transform: uppercase;
-          color: rgba(10,10,10,0.4); text-decoration: none;
+          font-family: 'Inter', sans-serif; font-size: 0.72rem; font-weight: 500;
+          letter-spacing: 0.04em; text-transform: uppercase;
+          color: #9098a9; text-decoration: none;
           transition: color 0.2s;
         }
-        .vdp-back:hover { color: #b8913e; }
+        .vdp-back:hover { color: #c9a84c; }
 
         .vdp-section { margin-bottom: 44px; }
 
@@ -213,55 +215,55 @@ const VillaDetailsPage: React.FC = () => {
         .vdp-amenities { border-top: 1px solid rgba(0,0,0,0.08); padding-top: 28px; }
         .vdp-amenities-group { margin-bottom: 22px; }
         .vdp-amenities-group-title {
-          font-family: 'Josefin Sans', sans-serif; font-size: 0.58rem;
-          letter-spacing: 0.22em; text-transform: uppercase; color: rgba(10,10,10,0.4);
+          font-family: 'Inter', sans-serif; font-size: 0.65rem; font-weight: 700;
+          letter-spacing: 0.08em; text-transform: uppercase; color: #9098a9;
           margin-bottom: 12px;
         }
         .vdp-amenities-items {
-          display: flex; flex-wrap: wrap; gap: 10px;
+          display: flex; flex-wrap: wrap; gap: 8px;
         }
         .vdp-amenity-chip {
           display: flex; align-items: center; gap: 8px;
-          background: #f5f5f5; border: 1px solid rgba(0,0,0,0.08); border-radius: 6px;
-          padding: 8px 14px;
-          font-family: 'Josefin Sans', sans-serif; font-size: 0.72rem;
-          letter-spacing: 0.04em; color: #0a0a0a;
+          background: #fff; border: 1.5px solid #eef0f4; border-radius: 20px;
+          padding: 7px 14px;
+          font-family: 'Inter', sans-serif; font-size: 0.72rem; font-weight: 500;
+          color: #374151; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
         }
-        .vdp-amenity-chip svg { flex-shrink: 0; color: #b8913e; }
+        .vdp-amenity-chip svg { flex-shrink: 0; color: #c9a84c; }
 
         /* ── BOOKING WIDGET ── */
         .vdp-widget {
           position: sticky; top: 110px;
-          background: #ffffff; border: 1px solid rgba(0,0,0,0.1);
-          border-radius: 10px; overflow: hidden;
-          box-shadow: 0 4px 30px rgba(0,0,0,0.08);
+          background: #ffffff; border: 1px solid #eef0f4;
+          border-radius: 16px; overflow: hidden;
+          box-shadow: 0 4px 24px rgba(0,0,0,0.08);
         }
         .vdp-widget-header {
-          padding: 26px 28px 22px; border-bottom: 1px solid rgba(0,0,0,0.08);
-          background: #fafafa;
+          padding: 26px 28px 22px; border-bottom: 1px solid #eef0f4;
+          background: #fafbfc;
         }
         .vdp-widget-header h3 {
           font-family: 'Playfair Display', serif; font-size: 1.45rem; font-weight: 700;
-          color: #0a0a0a; margin-bottom: 4px;
+          color: #1a1a2e; margin-bottom: 4px;
         }
         .vdp-widget-sub {
-          font-family: 'Josefin Sans', sans-serif; font-size: 0.62rem;
-          letter-spacing: 0.14em; text-transform: uppercase; color: rgba(10,10,10,0.35);
+          font-family: 'Inter', sans-serif; font-size: 0.65rem; font-weight: 500;
+          letter-spacing: 0.04em; text-transform: uppercase; color: #9098a9;
         }
         .vdp-widget-body {
           padding: 26px 28px 30px; display: flex; flex-direction: column; gap: 20px;
         }
         .vdp-field label {
-          display: block; font-family: 'Josefin Sans', sans-serif; font-size: 0.58rem;
-          letter-spacing: 0.2em; text-transform: uppercase; color: rgba(10,10,10,0.45); margin-bottom: 8px;
+          display: block; font-family: 'Inter', sans-serif; font-size: 0.65rem; font-weight: 600;
+          letter-spacing: 0.05em; text-transform: uppercase; color: #9098a9; margin-bottom: 8px;
         }
         .vdp-field input {
           width: 100%; padding: 11px 14px;
-          background: #f9f9f9; border: 1px solid rgba(0,0,0,0.15);
-          border-radius: 5px; font-family: 'Cormorant Garamond', serif; font-size: 1rem;
-          color: #0a0a0a; outline: none; transition: border-color 0.2s;
+          background: #f9fafb; border: 1.5px solid #e5e7eb;
+          border-radius: 10px; font-family: 'Cormorant Garamond', serif; font-size: 1rem;
+          color: #1a1a2e; outline: none; transition: border-color 0.18s, box-shadow 0.18s;
         }
-        .vdp-field input:focus { border-color: #b8913e; background: #ffffff; }
+        .vdp-field input:focus { border-color: #c9a84c; box-shadow: 0 0 0 3px rgba(201,168,76,0.12); background: #fff; }
         .vdp-dates { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
         /* guest selector override for light bg */

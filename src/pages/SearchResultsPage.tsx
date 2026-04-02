@@ -107,83 +107,85 @@ const SearchResultsPage: React.FC = () => {
     <>
       <style>{`
 
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'Cormorant Garamond',serif; background:#fff; color:#0a0a0a; }
+        body { font-family:'Cormorant Garamond',serif; background:#f5f6fa; color:#1a1a2e; }
 
         .sr-nav {
           position:fixed; top:0; left:0; right:0; z-index:100;
           padding:22px 60px; display:flex; align-items:center; justify-content:space-between;
-          background:rgba(201,168,76,0.92); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
-          border-bottom:1px solid rgba(255,255,255,0.15);
+          background:rgba(201,168,76,0.95); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+          border-bottom:1px solid rgba(255,255,255,0.18);
+          box-shadow:0 2px 16px rgba(0,0,0,0.08);
         }
-        .sr-nav-logo { font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:700; color:#f0f0f0; text-decoration:none; }
-        .sr-nav-logo span { color:#909090; }
+        .sr-nav-logo { font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:700; color:#fff; text-decoration:none; }
+        .sr-nav-logo span { color:rgba(255,255,255,0.65); }
         .sr-nav-links { display:flex; gap:36px; list-style:none; }
-        .sr-nav-links a { font-family:'Josefin Sans',sans-serif; font-size:0.68rem; letter-spacing:0.18em; text-transform:uppercase; color:#f0f0f0; text-decoration:none; opacity:0.6; transition:opacity 0.2s; }
+        .sr-nav-links a { font-family:'Inter',sans-serif; font-size:0.72rem; font-weight:500; letter-spacing:0.06em; text-transform:uppercase; color:#fff; text-decoration:none; opacity:0.75; transition:opacity 0.2s; }
         .sr-nav-links a:hover { opacity:1; }
         .hamburger { display:none; flex-direction:column; gap:5px; background:none; border:none; cursor:pointer; }
-        .hamburger span { width:22px; height:2px; background:#f0f0f0; display:block; }
-        .mobile-menu { display:none; position:fixed; inset:0; background:rgba(10,10,10,0.97); z-index:50; flex-direction:column; align-items:center; justify-content:center; gap:28px; }
+        .hamburger span { width:22px; height:2px; background:#fff; display:block; }
+        .mobile-menu { display:none; position:fixed; inset:0; background:rgba(26,26,46,0.98); z-index:50; flex-direction:column; align-items:center; justify-content:center; gap:28px; }
         .mobile-menu.open { display:flex; }
-        .mobile-menu a { font-family:'Josefin Sans',sans-serif; font-size:1rem; letter-spacing:0.2em; text-transform:uppercase; color:#f0f0f0; text-decoration:none; }
+        .mobile-menu a { font-family:'Inter',sans-serif; font-size:1rem; font-weight:500; letter-spacing:0.1em; text-transform:uppercase; color:#fff; text-decoration:none; }
 
         .sr-wrap { max-width:1200px; margin:0 auto; padding:110px 40px 80px; }
 
-        .sr-header { margin-bottom:48px; }
-        .sr-back { font-family:'Josefin Sans',sans-serif; font-size:0.62rem; letter-spacing:0.18em; text-transform:uppercase; color:rgba(10,10,10,0.4); text-decoration:none; display:inline-flex; align-items:center; gap:6px; margin-bottom:24px; transition:color 0.2s; }
-        .sr-back:hover { color:#0a0a0a; }
-        .sr-title { font-family:'Playfair Display',serif; font-size:clamp(1.6rem,4vw,2.4rem); font-weight:700; margin-bottom:10px; }
-        .sr-subtitle { font-family:'Josefin Sans',sans-serif; font-size:0.7rem; letter-spacing:0.15em; text-transform:uppercase; color:rgba(10,10,10,0.4); }
+        .sr-header { margin-bottom:40px; }
+        .sr-back { font-family:'Inter',sans-serif; font-size:0.72rem; font-weight:500; color:rgba(26,26,46,0.45); text-decoration:none; display:inline-flex; align-items:center; gap:6px; margin-bottom:20px; transition:color 0.2s; }
+        .sr-back:hover { color:#c9a84c; }
+        .sr-title { font-family:'Playfair Display',serif; font-size:clamp(1.6rem,4vw,2.4rem); font-weight:700; margin-bottom:8px; color:#1a1a2e; }
+        .sr-subtitle { font-family:'Inter',sans-serif; font-size:0.72rem; font-weight:500; letter-spacing:0.05em; text-transform:uppercase; color:rgba(26,26,46,0.4); }
 
-        .sr-grid {
-          display:grid; grid-template-columns:repeat(auto-fill, minmax(340px,1fr)); gap:32px;
-        }
+        .sr-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(340px,1fr)); gap:28px; }
 
         .sr-card {
-          border:1px solid rgba(0,0,0,0.1); border-radius:12px; overflow:hidden;
-          transition:box-shadow 0.2s, transform 0.2s;
+          background:#fff; border:1px solid #eef0f4; border-radius:16px; overflow:hidden;
+          box-shadow:0 2px 8px rgba(0,0,0,0.05);
+          transition:box-shadow 0.22s, transform 0.22s;
         }
-        .sr-card:hover { box-shadow:0 8px 32px rgba(0,0,0,0.1); transform:translateY(-2px); }
-        .sr-card.unavailable { opacity:0.6; }
+        .sr-card:hover { box-shadow:0 12px 36px rgba(0,0,0,0.1); transform:translateY(-3px); }
+        .sr-card.unavailable { opacity:0.65; }
 
         .sr-card-img { position:relative; width:100%; height:220px; overflow:hidden; }
-        .sr-card-img img { width:100%; height:100%; object-fit:cover; display:block; }
+        .sr-card-img img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.4s; }
+        .sr-card:hover .sr-card-img img { transform:scale(1.03); }
         .sr-card-badge {
           position:absolute; top:14px; right:14px;
-          font-family:'Josefin Sans',sans-serif; font-size:0.6rem; letter-spacing:0.15em; text-transform:uppercase;
+          font-family:'Inter',sans-serif; font-size:0.65rem; font-weight:600; letter-spacing:0.04em; text-transform:uppercase;
           padding:5px 12px; border-radius:20px;
         }
-        .sr-card-badge.available     { background:rgba(16,185,129,0.9); color:#fff; }
-        .sr-card-badge.reserved      { background:rgba(239,68,68,0.9);  color:#fff; }
-        .sr-card-badge.opening-soon  { background:rgba(124,58,237,0.9); color:#fff; }
+        .sr-card-badge.available    { background:#d1fae5; color:#065f46; }
+        .sr-card-badge.reserved     { background:#fee2e2; color:#991b1b; }
+        .sr-card-badge.opening-soon { background:#ede9fe; color:#5b21b6; }
 
         .sr-card-body { padding:22px 24px 24px; }
-        .sr-card-type { font-family:'Josefin Sans',sans-serif; font-size:0.58rem; letter-spacing:0.2em; text-transform:uppercase; color:rgba(10,10,10,0.35); margin-bottom:6px; }
-        .sr-card-name { font-family:'Playfair Display',serif; font-size:1.25rem; font-weight:700; margin-bottom:10px; }
-        .sr-card-meta { display:flex; gap:16px; font-family:'Josefin Sans',sans-serif; font-size:0.65rem; letter-spacing:0.06em; color:rgba(10,10,10,0.5); margin-bottom:16px; }
+        .sr-card-type { font-family:'Inter',sans-serif; font-size:0.65rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:#c9a84c; margin-bottom:6px; }
+        .sr-card-name { font-family:'Playfair Display',serif; font-size:1.3rem; font-weight:700; margin-bottom:10px; color:#1a1a2e; }
+        .sr-card-meta { display:flex; gap:14px; font-family:'Inter',sans-serif; font-size:0.72rem; font-weight:500; color:#9098a9; margin-bottom:16px; }
         .sr-card-amenities { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:20px; }
         .sr-card-amenity {
-          background:#f5f5f5; border-radius:4px; padding:4px 10px;
-          font-family:'Josefin Sans',sans-serif; font-size:0.62rem; letter-spacing:0.04em; color:#555;
+          background:#f5f6fa; border:1px solid #eef0f4; border-radius:20px; padding:4px 12px;
+          font-family:'Inter',sans-serif; font-size:0.68rem; font-weight:500; color:#6b7280;
         }
         .sr-card-price { margin-bottom:18px; }
-        .sr-card-price-main { font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:700; color:#0a0a0a; }
-        .sr-card-price-sub { font-family:'Josefin Sans',sans-serif; font-size:0.62rem; letter-spacing:0.08em; color:rgba(10,10,10,0.4); margin-top:2px; }
-        .sr-card-price-total { font-family:'Josefin Sans',sans-serif; font-size:0.72rem; letter-spacing:0.06em; color:#0a0a0a; margin-top:4px; }
+        .sr-card-price-main { font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:700; color:#1a1a2e; }
+        .sr-card-price-sub { font-family:'Inter',sans-serif; font-size:0.65rem; font-weight:500; color:#9098a9; margin-top:2px; }
+        .sr-card-price-total { font-family:'Inter',sans-serif; font-size:0.75rem; font-weight:600; color:#1a1a2e; margin-top:4px; }
 
         .sr-btn-reserve {
-          width:100%; padding:14px; background:#0a0a0a; color:#fff; border:none; border-radius:6px;
-          font-family:'Josefin Sans',sans-serif; font-size:0.72rem; letter-spacing:0.18em; text-transform:uppercase;
-          cursor:pointer; transition:background 0.2s;
+          width:100%; padding:13px; background:#1a1a2e; color:#fff; border:none; border-radius:10px;
+          font-family:'Inter',sans-serif; font-size:0.78rem; font-weight:600; letter-spacing:0.04em;
+          cursor:pointer; transition:background 0.18s, transform 0.12s;
         }
-        .sr-btn-reserve:hover { background:#333; }
+        .sr-btn-reserve:hover { background:#c9a84c; transform:translateY(-1px); }
         .sr-btn-reserved {
-          width:100%; padding:14px; background:#f5f5f5; color:#aaa; border:1px solid #e0e0e0; border-radius:6px;
-          font-family:'Josefin Sans',sans-serif; font-size:0.72rem; letter-spacing:0.18em; text-transform:uppercase;
+          width:100%; padding:13px; background:#f5f6fa; color:#9098a9; border:1.5px solid #eef0f4; border-radius:10px;
+          font-family:'Inter',sans-serif; font-size:0.78rem; font-weight:600; letter-spacing:0.04em;
           cursor:not-allowed;
         }
 
-        .sr-loading { text-align:center; padding:80px 0; font-family:'Josefin Sans',sans-serif; font-size:0.7rem; letter-spacing:0.2em; text-transform:uppercase; color:rgba(10,10,10,0.35); }
+        .sr-loading { text-align:center; padding:80px 0; font-family:'Inter',sans-serif; font-size:0.78rem; font-weight:500; color:#9098a9; }
 
         @media(max-width:768px) {
           .sr-nav { padding:18px 20px; }

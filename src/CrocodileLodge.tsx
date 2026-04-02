@@ -133,15 +133,16 @@ const CrocodileLodge: React.FC = () => {
           display: flex;
           align-items: center;
           gap: 7px;
-          font-family: 'Josefin Sans', sans-serif;
-          font-size: 0.72rem;
-          letter-spacing: 0.08em;
-          color: rgba(10,10,10,0.55);
+          font-family: 'Inter', sans-serif;
+          font-size: 0.7rem;
+          font-weight: 500;
+          letter-spacing: 0.03em;
+          color: rgba(10,10,10,0.5);
           text-decoration: none;
           white-space: nowrap;
           transition: color 0.2s;
         }
-        .topbar-item:hover { color: #0a0a0a; }
+        .topbar-item:hover { color: #1a1a2e; }
         .topbar-divider { width: 1px; height: 14px; background: rgba(0,0,0,0.15); }
         @media (max-width: 768px) {
           .topbar { gap: 14px; padding: 0 16px; }
@@ -196,14 +197,14 @@ const CrocodileLodge: React.FC = () => {
           list-style: none;
         }
         .nav-links a, .nav-links button {
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.7rem;
-          font-weight: 300;
-          letter-spacing: 0.2em;
+          font-weight: 500;
+          letter-spacing: 0.12em;
           text-transform: uppercase;
           color: var(--croc-cream);
           text-decoration: none;
-          opacity: 0.8;
+          opacity: 0.85;
           transition: opacity 0.3s, color 0.3s;
           background: none;
           border: none;
@@ -220,7 +221,7 @@ const CrocodileLodge: React.FC = () => {
         }
         .currency-selector .currency-icon { font-size: 0.85rem; }
         .currency-selector select {
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.65rem;
           letter-spacing: 0.1em;
           text-transform: uppercase;
@@ -237,10 +238,10 @@ const CrocodileLodge: React.FC = () => {
         .currency-selector select:hover { border-color: var(--croc-gold); color: var(--croc-gold); }
 
         .nav-book {
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.65rem;
-          font-weight: 400;
-          letter-spacing: 0.2em;
+          font-weight: 600;
+          letter-spacing: 0.12em;
           text-transform: uppercase;
           color: var(--croc-deep);
           background: var(--croc-gold);
@@ -303,7 +304,7 @@ const CrocodileLodge: React.FC = () => {
         }
 
         .mobile-menu a, .mobile-menu button {
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 1rem;
           letter-spacing: 0.2em;
           text-transform: uppercase;
@@ -369,7 +370,7 @@ const CrocodileLodge: React.FC = () => {
         }
 
         .hero-eyebrow {
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.65rem;
           font-weight: 300;
           letter-spacing: 0.35em;
@@ -397,7 +398,7 @@ const CrocodileLodge: React.FC = () => {
         }
 
         .btn-primary {
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.7rem;
           font-weight: 400;
           letter-spacing: 0.2em;
@@ -423,7 +424,7 @@ const CrocodileLodge: React.FC = () => {
         .btn-primary span { position: relative; z-index: 1; }
 
         .btn-ghost {
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.7rem;
           font-weight: 300;
           letter-spacing: 0.2em;
@@ -454,7 +455,7 @@ const CrocodileLodge: React.FC = () => {
           display: block;
         }
         .stat-label {
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.6rem;
           letter-spacing: 0.2em;
           text-transform: uppercase;
@@ -474,7 +475,7 @@ const CrocodileLodge: React.FC = () => {
           animation: fade-in 1s ease 1.5s forwards;
         }
         .scroll-hint span {
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.55rem;
           letter-spacing: 0.25em;
           text-transform: uppercase;
@@ -517,7 +518,7 @@ const CrocodileLodge: React.FC = () => {
         .whatsapp-label {
           background: #fff;
           color: #128c7e;
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.7rem;
           font-weight: 600;
           letter-spacing: 0.08em;
@@ -680,7 +681,7 @@ const CrocodileLodge: React.FC = () => {
 
         .booking-field label {
           display: block;
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.55rem;
           letter-spacing: 0.22em;
           text-transform: uppercase;
@@ -709,7 +710,7 @@ const CrocodileLodge: React.FC = () => {
           cursor: pointer;
         }
         .booking-check span {
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.6rem;
           letter-spacing: 0.15em;
           text-transform: uppercase;
@@ -721,7 +722,7 @@ const CrocodileLodge: React.FC = () => {
           color: var(--croc-cream);
           border: none;
           padding: 0 36px;
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.65rem;
           font-weight: 400;
           letter-spacing: 0.2em;
@@ -765,7 +766,7 @@ const CrocodileLodge: React.FC = () => {
           align-items: center;
           padding: 10px 0;
           border-bottom: 1px solid rgba(10,10,10,0.07);
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.72rem;
           letter-spacing: 0.12em;
           text-transform: uppercase;
@@ -800,7 +801,7 @@ const CrocodileLodge: React.FC = () => {
         }
 
         .checking-avail {
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.72rem;
           letter-spacing: 0.25em;
           text-transform: uppercase;
@@ -850,7 +851,7 @@ const CrocodileLodge: React.FC = () => {
         }
 
         .avail-text strong {
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.78rem;
           letter-spacing: 0.2em;
           text-transform: uppercase;
@@ -876,7 +877,7 @@ const CrocodileLodge: React.FC = () => {
           color: var(--croc-deep);
           border: none;
           padding: 16px 44px;
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.7rem;
           font-weight: 400;
           letter-spacing: 0.2em;
@@ -908,7 +909,7 @@ const CrocodileLodge: React.FC = () => {
         }
 
         .section-tag {
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.62rem;
           letter-spacing: 0.3em;
           text-transform: uppercase;
@@ -982,7 +983,7 @@ const CrocodileLodge: React.FC = () => {
           margin-bottom: 8px;
         }
         .day-name {
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.55rem;
           letter-spacing: 0.1em;
           text-transform: uppercase;
@@ -1001,7 +1002,7 @@ const CrocodileLodge: React.FC = () => {
           display: flex;
           align-items: center;
           justify-content: center;
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.75rem;
           color: rgba(144,144,144,0.7);
           cursor: pointer;
@@ -1046,7 +1047,7 @@ const CrocodileLodge: React.FC = () => {
           display: flex;
           align-items: center;
           gap: 8px;
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.6rem;
           letter-spacing: 0.1em;
           text-transform: uppercase;
@@ -1119,7 +1120,7 @@ const CrocodileLodge: React.FC = () => {
         }
         
         .villa-guests {
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.85rem;
           color: rgba(13, 26, 15, 0.7);
           margin: 0;
@@ -1143,7 +1144,7 @@ const CrocodileLodge: React.FC = () => {
           border: 1px solid rgba(13, 26, 15, 0.12);
           border-radius: 20px;
           padding: 5px 12px;
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.72rem;
           letter-spacing: 0.06em;
           color: rgba(13, 26, 15, 0.75);
@@ -1172,13 +1173,13 @@ const CrocodileLodge: React.FC = () => {
         }
         .status-available {
           color: var(--croc-moss);
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.8rem;
           font-weight: 500;
         }
         .status-unavailable {
           color: var(--croc-sage);
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.8rem;
           font-weight: 500;
         }
@@ -1193,7 +1194,7 @@ const CrocodileLodge: React.FC = () => {
           padding: 12px 16px;
           border: none;
           border-radius: 4px;
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.8rem;
           font-weight: 400;
           letter-spacing: 0.1em;
@@ -1302,7 +1303,7 @@ const CrocodileLodge: React.FC = () => {
           padding: 36px;
         }
         .villa-category {
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.58rem;
           letter-spacing: 0.3em;
           text-transform: uppercase;
@@ -1336,13 +1337,13 @@ const CrocodileLodge: React.FC = () => {
           color: var(--croc-gold);
         }
         .price-per {
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.6rem;
           letter-spacing: 0.1em;
           color: rgba(240,240,240,0.4);
         }
         .villa-btn {
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.62rem;
           letter-spacing: 0.2em;
           text-transform: uppercase;
@@ -1521,7 +1522,7 @@ const CrocodileLodge: React.FC = () => {
           line-height: 1;
         }
         .exp-float-label {
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.58rem;
           letter-spacing: 0.15em;
           text-transform: uppercase;
@@ -1646,7 +1647,7 @@ const CrocodileLodge: React.FC = () => {
           color: var(--croc-deep);
         }
         .author-origin {
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.58rem;
           letter-spacing: 0.15em;
           text-transform: uppercase;
@@ -1675,7 +1676,7 @@ const CrocodileLodge: React.FC = () => {
           align-items: center;
         }
         .location-label {
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.6rem;
           letter-spacing: 0.3em;
           text-transform: uppercase;
@@ -1709,7 +1710,7 @@ const CrocodileLodge: React.FC = () => {
           flex-shrink: 0;
         }
         .location-detail-text {
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.72rem;
           letter-spacing: 0.06em;
           color: rgba(10,10,10,0.65);
@@ -1723,7 +1724,7 @@ const CrocodileLodge: React.FC = () => {
           padding: 14px 28px;
           background: var(--croc-forest);
           color: var(--croc-cream);
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.65rem;
           letter-spacing: 0.2em;
           text-transform: uppercase;
@@ -1796,7 +1797,7 @@ const CrocodileLodge: React.FC = () => {
         }
         .contact-icon { font-size: 0.78rem; }
         .contact-text {
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.68rem;
           letter-spacing: 0.04em;
           color: rgba(10,10,10,0.6);
@@ -1820,14 +1821,14 @@ const CrocodileLodge: React.FC = () => {
           align-items: center;
         }
         .copyright {
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.58rem;
           letter-spacing: 0.1em;
           color: rgba(10,10,10,0.4);
         }
         .footer-legal { display: flex; gap: 24px; }
         .footer-legal a {
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.58rem;
           letter-spacing: 0.1em;
           color: rgba(10,10,10,0.4);

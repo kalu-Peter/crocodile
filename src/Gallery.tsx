@@ -396,14 +396,15 @@ const Gallery: React.FC = () => {
           --text-light: #f0f0f0;
         }
 
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         html { scroll-behavior: smooth; }
 
         body {
           font-family: 'Cormorant Garamond', serif;
-          background: #ffffff;
-          color: #0a0a0a;
+          background: #f5f6fa;
+          color: #1a1a2e;
           overflow-x: hidden;
         }
 
@@ -412,14 +413,15 @@ const Gallery: React.FC = () => {
           position: fixed;
           top: 0; left: 0; right: 0;
           z-index: 100;
-          padding: 28px 60px;
+          padding: 22px 60px;
           display: flex;
           justify-content: space-between;
           align-items: center;
-          background: rgba(201,168,76,0.92);
-          backdrop-filter: blur(10px);
-          -webkit-backdrop-filter: blur(10px);
-          border-bottom: 1px solid rgba(255,255,255,0.15);
+          background: rgba(201,168,76,0.95);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border-bottom: 1px solid rgba(255,255,255,0.18);
+          box-shadow: 0 2px 16px rgba(0,0,0,0.08);
         }
 
         .nav-logo {
@@ -427,63 +429,51 @@ const Gallery: React.FC = () => {
           font-size: 1.4rem;
           font-weight: 700;
           letter-spacing: 0.05em;
-          color: var(--croc-cream);
+          color: #fff;
           text-decoration: none;
           background: none;
           border: none;
           cursor: pointer;
           padding: 0;
         }
-        .nav-logo span { color: var(--croc-gold); }
+        .nav-logo span { color: rgba(255,255,255,0.65); }
 
         .nav-links {
           display: flex;
-          gap: 44px;
+          gap: 40px;
           list-style: none;
         }
-        .nav-links a {
-          font-family: 'Josefin Sans', sans-serif;
-          font-size: 0.7rem;
-          font-weight: 300;
-          letter-spacing: 0.2em;
-          text-transform: uppercase;
-          color: var(--croc-cream);
-          text-decoration: none;
-          opacity: 0.8;
-          transition: opacity 0.3s, color 0.3s;
-        }
-        .nav-links a:hover { opacity: 1; color: var(--croc-gold); }
-
         .nav-links a, .nav-links button {
-          font-family: 'Josefin Sans', sans-serif;
-          font-size: 0.7rem;
-          font-weight: 300;
-          letter-spacing: 0.2em;
+          font-family: 'Inter', sans-serif;
+          font-size: 0.72rem;
+          font-weight: 500;
+          letter-spacing: 0.06em;
           text-transform: uppercase;
-          color: var(--croc-cream);
+          color: #fff;
           text-decoration: none;
-          opacity: 0.8;
-          transition: opacity 0.3s, color 0.3s;
+          opacity: 0.75;
+          transition: opacity 0.2s;
           background: none;
           border: none;
           cursor: pointer;
           padding: 0;
         }
-        .nav-links a:hover, .nav-links button:hover { opacity: 1; color: var(--croc-gold); }
+        .nav-links a:hover, .nav-links button:hover { opacity: 1; }
 
         .nav-book {
-          font-family: 'Josefin Sans', sans-serif;
-          font-size: 0.65rem;
-          font-weight: 400;
-          letter-spacing: 0.2em;
+          font-family: 'Inter', sans-serif;
+          font-size: 0.7rem;
+          font-weight: 600;
+          letter-spacing: 0.06em;
           text-transform: uppercase;
-          color: var(--croc-deep);
-          background: var(--croc-gold);
-          padding: 12px 28px;
+          color: #1a1a2e;
+          background: #fff;
+          padding: 10px 22px;
+          border-radius: 8px;
           text-decoration: none;
-          transition: background 0.3s, transform 0.2s;
+          transition: background 0.2s, transform 0.15s;
         }
-        .nav-book:hover { background: var(--croc-amber); transform: translateY(-1px); }
+        .nav-book:hover { background: #f0f0f0; transform: translateY(-1px); }
 
         /* HAMBURGER MENU */
         .hamburger {
@@ -538,21 +528,22 @@ const Gallery: React.FC = () => {
         }
 
         .mobile-menu a, .mobile-menu button {
-          font-family: 'Josefin Sans', sans-serif;
-          font-size: 1rem;
-          letter-spacing: 0.2em;
+          font-family: 'Inter', sans-serif;
+          font-size: 0.95rem;
+          font-weight: 500;
+          letter-spacing: 0.1em;
           text-transform: uppercase;
-          color: var(--croc-cream);
+          color: #fff;
           text-decoration: none;
           background: none;
           border: none;
           cursor: pointer;
           padding: 0;
-          transition: color 0.3s;
+          transition: color 0.2s;
         }
 
         .mobile-menu a:hover, .mobile-menu button:hover {
-          color: var(--croc-gold);
+          color: #c9a84c;
         }
 
         .mobile-menu .nav-book {
@@ -564,29 +555,29 @@ const Gallery: React.FC = () => {
         /* GALLERY */
         .gallery-container {
           min-height: 100vh;
-          background: #ffffff;
-          padding-top: 120px;
+          background: #f5f6fa;
+          padding-top: 110px;
           padding-bottom: 80px;
         }
 
         .gallery-header {
           text-align: center;
-          margin-bottom: 60px;
+          margin-bottom: 52px;
           padding: 0 60px;
         }
 
         .gallery-eyebrow {
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 0.65rem;
-          font-weight: 300;
-          letter-spacing: 0.35em;
+          font-weight: 600;
+          letter-spacing: 0.15em;
           text-transform: uppercase;
-          color: rgba(10,10,10,0.45);
-          margin-bottom: 20px;
+          color: #c9a84c;
+          margin-bottom: 16px;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 20px;
+          gap: 16px;
         }
         .gallery-eyebrow::before {
           content: '';
@@ -607,43 +598,47 @@ const Gallery: React.FC = () => {
           font-family: 'Playfair Display', serif;
           font-size: clamp(2.5rem, 5vw, 4rem);
           font-weight: 900;
-          color: #0a0a0a;
-          margin-bottom: 40px;
+          color: #1a1a2e;
+          margin-bottom: 36px;
         }
 
         /* SECTION TABS */
         .section-tabs {
           display: flex;
           justify-content: center;
-          gap: 20px;
-          margin-bottom: 80px;
+          gap: 10px;
+          margin-bottom: 60px;
           flex-wrap: wrap;
           padding: 0 60px;
         }
 
         .section-tab {
-          font-family: 'Josefin Sans', sans-serif;
-          font-size: 0.75rem;
-          letter-spacing: 0.2em;
+          font-family: 'Inter', sans-serif;
+          font-size: 0.72rem;
+          font-weight: 600;
+          letter-spacing: 0.06em;
           text-transform: uppercase;
-          padding: 14px 28px;
-          border: 1px solid rgba(10,10,10,0.2);
-          background: transparent;
-          color: #0a0a0a;
+          padding: 10px 24px;
+          border: 1.5px solid #e5e7eb;
+          border-radius: 24px;
+          background: #fff;
+          color: #9098a9;
           cursor: pointer;
-          transition: all 0.3s;
+          transition: all 0.18s;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.04);
         }
 
         .section-tab.active {
-          background: #0a0a0a;
-          color: #ffffff;
-          border-color: #0a0a0a;
+          background: #1a1a2e;
+          color: #fff;
+          border-color: #1a1a2e;
+          box-shadow: 0 4px 12px rgba(26,26,46,0.2);
         }
 
-        .section-tab:hover {
-          border-color: #0a0a0a;
-          color: #0a0a0a;
-          background: rgba(10,10,10,0.06);
+        .section-tab:hover:not(.active) {
+          border-color: #c9a84c;
+          color: #c9a84c;
+          background: #fff;
         }
 
         /* GALLERY ITEMS */
@@ -660,36 +655,40 @@ const Gallery: React.FC = () => {
           position: relative;
           overflow: hidden;
           aspect-ratio: 1;
-          cursor: pointer;
-          group: 'image';
+          cursor: zoom-in;
+          border-radius: 12px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+          transition: box-shadow 0.22s, transform 0.22s;
         }
+        .gallery-item:hover { box-shadow: 0 10px 32px rgba(0,0,0,0.14); transform: translateY(-2px); }
 
         .gallery-item-img {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          transition: transform 0.6s ease;
+          transition: transform 0.5s ease;
+          display: block;
         }
 
         .gallery-item:hover .gallery-item-img {
-          transform: scale(1.08);
+          transform: scale(1.06);
         }
 
         .gallery-item-overlay {
           position: absolute;
           inset: 0;
-          background: rgba(10,10,10,0.6);
+          background: rgba(26,26,46,0.5);
           opacity: 0;
-          transition: opacity 0.4s;
+          transition: opacity 0.3s;
           display: flex;
           align-items: center;
           justify-content: center;
+          border-radius: 12px;
         }
 
         .gallery-item:hover .gallery-item-overlay {
           opacity: 1;
         }
-        .gallery-item { cursor: zoom-in; }
 
         /* Image viewer — compact panel, not full-screen */
         .img-viewer-overlay {
@@ -709,14 +708,14 @@ const Gallery: React.FC = () => {
         .img-viewer-back {
           display: inline-flex; align-items: center; gap: 8px;
           background: none; border: none; color: rgba(255,255,255,0.75);
-          font-family: 'Josefin Sans', sans-serif; font-size: 0.68rem;
-          letter-spacing: 0.18em; text-transform: uppercase; cursor: pointer;
+          font-family: 'Inter', sans-serif; font-size: 0.72rem; font-weight: 500;
+          letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer;
           transition: color 0.2s; padding: 0;
         }
-        .img-viewer-back:hover { color: #fff; }
+        .img-viewer-back:hover { color: #c9a84c; }
         .img-viewer-counter {
-          font-family: 'Josefin Sans', sans-serif; font-size: 0.68rem;
-          letter-spacing: 0.15em; color: rgba(255,255,255,0.45);
+          font-family: 'Inter', sans-serif; font-size: 0.72rem; font-weight: 500;
+          letter-spacing: 0.06em; color: rgba(255,255,255,0.45);
         }
         .img-viewer-stage {
           width: 100%; height: 380px; position: relative; overflow: hidden;
@@ -747,7 +746,7 @@ const Gallery: React.FC = () => {
           background: none; opacity: 0.5; transition: opacity 0.2s, border-color 0.2s;
         }
         .img-viewer-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        .img-viewer-thumb:hover, .img-viewer-thumb.active { opacity: 1; border-color: #b8913e; }
+        .img-viewer-thumb:hover, .img-viewer-thumb.active { opacity: 1; border-color: #c9a84c; }
         @media (max-width: 600px) {
           .img-viewer-overlay { padding: 70px 0 0; align-items: flex-start; }
           .img-viewer-stage { height: 260px; }
@@ -772,18 +771,19 @@ const Gallery: React.FC = () => {
           padding: 0 60px;
         }
         .video-card {
-          background: #0a0a0a;
-          border-radius: 6px;
+          background: #1a1a2e;
+          border-radius: 14px;
           overflow: hidden;
+          box-shadow: 0 4px 16px rgba(0,0,0,0.12);
         }
         .video-card video {
           width: 100%; display: block;
           max-height: 280px; object-fit: cover;
         }
         .video-card-label {
-          font-family: 'Josefin Sans', sans-serif;
-          font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase;
-          color: rgba(255,255,255,0.4); padding: 10px 14px;
+          font-family: 'Inter', sans-serif;
+          font-size: 0.65rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+          color: rgba(255,255,255,0.45); padding: 12px 16px;
         }
 
         @media (max-width: 900px) {
