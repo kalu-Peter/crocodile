@@ -68,11 +68,16 @@ const AdminDashboardPage: React.FC = () => {
   const [blockedDates, setBlockedDates] = useState<BlockedDate[]>([]);
   const [blockLoading, setBlockLoading] = useState(false);
   const [blockPropFilter, setBlockPropFilter] = useState("all");
+  const [blockMode, setBlockMode] = useState<"single" | "range" | "month">("single");
   const [blockForm, setBlockForm] = useState({
     property_name: PROPERTY_NAMES[0] ?? "",
-    blocked_date: "",
+    single_date: "",
+    start_date: "",
+    end_date: "",
+    month: "",
     reason: "manual_block",
   });
+  const [blockSaving, setBlockSaving] = useState(false);
   const [blockError, setBlockError] = useState("");
   const [blockSuccess, setBlockSuccess] = useState("");
 
@@ -219,18 +224,42 @@ const AdminDashboardPage: React.FC = () => {
 
   const submitBlockDate = async (e: React.FormEvent) => {
     e.preventDefault();
-    setBlockError("");
-    setBlockSuccess("");
-    if (!blockForm.blocked_date) { setBlockError("Please select a date."); return; }
-    const res = await api("/blocked-dates", {
-      method: "POST",
-      body: JSON.stringify(blockForm),
-    });
-    const data = await res.json();
-    if (!res.ok) { setBlockError(data.error ?? "Failed to block date."); return; }
-    setBlockSuccess(`${blockForm.blocked_date} blocked for ${blockForm.property_name}.`);
-    setBlockForm((f) => ({ ...f, blocked_date: "" }));
-    await fetchBlockedDates();
+    setBlockError(""); setBlockSuccess("");
+
+    let start_date = "", end_date = "";
+
+    if (blockMode === "single") {
+      if (!blockForm.single_date) { setBlockError("Please select a date."); return; }
+      start_date = blockForm.single_date;
+      end_date = blockForm.single_date;
+    } else if (blockMode === "range") {
+      if (!blockForm.start_date || !blockForm.end_date) { setBlockError("Please select both start and end dates."); return; }
+      if (blockForm.end_date < blockForm.start_date) { setBlockError("End date must be after start date."); return; }
+      start_date = blockForm.start_date;
+      end_date = blockForm.end_date;
+    } else {
+      if (!blockForm.month) { setBlockError("Please select a month."); return; }
+      const [y, m] = blockForm.month.split("-").map(Number);
+      const firstDay = new Date(y, m - 1, 1);
+      const lastDay = new Date(y, m, 0);
+      start_date = firstDay.toISOString().split("T")[0];
+      end_date = lastDay.toISOString().split("T")[0];
+    }
+
+    setBlockSaving(true);
+    try {
+      const res = await api("/blocked-dates", {
+        method: "POST",
+        body: JSON.stringify({ property_name: blockForm.property_name, start_date, end_date, reason: blockForm.reason }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setBlockError(data.error ?? "Failed to block dates."); return; }
+      setBlockSuccess(data.message ?? "Dates blocked successfully.");
+      setBlockForm((f) => ({ ...f, single_date: "", start_date: "", end_date: "", month: "" }));
+      await fetchBlockedDates();
+    } finally {
+      setBlockSaving(false);
+    }
   };
 
   // ── Derived ───────────────────────────────────────────────────────────────
@@ -832,7 +861,33 @@ const AdminDashboardPage: React.FC = () => {
 
               {/* Add block form */}
               <div className="adm-form-card">
-                <h3>Block a Date</h3>
+                <h3>Block Dates</h3>
+
+                {/* Mode selector */}
+                <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+                  {(["single", "range", "month"] as const).map((m) => (
+                    <button
+                      key={m}
+                      type="button"
+                      onClick={() => setBlockMode(m)}
+                      style={{
+                        padding: "6px 16px",
+                        fontSize: "0.7rem",
+                        letterSpacing: "0.12em",
+                        textTransform: "uppercase",
+                        fontFamily: "'Josefin Sans', sans-serif",
+                        border: "1px solid",
+                        borderColor: blockMode === m ? "#0a0a0a" : "#e0e0e0",
+                        background: blockMode === m ? "#0a0a0a" : "#ffffff",
+                        color: blockMode === m ? "#ffffff" : "#aaaaaa",
+                        cursor: "pointer",
+                      }}
+                    >
+                      {m === "single" ? "Single Day" : m === "range" ? "Date Range" : "Whole Month"}
+                    </button>
+                  ))}
+                </div>
+
                 <form onSubmit={submitBlockDate}>
                   <div className="adm-form-row">
                     <div className="adm-form-field">
@@ -845,15 +900,54 @@ const AdminDashboardPage: React.FC = () => {
                         {PROPERTY_NAMES.map((n) => <option key={n} value={n}>{n}</option>)}
                       </select>
                     </div>
-                    <div className="adm-form-field">
-                      <label>Date</label>
-                      <input
-                        type="date"
-                        value={blockForm.blocked_date}
-                        min={new Date().toISOString().split("T")[0]}
-                        onChange={(e) => setBlockForm((f) => ({ ...f, blocked_date: e.target.value }))}
-                      />
-                    </div>
+
+                    {blockMode === "single" && (
+                      <div className="adm-form-field">
+                        <label>Date</label>
+                        <input
+                          type="date"
+                          value={blockForm.single_date}
+                          min={new Date().toISOString().split("T")[0]}
+                          onChange={(e) => setBlockForm((f) => ({ ...f, single_date: e.target.value }))}
+                        />
+                      </div>
+                    )}
+
+                    {blockMode === "range" && (
+                      <>
+                        <div className="adm-form-field">
+                          <label>Start Date</label>
+                          <input
+                            type="date"
+                            value={blockForm.start_date}
+                            min={new Date().toISOString().split("T")[0]}
+                            onChange={(e) => setBlockForm((f) => ({ ...f, start_date: e.target.value }))}
+                          />
+                        </div>
+                        <div className="adm-form-field">
+                          <label>End Date</label>
+                          <input
+                            type="date"
+                            value={blockForm.end_date}
+                            min={blockForm.start_date || new Date().toISOString().split("T")[0]}
+                            onChange={(e) => setBlockForm((f) => ({ ...f, end_date: e.target.value }))}
+                          />
+                        </div>
+                      </>
+                    )}
+
+                    {blockMode === "month" && (
+                      <div className="adm-form-field">
+                        <label>Month</label>
+                        <input
+                          type="month"
+                          value={blockForm.month}
+                          min={new Date().toISOString().slice(0, 7)}
+                          onChange={(e) => setBlockForm((f) => ({ ...f, month: e.target.value }))}
+                        />
+                      </div>
+                    )}
+
                     <div className="adm-form-field">
                       <label>Reason</label>
                       <select
@@ -863,10 +957,12 @@ const AdminDashboardPage: React.FC = () => {
                       >
                         <option value="manual_block">Manual Block</option>
                         <option value="maintenance">Maintenance</option>
+                        <option value="owner_stay">Owner Stay</option>
                       </select>
                     </div>
-                    <button className="adm-btn adm-btn-save" type="submit" style={{ padding: "10px 24px", alignSelf: "flex-end" }}>
-                      Block Date
+
+                    <button className="adm-btn adm-btn-save" type="submit" disabled={blockSaving} style={{ padding: "10px 24px", alignSelf: "flex-end" }}>
+                      {blockSaving ? "Blocking…" : blockMode === "single" ? "Block Day" : blockMode === "range" ? "Block Range" : "Block Month"}
                     </button>
                   </div>
                   {blockError   && <div className="adm-form-msg error">{blockError}</div>}

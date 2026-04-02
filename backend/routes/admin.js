@@ -38,9 +38,9 @@ router.put("/reservations/:id/confirm", confirmReservation);
 router.put("/reservations/:id/cancel",  cancelReservation);
 
 // Blocked dates
-router.post("/block-date",    blockDate);
-router.get("/blocked-dates",  getBlockedDates);
-router.delete("/block-date/:id", unblockDate);
+router.get("/blocked-dates",       getBlockedDates);
+router.post("/blocked-dates",      blockDate);
+router.delete("/blocked-dates/:id", unblockDate);
 
 // Pricing
 router.get("/pricing",        getAllPricing);
