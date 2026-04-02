@@ -46,118 +46,145 @@ const AdminLoginPage: React.FC = () => {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Josefin+Sans:wght@300;400&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         .al-root {
           min-height: 100vh;
-          background: #ffffff;
+          background: #f5f6fa;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-family: 'Josefin Sans', sans-serif;
+          font-family: 'Inter', sans-serif;
+          padding: 24px;
         }
 
         .al-card {
           width: 100%;
-          max-width: 400px;
-          padding: 52px 48px;
+          max-width: 420px;
+          padding: 48px 44px;
           background: #ffffff;
-          border: 1px solid #e8e8e8;
+          border: 1px solid #eef0f4;
+          border-radius: 20px;
+          box-shadow: 0 4px 24px rgba(0,0,0,0.07);
         }
 
+        .al-brand {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-bottom: 6px;
+        }
+        .al-brand-dot {
+          width: 10px; height: 10px;
+          background: #c9a84c;
+          border-radius: 50%;
+          flex-shrink: 0;
+        }
         .al-logo {
           font-family: 'Playfair Display', serif;
           font-size: 1.3rem;
-          color: #0a0a0a;
-          letter-spacing: 0.04em;
-          margin-bottom: 6px;
+          color: #1a1a2e;
+          letter-spacing: 0.02em;
         }
-        .al-logo span { color: #909090; }
+        .al-logo span { color: #c9a84c; }
 
         .al-subtitle {
-          font-size: 0.62rem;
-          letter-spacing: 0.3em;
+          font-size: 0.72rem;
+          font-weight: 500;
+          letter-spacing: 0.08em;
           text-transform: uppercase;
-          color: #aaaaaa;
-          margin-bottom: 44px;
+          color: #9098a9;
+          margin-bottom: 36px;
+          padding-left: 20px;
         }
 
         .al-field {
-          margin-bottom: 20px;
+          margin-bottom: 18px;
         }
 
         .al-field label {
           display: block;
-          font-size: 0.6rem;
-          letter-spacing: 0.25em;
+          font-size: 0.7rem;
+          font-weight: 600;
+          letter-spacing: 0.05em;
           text-transform: uppercase;
-          color: #aaaaaa;
+          color: #9098a9;
           margin-bottom: 8px;
         }
 
         .al-field input {
           width: 100%;
-          background: #fafafa;
-          border: 1px solid #e0e0e0;
-          color: #0a0a0a;
-          font-family: 'Josefin Sans', sans-serif;
-          font-size: 0.9rem;
+          background: #f9fafb;
+          border: 1.5px solid #e5e7eb;
+          border-radius: 10px;
+          color: #1a1a2e;
+          font-family: 'Inter', sans-serif;
+          font-size: 0.92rem;
+          font-weight: 400;
           padding: 13px 16px;
           outline: none;
-          transition: border-color 0.2s;
-          box-sizing: border-box;
+          transition: border-color 0.18s, background 0.18s;
         }
 
         .al-field input:focus {
-          border-color: #0a0a0a;
+          border-color: #c9a84c;
+          background: #ffffff;
         }
 
+        .al-field input::placeholder { color: #c4c9d4; }
+
         .al-error {
-          font-size: 0.72rem;
-          letter-spacing: 0.05em;
-          color: #ef4444;
-          margin-bottom: 20px;
-          padding: 10px 14px;
-          background: rgba(239,68,68,0.08);
-          border: 1px solid rgba(239,68,68,0.2);
+          font-size: 0.78rem;
+          font-weight: 500;
+          color: #991b1b;
+          margin-bottom: 18px;
+          padding: 11px 14px;
+          background: #fef2f2;
+          border: 1px solid #fecaca;
+          border-radius: 8px;
         }
 
         .al-btn {
           width: 100%;
-          background: #0a0a0a;
+          background: #1a1a2e;
           color: #ffffff;
           border: none;
+          border-radius: 10px;
           padding: 14px;
-          font-family: 'Josefin Sans', sans-serif;
-          font-size: 0.68rem;
-          font-weight: 400;
-          letter-spacing: 0.25em;
-          text-transform: uppercase;
+          font-family: 'Inter', sans-serif;
+          font-size: 0.82rem;
+          font-weight: 600;
+          letter-spacing: 0.04em;
           cursor: pointer;
-          transition: background 0.2s;
-          margin-top: 8px;
+          transition: background 0.18s, transform 0.12s;
+          margin-top: 6px;
         }
 
-        .al-btn:hover:not(:disabled) { background: #282828; }
-        .al-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .al-btn:hover:not(:disabled) { background: #2d2d4e; transform: translateY(-1px); }
+        .al-btn:active:not(:disabled) { transform: translateY(0); }
+        .al-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
         .al-back {
           display: block;
           text-align: center;
-          margin-top: 28px;
-          font-size: 0.6rem;
-          letter-spacing: 0.2em;
-          text-transform: uppercase;
-          color: #aaaaaa;
+          margin-top: 24px;
+          font-size: 0.75rem;
+          font-weight: 500;
+          color: #9098a9;
           text-decoration: none;
-          transition: color 0.2s;
+          transition: color 0.18s;
         }
-        .al-back:hover { color: #0a0a0a; }
+        .al-back:hover { color: #1a1a2e; }
       `}</style>
 
       <div className="al-root">
         <div className="al-card">
-          <div className="al-logo">Croc<span>odile</span> Lodge</div>
+          <div className="al-brand">
+            <div className="al-brand-dot"></div>
+            <div className="al-logo">Croc<span>odile</span> Lodge</div>
+          </div>
           <div className="al-subtitle">Admin Portal</div>
 
           <form onSubmit={handleSubmit} autoComplete="off">
