@@ -14,7 +14,7 @@ const AdminDashboardPage: React.FC = () => {
   const adminUser = sessionStorage.getItem("adminUser") ?? "Admin";
 
   useEffect(() => {
-    if (!secret) navigate("/crocodile-admin", { replace: true });
+    if (!secret) navigate("/admin", { replace: true });
   }, [secret, navigate]);
 
   const api = useCallback(
@@ -290,7 +290,7 @@ const AdminDashboardPage: React.FC = () => {
   const logout = () => {
     sessionStorage.removeItem("adminSecret");
     sessionStorage.removeItem("adminUser");
-    navigate("/crocodile-admin", { replace: true });
+    navigate("/admin", { replace: true });
   };
 
   const fmt = (d: string) => new Date(d).toLocaleDateString("en-KE", { day: "2-digit", month: "short", year: "numeric" });

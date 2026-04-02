@@ -27,8 +27,8 @@ function App() {
               <Route path="/villa/:villaId"            element={<VillaDetailsPage />} />
               <Route path="/search"                    element={<SearchResultsPage />} />
               <Route path="/reservation"               element={<ReservationPage />} />
-              <Route path="/crocodile-admin"           element={<AdminLoginPage />} />
-              <Route path="/crocodile-admin/dashboard" element={<AdminDashboardPage />} />
+              <Route path="/admin"           element={<AdminLoginPage />} />
+              <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
             </Routes>
           </PageTransition>
         </Suspense>

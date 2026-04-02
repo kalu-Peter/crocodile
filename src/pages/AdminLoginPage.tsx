@@ -10,7 +10,7 @@ const AdminLoginPage: React.FC = () => {
 
   useEffect(() => {
     if (sessionStorage.getItem("adminSecret")) {
-      navigate("/crocodile-admin/dashboard", { replace: true });
+      navigate("/admin/dashboard", { replace: true });
     }
   }, [navigate]);
 
@@ -32,7 +32,7 @@ const AdminLoginPage: React.FC = () => {
       if (res.ok) {
         sessionStorage.setItem("adminSecret", data.secret);
         sessionStorage.setItem("adminUser", data.username);
-        navigate("/crocodile-admin/dashboard", { replace: true });
+        navigate("/admin/dashboard", { replace: true });
       } else {
         setError(data.error ?? "Invalid credentials. Please try again.");
       }
@@ -50,7 +50,7 @@ const AdminLoginPage: React.FC = () => {
 
         .al-root {
           min-height: 100vh;
-          background: #0a0a0a;
+          background: #ffffff;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -61,14 +61,14 @@ const AdminLoginPage: React.FC = () => {
           width: 100%;
           max-width: 400px;
           padding: 52px 48px;
-          background: #141414;
-          border: 1px solid #282828;
+          background: #ffffff;
+          border: 1px solid #e8e8e8;
         }
 
         .al-logo {
           font-family: 'Playfair Display', serif;
           font-size: 1.3rem;
-          color: #f0f0f0;
+          color: #0a0a0a;
           letter-spacing: 0.04em;
           margin-bottom: 6px;
         }
@@ -78,7 +78,7 @@ const AdminLoginPage: React.FC = () => {
           font-size: 0.62rem;
           letter-spacing: 0.3em;
           text-transform: uppercase;
-          color: #505050;
+          color: #aaaaaa;
           margin-bottom: 44px;
         }
 
@@ -91,15 +91,15 @@ const AdminLoginPage: React.FC = () => {
           font-size: 0.6rem;
           letter-spacing: 0.25em;
           text-transform: uppercase;
-          color: #505050;
+          color: #aaaaaa;
           margin-bottom: 8px;
         }
 
         .al-field input {
           width: 100%;
-          background: #0a0a0a;
-          border: 1px solid #282828;
-          color: #f0f0f0;
+          background: #fafafa;
+          border: 1px solid #e0e0e0;
+          color: #0a0a0a;
           font-family: 'Josefin Sans', sans-serif;
           font-size: 0.9rem;
           padding: 13px 16px;
@@ -109,7 +109,7 @@ const AdminLoginPage: React.FC = () => {
         }
 
         .al-field input:focus {
-          border-color: #909090;
+          border-color: #0a0a0a;
         }
 
         .al-error {
@@ -124,8 +124,8 @@ const AdminLoginPage: React.FC = () => {
 
         .al-btn {
           width: 100%;
-          background: #909090;
-          color: #0a0a0a;
+          background: #0a0a0a;
+          color: #ffffff;
           border: none;
           padding: 14px;
           font-family: 'Josefin Sans', sans-serif;
@@ -138,7 +138,7 @@ const AdminLoginPage: React.FC = () => {
           margin-top: 8px;
         }
 
-        .al-btn:hover:not(:disabled) { background: #e0e0e0; }
+        .al-btn:hover:not(:disabled) { background: #282828; }
         .al-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
         .al-back {
@@ -148,11 +148,11 @@ const AdminLoginPage: React.FC = () => {
           font-size: 0.6rem;
           letter-spacing: 0.2em;
           text-transform: uppercase;
-          color: #505050;
+          color: #aaaaaa;
           text-decoration: none;
           transition: color 0.2s;
         }
-        .al-back:hover { color: #909090; }
+        .al-back:hover { color: #0a0a0a; }
       `}</style>
 
       <div className="al-root">
