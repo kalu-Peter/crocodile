@@ -841,63 +841,6 @@ const AdminDashboardPage: React.FC = () => {
           {/* ── BLOCKED DATES ─────────────────────────────── */}
           {activeTab === "blocked-dates" && (
             <>
-              <div className="adm-section-head">
-                <div className="adm-section-title">Blocked Dates</div>
-                <div className="adm-filters">
-                  <select
-                    className="adm-select"
-                    value={blockPropFilter}
-                    onChange={(e) => setBlockPropFilter(e.target.value)}
-                  >
-                    <option value="all">All Properties</option>
-                    {PROPERTY_NAMES.map((n) => <option key={n} value={n}>{n}</option>)}
-                  </select>
-                  <button className="adm-filter-btn" onClick={fetchBlockedDates}>↺ Refresh</button>
-                </div>
-              </div>
-
-              {blockLoading ? (
-                <div className="adm-loading">Loading blocked dates…</div>
-              ) : blockedDates.length === 0 ? (
-                <div className="adm-loading">No blocked dates found.</div>
-              ) : (
-                <div className="adm-table-wrap">
-                  <table className="adm-table">
-                    <thead>
-                      <tr>
-                        <th>Property</th>
-                        <th>Blocked Date</th>
-                        <th>Reason</th>
-                        <th>Blocked On</th>
-                        <th>Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {blockedDates.map((b) => (
-                        <tr key={b.id}>
-                          <td>{b.property_name}</td>
-                          <td>{fmt(b.blocked_date)}</td>
-                          <td>
-                            <span className="badge badge-default">
-                              {b.reason.replace("_", " ")}
-                            </span>
-                          </td>
-                          <td style={{ fontSize: "0.68rem", color: "#aaaaaa" }}>{fmt(b.created_at)}</td>
-                          <td>
-                            <button
-                              className="adm-btn adm-btn-remove"
-                              onClick={() => unblockDate(b.id)}
-                            >
-                              Unblock
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-
               {/* Add block form */}
               <div className="adm-form-card">
                 <h3>Block Dates</h3>
@@ -1008,12 +951,122 @@ const AdminDashboardPage: React.FC = () => {
                   {blockSuccess && <div className="adm-form-msg success">{blockSuccess}</div>}
                 </form>
               </div>
+
+              <div className="adm-section-head">
+                <div className="adm-section-title">Blocked Dates</div>
+                <div className="adm-filters">
+                  <select
+                    className="adm-select"
+                    value={blockPropFilter}
+                    onChange={(e) => setBlockPropFilter(e.target.value)}
+                  >
+                    <option value="all">All Properties</option>
+                    {PROPERTY_NAMES.map((n) => <option key={n} value={n}>{n}</option>)}
+                  </select>
+                  <button className="adm-filter-btn" onClick={fetchBlockedDates}>↺ Refresh</button>
+                </div>
+              </div>
+
+              {blockLoading ? (
+                <div className="adm-loading">Loading blocked dates…</div>
+              ) : blockedDates.length === 0 ? (
+                <div className="adm-loading">No blocked dates found.</div>
+              ) : (
+                <div className="adm-table-wrap">
+                  <table className="adm-table">
+                    <thead>
+                      <tr>
+                        <th>Property</th>
+                        <th>Blocked Date</th>
+                        <th>Reason</th>
+                        <th>Blocked On</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {blockedDates.map((b) => (
+                        <tr key={b.id}>
+                          <td>{b.property_name}</td>
+                          <td>{fmt(b.blocked_date)}</td>
+                          <td>
+                            <span className="badge badge-default">
+                              {b.reason.replace("_", " ")}
+                            </span>
+                          </td>
+                          <td style={{ fontSize: "0.68rem", color: "#aaaaaa" }}>{fmt(b.created_at)}</td>
+                          <td>
+                            <button
+                              className="adm-btn adm-btn-remove"
+                              onClick={() => unblockDate(b.id)}
+                            >
+                              Unblock
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </>
           )}
 
           {/* ── SEASONAL PRICING ──────────────────────────── */}
           {activeTab === "seasonal-pricing" && (
             <>
+              {/* Add rule form */}
+              <div className="adm-form-card">
+                <h3>Add Pricing Rule — {VILLAS.find((v) => v.id === seasonalVilla)?.name}</h3>
+                <form onSubmit={submitSeasonalRule}>
+                  <div className="adm-form-row">
+                    <div className="adm-form-field">
+                      <label>Label (e.g. High Season)</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Easter Holiday"
+                        value={seasonalForm.label}
+                        onChange={(e) => setSeasonalForm((f) => ({ ...f, label: e.target.value }))}
+                      />
+                    </div>
+                    <div className="adm-form-field">
+                      <label>Start Date</label>
+                      <input
+                        type="date"
+                        value={seasonalForm.start_date}
+                        onChange={(e) => setSeasonalForm((f) => ({ ...f, start_date: e.target.value }))}
+                        required
+                      />
+                    </div>
+                    <div className="adm-form-field">
+                      <label>End Date</label>
+                      <input
+                        type="date"
+                        value={seasonalForm.end_date}
+                        min={seasonalForm.start_date}
+                        onChange={(e) => setSeasonalForm((f) => ({ ...f, end_date: e.target.value }))}
+                        required
+                      />
+                    </div>
+                    <div className="adm-form-field">
+                      <label>Price / Night (Ksh)</label>
+                      <input
+                        type="number"
+                        min="1"
+                        placeholder="e.g. 9500"
+                        value={seasonalForm.price_per_night}
+                        onChange={(e) => setSeasonalForm((f) => ({ ...f, price_per_night: e.target.value }))}
+                        required
+                      />
+                    </div>
+                    <button className="adm-btn adm-btn-save" type="submit" disabled={seasonalSaving} style={{ padding: "10px 24px", alignSelf: "flex-end" }}>
+                      {seasonalSaving ? "…" : "Add Rule"}
+                    </button>
+                  </div>
+                  {seasonalError   && <div className="adm-form-msg error">{seasonalError}</div>}
+                  {seasonalSuccess && <div className="adm-form-msg success">{seasonalSuccess}</div>}
+                </form>
+              </div>
+
               <div className="adm-section-head">
                 <div className="adm-section-title">Seasonal Pricing</div>
                 <div className="adm-filters">
@@ -1067,59 +1120,6 @@ const AdminDashboardPage: React.FC = () => {
                   </table>
                 </div>
               )}
-
-              {/* Add rule form */}
-              <div className="adm-form-card">
-                <h3>Add Pricing Rule — {VILLAS.find((v) => v.id === seasonalVilla)?.name}</h3>
-                <form onSubmit={submitSeasonalRule}>
-                  <div className="adm-form-row">
-                    <div className="adm-form-field">
-                      <label>Label (e.g. High Season)</label>
-                      <input
-                        type="text"
-                        placeholder="e.g. Easter Holiday"
-                        value={seasonalForm.label}
-                        onChange={(e) => setSeasonalForm((f) => ({ ...f, label: e.target.value }))}
-                      />
-                    </div>
-                    <div className="adm-form-field">
-                      <label>Start Date</label>
-                      <input
-                        type="date"
-                        value={seasonalForm.start_date}
-                        onChange={(e) => setSeasonalForm((f) => ({ ...f, start_date: e.target.value }))}
-                        required
-                      />
-                    </div>
-                    <div className="adm-form-field">
-                      <label>End Date</label>
-                      <input
-                        type="date"
-                        value={seasonalForm.end_date}
-                        min={seasonalForm.start_date}
-                        onChange={(e) => setSeasonalForm((f) => ({ ...f, end_date: e.target.value }))}
-                        required
-                      />
-                    </div>
-                    <div className="adm-form-field">
-                      <label>Price / Night (Ksh)</label>
-                      <input
-                        type="number"
-                        min="1"
-                        placeholder="e.g. 9500"
-                        value={seasonalForm.price_per_night}
-                        onChange={(e) => setSeasonalForm((f) => ({ ...f, price_per_night: e.target.value }))}
-                        required
-                      />
-                    </div>
-                    <button className="adm-btn adm-btn-save" type="submit" disabled={seasonalSaving} style={{ padding: "10px 24px", alignSelf: "flex-end" }}>
-                      {seasonalSaving ? "…" : "Add Rule"}
-                    </button>
-                  </div>
-                  {seasonalError   && <div className="adm-form-msg error">{seasonalError}</div>}
-                  {seasonalSuccess && <div className="adm-form-msg success">{seasonalSuccess}</div>}
-                </form>
-              </div>
             </>
           )}
 
