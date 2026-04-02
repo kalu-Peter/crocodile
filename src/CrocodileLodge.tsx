@@ -329,7 +329,7 @@ const CrocodileLodge: React.FC = () => {
 
         /* HERO */
         .hero {
-          height: 100vh;
+          min-height: 100vh;
           position: relative;
           display: flex;
           flex-direction: column;
@@ -354,7 +354,8 @@ const CrocodileLodge: React.FC = () => {
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          gap: 48px;
+          gap: 36px;
+          padding: 120px 0 100px;
         }
 
         .hero-title-wrap {
@@ -367,6 +368,32 @@ const CrocodileLodge: React.FC = () => {
           position: relative;
           z-index: 10;
           width: 100%;
+        }
+
+        .hero-tagline {
+          max-width: 720px;
+          margin: 0 auto;
+          padding: 0 24px;
+          text-align: center;
+          opacity: 0;
+          animation: fade-up 1s ease 0.9s forwards;
+        }
+        .hero-tagline p {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: clamp(0.95rem, 1.6vw, 1.18rem);
+          font-style: italic;
+          color: rgba(255,255,255,0.82);
+          line-height: 1.7;
+          margin: 0;
+          text-shadow: 0 1px 8px rgba(0,0,0,0.45);
+        }
+        .hero-tagline p + p { margin-top: 10px; }
+        @media (max-width: 768px) {
+          .hero-tagline { padding: 0 20px; }
+          .hero-tagline p { font-size: 0.9rem; line-height: 1.65; }
+        }
+        @media (max-width: 480px) {
+          .hero-tagline p { font-size: 0.85rem; }
         }
 
         .hero-eyebrow {
@@ -2012,6 +2039,14 @@ const CrocodileLodge: React.FC = () => {
               </button>
             </div>
           </div>
+
+          {/* HERO TAGLINE */}
+          <div className="hero-tagline">
+            <p>The Indian Ocean is calling you, just steps from Diani Beach in Kenya...</p>
+            <p>The Lodge, a dreamy oasis just minutes from the sea, invites you to experience an unforgettable vacation.</p>
+            <p>Kite surfing, scuba diving, safaris... Adventure awaits, set to the rhythm of the savannah and turquoise waves.</p>
+            <p>Send me a message, and I'll reveal the secrets of this little corner of paradise.</p>
+          </div>
         </div>
       </section>
 
@@ -2019,16 +2054,6 @@ const CrocodileLodge: React.FC = () => {
       <section className="villas-section" id="villas">
         <div className="section-header reveal" style={{ marginBottom: "40px" }}>
           <h2 className="section-title">Crocodile Stay</h2>
-          <p style={{
-            fontFamily: "'Cormorant Garamond', serif",
-            fontSize: "clamp(1rem, 1.5vw, 1.2rem)",
-            color: "rgba(10,10,10,0.65)",
-            lineHeight: 1.55,
-            maxWidth: "680px",
-            margin: "28px auto 0",
-            textAlign: "center",
-            whiteSpace: "pre-line",
-          }}>{"The Indian Ocean is calling you, just steps from Diani Beach in Kenya...\nThe Lodge, a dreamy oasis just minutes from the sea, invites you to experience an unforgettable vacation.\n\nKite surfing, scuba diving, safaris... Adventure awaits, set to the rhythm of the savannah and turquoise waves.\n\nSend me a message, and I'll reveal the secrets of this little corner of paradise."}</p>
         </div>
 
         <div className="villas-grid">
