@@ -188,6 +188,17 @@ const CrocodileLodge: React.FC = () => {
           border: none;
           cursor: pointer;
           padding: 0;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        .nav-logo-img {
+          height: 40px;
+          width: 40px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 2px solid rgba(255,255,255,0.3);
+          flex-shrink: 0;
         }
         .nav-logo span { color: var(--croc-gold); }
 
@@ -1812,6 +1823,17 @@ const CrocodileLodge: React.FC = () => {
           font-weight: 900;
           color: var(--croc-deep);
           white-space: nowrap;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        .footer-logo-img {
+          height: 48px;
+          width: 48px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 2px solid rgba(10,10,10,0.12);
+          flex-shrink: 0;
         }
         .footer-logo span { color: var(--croc-deep); }
 
@@ -1948,6 +1970,7 @@ const CrocodileLodge: React.FC = () => {
         className={`${navScrolled ? "nav-scrolled" : ""} ${!navVisible ? "nav-hidden" : ""}`}
       >
         <Link to="/" className="nav-logo">
+          <img src="/favicon/logo.jpeg" alt="Crocodile Lodge" className="nav-logo-img" />
           Croc<span>odile</span> Lodge
         </Link>
         <ul className="nav-links">
@@ -2116,6 +2139,7 @@ const CrocodileLodge: React.FC = () => {
       <footer id="contact">
         <div className="footer-main">
           <div className="footer-logo">
+            <img src="/favicon/logo.jpeg" alt="Crocodile Lodge" className="footer-logo-img" />
             Croc<span>odile</span> Villas
           </div>
           <div className="social-links">
