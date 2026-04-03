@@ -1,169 +1,128 @@
 import { cors } from "./_lib/helpers.js";
 
-// ─── M-Pesa helpers ────────────────────────────────────────────────────────
-const MPESA_BASE = process.env.MPESA_SANDBOX !== "false"
-  ? "https://sandbox.safaricom.co.ke"
-  : "https://api.safaricom.co.ke";
+const PESAPAL_BASE = process.env.PESAPAL_SANDBOX === "true"
+  ? "https://cybqa.pesapal.com/pesapalv3"
+  : "https://pay.pesapal.com/v3";
 
-async function getMpesaToken() {
-  const auth = Buffer.from(
-    `${process.env.MPESA_CONSUMER_KEY}:${process.env.MPESA_CONSUMER_SECRET}`
-  ).toString("base64");
-  const res = await fetch(`${MPESA_BASE}/oauth/v1/generate?grant_type=client_credentials`, {
-    headers: { Authorization: `Basic ${auth}` },
-  });
-  return (await res.json()).access_token;
-}
+const CONSUMER_KEY    = process.env.PESAPAL_CONSUMER_KEY;
+const CONSUMER_SECRET = process.env.PESAPAL_CONSUMER_SECRET;
 
-function mpesaTimestamp() {
-  return new Date().toISOString().replace(/[-T:.Z]/g, "").slice(0, 14);
-}
-
-function mpesaPassword(ts) {
-  return Buffer.from(`${process.env.MPESA_SHORTCODE}${process.env.MPESA_PASSKEY}${ts}`).toString("base64");
-}
-
-function formatPhone(phone) {
-  return "254" + phone.replace(/\D/g, "").replace(/^(254|0)/, "");
-}
-
-// ─── PayPal helpers ─────────────────────────────────────────────────────────
-const PAYPAL_BASE = process.env.PAYPAL_SANDBOX !== "false"
-  ? "https://api-m.sandbox.paypal.com"
-  : "https://api-m.paypal.com";
-
-async function getPaypalToken() {
-  const auth = Buffer.from(
-    `${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`
-  ).toString("base64");
-  const res = await fetch(`${PAYPAL_BASE}/v1/oauth2/token`, {
+async function getPesapalToken() {
+  const res = await fetch(`${PESAPAL_BASE}/api/Auth/RequestToken`, {
     method: "POST",
-    headers: { Authorization: `Basic ${auth}`, "Content-Type": "application/x-www-form-urlencoded" },
-    body: "grant_type=client_credentials",
+    headers: { "Content-Type": "application/json", "Accept": "application/json" },
+    body: JSON.stringify({ consumer_key: CONSUMER_KEY, consumer_secret: CONSUMER_SECRET }),
   });
-  return (await res.json()).access_token;
+  const data = await res.json();
+  if (!data.token) throw new Error(`PesaPal auth failed: ${JSON.stringify(data)}`);
+  return data.token;
 }
 
-async function kesToUsd(kes) {
+async function getOrRegisterIPN(token) {
+  if (process.env.PESAPAL_IPN_ID) return process.env.PESAPAL_IPN_ID;
+
+  const ipnUrl = process.env.PESAPAL_IPN_URL;
+  if (!ipnUrl) return "";
+
   try {
-    const r = await fetch("https://open.er-api.com/v6/latest/KES");
-    const d = await r.json();
-    return (kes * (d?.rates?.USD ?? 0.0077)).toFixed(2);
+    const res = await fetch(`${PESAPAL_BASE}/api/Transactions/RegisterIPN`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify({ url: ipnUrl, ipn_notification_type: "GET" }),
+    });
+    const data = await res.json();
+    return data.ipn_id || "";
   } catch {
-    return (kes * 0.0077).toFixed(2);
+    return "";
   }
 }
 
-// ─── Handler ────────────────────────────────────────────────────────────────
 export default async function handler(req, res) {
   if (cors(req, res)) return;
+
+  // IPN callback from PesaPal (GET request)
+  if (req.method === "GET") {
+    return res.status(200).send("OK");
+  }
+
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   const { action, ...body } = req.body ?? {};
 
   try {
-    // ── M-Pesa: initiate STK Push ──────────────────────────────────────────
-    if (action === "mpesa-initiate") {
-      const { phone, amount, reference } = body;
-      if (!phone || !amount) return res.status(400).json({ error: "phone and amount are required" });
+    // ── Initiate PesaPal payment ──────────────────────────────────────────────
+    if (action === "pesapal-initiate") {
+      const { amount, description, email, phone, firstName, lastName, callbackUrl } = body;
+      if (!amount || !email) return res.status(400).json({ error: "amount and email are required" });
 
-      const token = await getMpesaToken();
-      const ts = mpesaTimestamp();
-      const formattedPhone = formatPhone(phone);
+      const token     = await getPesapalToken();
+      const ipnId     = await getOrRegisterIPN(token);
+      const merchantRef = `CROC-${Date.now()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
 
-      const stkRes = await fetch(`${MPESA_BASE}/mpesa/stkpush/v1/processrequest`, {
+      const submitRes = await fetch(`${PESAPAL_BASE}/api/Transactions/SubmitOrderRequest`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
         body: JSON.stringify({
-          BusinessShortCode: process.env.MPESA_SHORTCODE,
-          Password: mpesaPassword(ts),
-          Timestamp: ts,
-          TransactionType: "CustomerPayBillOnline",
-          Amount: Math.ceil(amount),
-          PartyA: formattedPhone,
-          PartyB: process.env.MPESA_SHORTCODE,
-          PhoneNumber: formattedPhone,
-          CallBackURL: process.env.MPESA_CALLBACK_URL,
-          AccountReference: reference || "CrocodileLodge",
-          TransactionDesc: "Villa Reservation",
+          id: merchantRef,
+          currency: "KES",
+          amount: Math.ceil(amount),
+          description: description || "Villa Reservation – Crocodile Lodge",
+          callback_url: callbackUrl,
+          ...(ipnId ? { notification_id: ipnId } : {}),
+          billing_address: {
+            email_address: email,
+            phone_number: phone || "",
+            first_name: firstName || "",
+            last_name: lastName || "",
+          },
         }),
       });
-      const data = await stkRes.json();
-      if (data.ResponseCode === "0") return res.json({ success: true, checkoutRequestId: data.CheckoutRequestID });
-      return res.status(400).json({ error: data.ResponseDescription || "STK Push failed" });
-    }
 
-    // ── M-Pesa: query payment status ───────────────────────────────────────
-    if (action === "mpesa-query") {
-      const { checkoutRequestId } = body;
-      if (!checkoutRequestId) return res.status(400).json({ error: "checkoutRequestId required" });
-
-      const token = await getMpesaToken();
-      const ts = mpesaTimestamp();
-
-      const qRes = await fetch(`${MPESA_BASE}/mpesa/stkpushquery/v1/query`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          BusinessShortCode: process.env.MPESA_SHORTCODE,
-          Password: mpesaPassword(ts),
-          Timestamp: ts,
-          CheckoutRequestID: checkoutRequestId,
-        }),
-      });
-      const data = await qRes.json();
-      const code = String(data.ResultCode ?? "");
-      if (code === "0") return res.json({ status: "success" });
-      if (code === "1032") return res.json({ status: "cancelled", message: "Payment was cancelled" });
-      if (code !== "") return res.json({ status: "failed", message: data.ResultDesc || "Payment failed" });
-      return res.json({ status: "pending" });
-    }
-
-    // ── PayPal: create order ───────────────────────────────────────────────
-    if (action === "paypal-create") {
-      const { amountKES, description } = body;
-      if (!amountKES) return res.status(400).json({ error: "amountKES required" });
-
-      const amountUSD = await kesToUsd(amountKES);
-      const token = await getPaypalToken();
-
-      const orderRes = await fetch(`${PAYPAL_BASE}/v2/checkout/orders`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          intent: "CAPTURE",
-          purchase_units: [{
-            amount: { currency_code: "USD", value: amountUSD },
-            description: description || "Villa Reservation – Crocodile Lodge",
-          }],
-        }),
-      });
-      const order = await orderRes.json();
-      if (!order.id) return res.status(400).json({ error: order.message || "Failed to create PayPal order" });
-      return res.json({ orderId: order.id, amountUSD });
-    }
-
-    // ── PayPal: capture order ──────────────────────────────────────────────
-    if (action === "paypal-capture") {
-      const { orderId } = body;
-      if (!orderId) return res.status(400).json({ error: "orderId required" });
-
-      const token = await getPaypalToken();
-      const captureRes = await fetch(`${PAYPAL_BASE}/v2/checkout/orders/${orderId}/capture`, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-      });
-      const data = await captureRes.json();
-      if (data.status === "COMPLETED") {
-        return res.json({
-          success: true,
-          transactionId: data.purchase_units?.[0]?.payments?.captures?.[0]?.id,
-        });
+      const data = await submitRes.json();
+      if (!data.redirect_url) {
+        return res.status(400).json({ error: data.error?.message || "Failed to initiate PesaPal payment" });
       }
-      return res.status(400).json({ error: "Payment not completed" });
+      return res.json({
+        redirectUrl:      data.redirect_url,
+        orderTrackingId:  data.order_tracking_id,
+        merchantReference: merchantRef,
+      });
     }
 
-    return res.status(400).json({ error: "Invalid action. Use: mpesa-initiate, mpesa-query, paypal-create, paypal-capture" });
+    // ── Check PesaPal transaction status ─────────────────────────────────────
+    if (action === "pesapal-status") {
+      const { orderTrackingId } = body;
+      if (!orderTrackingId) return res.status(400).json({ error: "orderTrackingId required" });
+
+      const token     = await getPesapalToken();
+      const statusRes = await fetch(
+        `${PESAPAL_BASE}/api/Transactions/GetTransactionStatus?orderTrackingId=${encodeURIComponent(orderTrackingId)}`,
+        { headers: { "Accept": "application/json", "Authorization": `Bearer ${token}` } }
+      );
+      const data = await statusRes.json();
+
+      const desc = (data.payment_status_description || "").toLowerCase();
+      const status =
+        desc === "completed" ? "success" :
+        desc === "failed" || desc === "invalid" || desc === "reversed" ? "failed" :
+        "pending";
+
+      return res.json({
+        status,
+        transactionId:  data.confirmation_code || orderTrackingId,
+        paymentMethod:  data.payment_method,
+      });
+    }
+
+    return res.status(400).json({ error: "Invalid action. Use: pesapal-initiate, pesapal-status" });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }

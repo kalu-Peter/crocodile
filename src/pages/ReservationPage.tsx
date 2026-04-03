@@ -1,17 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { VILLAS, getVillaPrice } from "../types";
 import { useCurrency } from "../context/CurrencyContext";
-
-declare global {
-  interface Window {
-    paypal?: {
-      HostedButtons: (config: Record<string, unknown>) => {
-        render: (selector: string) => void;
-      };
-    };
-  }
-}
 
 function nightsBetween(a: string, b: string) {
   if (!a || !b) return 0;
@@ -34,7 +24,6 @@ function getMinNights(villaId: string) {
   return MIN_NIGHTS[villaId] ?? 1;
 }
 
-/** Returns the earliest valid checkout date string given a checkin date and villaId */
 function minCheckout(checkin: string, villaId: string) {
   if (!checkin) return "";
   const d = new Date(checkin);
@@ -51,7 +40,9 @@ function formatDate(d: string) {
   });
 }
 
-type MpesaStatus = "idle" | "pending" | "polling" | "success" | "failed";
+type PesapalStatus = "idle" | "initiating" | "checking" | "success" | "failed";
+
+const STORAGE_KEY = "pesapal_pending_booking";
 
 const ReservationPage: React.FC = () => {
   const navigate = useNavigate();
@@ -80,14 +71,9 @@ const ReservationPage: React.FC = () => {
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
   const [confirmationId, setConfirmationId] = useState("");
 
-  // Payment state
-  const [paymentMethod, setPaymentMethod] = useState<"mpesa" | "paypal">(
-    "mpesa",
-  );
-  const [mpesaPhone, setMpesaPhone] = useState("");
-  const [mpesaStatus, setMpesaStatus] = useState<MpesaStatus>("idle");
-  const [mpesaMessage, setMpesaMessage] = useState("");
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // PesaPal state
+  const [pesapalStatus, setPesapalStatus] = useState<PesapalStatus>("idle");
+  const [pesapalMessage, setPesapalMessage] = useState("");
 
   // Seasonal price
   const [seasonalPrice, setSeasonalPrice] = useState<number | null>(null);
@@ -95,12 +81,6 @@ const ReservationPage: React.FC = () => {
   useEffect(() => {
     if (!villaId) navigate("/");
   }, [villaId, navigate]);
-
-  useEffect(() => {
-    return () => {
-      if (pollRef.current) clearInterval(pollRef.current);
-    };
-  }, []);
 
   if (!villa) return null;
 
@@ -118,56 +98,61 @@ const ReservationPage: React.FC = () => {
       setSeasonalPrice(null);
       return;
     }
-    fetch(
-      `/api/seasonal-price?villaId=${encodeURIComponent(villa.id)}&checkin=${checkin}`,
-    )
+    fetch(`/api/seasonal-price?villaId=${encodeURIComponent(villa.id)}&checkin=${checkin}`)
       .then((r) => r.json())
       .then((data) => setSeasonalPrice(data.price ?? null))
       .catch(() => setSeasonalPrice(null));
   }, [checkin, villa]);
 
-  // Render PayPal hosted button when tab is selected
+  // On mount: check if returning from PesaPal callback
   useEffect(() => {
-    if (paymentMethod !== "paypal") return;
+    const orderTrackingId = queryParams.get("OrderTrackingId");
+    if (!orderTrackingId) return;
 
-    const HOSTED_BUTTON_ID = "68VNHVZRR95SU";
-    const containerId = `paypal-container-${HOSTED_BUTTON_ID}`;
-
-    const renderButtons = () => {
-      const container = document.getElementById(containerId);
-      if (!container || !window.paypal) return;
-      container.innerHTML = "";
-      window.paypal
-        .HostedButtons({
-          hostedButtonId: HOSTED_BUTTON_ID,
-          onApprove: async (data: { orderID?: string }) => {
-            await createReservation("paypal", data.orderID);
-          },
-        })
-        .render(`#${containerId}`);
+    const pending = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || "{}") as {
+      firstName?: string; lastName?: string; email?: string; phone?: string;
     };
-
-    if (window.paypal) {
-      renderButtons();
-      return;
+    if (pending.firstName) {
+      setFormData({
+        firstName: pending.firstName ?? "",
+        lastName:  pending.lastName  ?? "",
+        email:     pending.email     ?? "",
+        phone:     pending.phone     ?? "",
+      });
     }
 
-    const existing = document.getElementById("paypal-sdk-script");
-    if (existing) {
-      existing.addEventListener("load", renderButtons, { once: true });
-      return () => existing.removeEventListener("load", renderButtons);
-    }
+    setPesapalStatus("checking");
+    setPesapalMessage("Verifying your payment, please wait...");
 
-    const script = document.createElement("script");
-    script.id = "paypal-sdk-script";
-    script.src =
-      "https://www.paypal.com/sdk/js?client-id=BAAdPWwfkvCuTcdFkWRkprtsqZrpr2gb6WS3bZ5S1a7usAD0WHrFBbPrxcK9-bHVlEMBXzm7x-9r9B1x7s&components=hosted-buttons&disable-funding=venmo&currency=EUR";
-    script.crossOrigin = "anonymous";
-    script.async = true;
-    script.addEventListener("load", renderButtons, { once: true });
-    document.head.appendChild(script);
-    return () => script.removeEventListener("load", renderButtons);
-  }, [paymentMethod, total]); // eslint-disable-line react-hooks/exhaustive-deps
+    fetch("/api/payments", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "pesapal-status", orderTrackingId }),
+    })
+      .then((r) => r.json())
+      .then(async (data: { status: string; transactionId?: string }) => {
+        if (data.status === "success") {
+          setPesapalStatus("success");
+          setPesapalMessage("Payment confirmed!");
+          sessionStorage.removeItem(STORAGE_KEY);
+          await createReservation(
+            "pesapal",
+            data.transactionId ?? orderTrackingId,
+            pending,
+          );
+        } else if (data.status === "failed") {
+          setPesapalStatus("failed");
+          setPesapalMessage("Payment was not successful. Please try again.");
+        } else {
+          setPesapalStatus("failed");
+          setPesapalMessage("Payment could not be verified. Please contact us if your money was deducted.");
+        }
+      })
+      .catch(() => {
+        setPesapalStatus("failed");
+        setPesapalMessage("Network error while verifying payment. Please contact us.");
+      });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -187,10 +172,7 @@ const ReservationPage: React.FC = () => {
       alert("Please enter your full name.");
       return false;
     }
-    if (
-      !formData.email.trim() ||
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)
-    ) {
+    if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       alert("Please enter a valid email.");
       return false;
     }
@@ -201,7 +183,12 @@ const ReservationPage: React.FC = () => {
     return true;
   };
 
-  const createReservation = async (method: string, transactionId?: string) => {
+  const createReservation = async (
+    method: string,
+    transactionId?: string,
+    overrideForm?: { firstName?: string; lastName?: string; email?: string; phone?: string },
+  ) => {
+    const fd = overrideForm ?? formData;
     const res = await fetch("/api/reservations", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -210,9 +197,9 @@ const ReservationPage: React.FC = () => {
         guests: guestCount,
         checkin,
         checkout,
-        name: `${formData.firstName} ${formData.lastName}`,
-        phone: formData.phone,
-        email: formData.email,
+        name: `${fd.firstName} ${fd.lastName}`,
+        phone: fd.phone,
+        email: fd.email,
         total_price: total,
         laundry_fee: laundryFee,
         ac_fee: acFee,
@@ -220,86 +207,52 @@ const ReservationPage: React.FC = () => {
         payment_transaction_id: transactionId ?? null,
       }),
     });
-    const data = (await res.json()) as {
-      reservation?: { id: string };
-      error?: string;
-    };
+    const data = (await res.json()) as { reservation?: { id: string }; error?: string };
     if (!res.ok) throw new Error(data.error ?? "Could not save reservation");
     setConfirmationId(data.reservation?.id ?? "");
     setBookingConfirmed(true);
   };
 
-  const handleMpesaPay = async () => {
+  const handlePesapalPay = async () => {
     if (!validateForm()) return;
-    const phone = mpesaPhone.trim() || formData.phone.trim();
-    if (!phone) {
-      alert("Please enter an M-Pesa phone number.");
-      return;
-    }
 
-    setMpesaStatus("pending");
-    setMpesaMessage("Sending STK Push to your phone...");
+    setPesapalStatus("initiating");
+    setPesapalMessage("Connecting to PesaPal...");
+
+    // Save form data to sessionStorage before redirect
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+
+    // Build callback URL (current page URL — PesaPal appends its params)
+    const callbackUrl = `${window.location.origin}${window.location.pathname}${window.location.search}`;
 
     try {
       const res = await fetch("/api/payments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: "mpesa-initiate",
-          phone,
+          action: "pesapal-initiate",
           amount: total,
-          reference: villa.name,
+          description: `${villa.name} – ${nights} night${nights !== 1 ? "s" : ""}`,
+          email: formData.email,
+          phone: `+254${formData.phone.replace(/\D/g, "")}`,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          callbackUrl,
         }),
       });
-      const data = (await res.json()) as {
-        success?: boolean;
-        checkoutRequestId?: string;
-        error?: string;
-      };
 
-      if (!res.ok || !data.checkoutRequestId) {
-        setMpesaStatus("failed");
-        setMpesaMessage(data.error ?? "Failed to initiate M-Pesa payment.");
+      const data = (await res.json()) as { redirectUrl?: string; error?: string };
+      if (!res.ok || !data.redirectUrl) {
+        setPesapalStatus("failed");
+        setPesapalMessage(data.error ?? "Failed to connect to PesaPal. Please try again.");
         return;
       }
 
-      setMpesaStatus("polling");
-      setMpesaMessage("Check your phone and enter your M-Pesa PIN...");
-
-      const checkoutRequestId = data.checkoutRequestId;
-      let polls = 0;
-      pollRef.current = setInterval(async () => {
-        polls++;
-        if (polls > 24) {
-          if (pollRef.current) clearInterval(pollRef.current);
-          setMpesaStatus("failed");
-          setMpesaMessage("Payment timed out. Please try again.");
-          return;
-        }
-        try {
-          const qRes = await fetch("/api/payments", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ action: "mpesa-query", checkoutRequestId }),
-          });
-          const q = (await qRes.json()) as { status: string; message?: string };
-          if (q.status === "success") {
-            if (pollRef.current) clearInterval(pollRef.current);
-            setMpesaStatus("success");
-            setMpesaMessage("Payment confirmed!");
-            await createReservation("mpesa");
-          } else if (q.status === "failed" || q.status === "cancelled") {
-            if (pollRef.current) clearInterval(pollRef.current);
-            setMpesaStatus("failed");
-            setMpesaMessage(q.message ?? "Payment failed. Please try again.");
-          }
-        } catch {
-          // continue polling on network error
-        }
-      }, 5000);
+      // Redirect to PesaPal hosted payment page
+      window.location.href = data.redirectUrl;
     } catch {
-      setMpesaStatus("failed");
-      setMpesaMessage("Network error. Please try again.");
+      setPesapalStatus("failed");
+      setPesapalMessage("Network error. Please try again.");
     }
   };
 
@@ -307,7 +260,7 @@ const ReservationPage: React.FC = () => {
     return (
       <>
         <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Josefin+Sans:wght@200;300;400&family=Cormorant+Garamond:wght@300;400&display=swap');
+          @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600&family=Cormorant+Garamond:wght@300;400&display=swap');
           * { margin:0; padding:0; box-sizing:border-box; }
           body { font-family:'Cormorant Garamond',serif; background:#fff; color:#0a0a0a; }
           .confirm-wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:60px 20px; }
@@ -315,8 +268,8 @@ const ReservationPage: React.FC = () => {
           .confirm-icon { width:64px; height:64px; border-radius:50%; background:#0a0a0a; color:#fff; font-size:1.8rem; display:flex; align-items:center; justify-content:center; margin:0 auto 28px; }
           .confirm-box h1 { font-family:'Playfair Display',serif; font-size:2rem; margin-bottom:10px; }
           .confirm-box p { color:rgba(10,10,10,0.6); font-size:1.05rem; line-height:1.7; margin-bottom:28px; }
-          .confirm-id { font-family:'Josefin Sans',sans-serif; font-size:0.7rem; letter-spacing:0.18em; text-transform:uppercase; color:rgba(10,10,10,0.4); margin-bottom:36px; }
-          .btn-home { display:inline-block; padding:14px 36px; background:#0a0a0a; color:#fff; font-family:'Josefin Sans',sans-serif; font-size:0.72rem; letter-spacing:0.18em; text-transform:uppercase; border:none; border-radius:4px; cursor:pointer; text-decoration:none; }
+          .confirm-id { font-family:'Inter',sans-serif; font-size:0.7rem; letter-spacing:0.18em; text-transform:uppercase; color:rgba(10,10,10,0.4); margin-bottom:36px; }
+          .btn-home { display:inline-block; padding:14px 36px; background:#0a0a0a; color:#fff; font-family:'Inter',sans-serif; font-size:0.72rem; letter-spacing:0.18em; text-transform:uppercase; border:none; border-radius:4px; cursor:pointer; text-decoration:none; }
         `}</style>
         <div className="confirm-wrap">
           <div className="confirm-box">
@@ -329,8 +282,7 @@ const ReservationPage: React.FC = () => {
             </p>
             {confirmationId && (
               <div className="confirm-id">
-                Confirmation # RES-
-                {confirmationId.substring(0, 8).toUpperCase()}
+                Confirmation # RES-{confirmationId.substring(0, 8).toUpperCase()}
               </div>
             )}
             <button className="btn-home" onClick={() => navigate("/")}>
@@ -371,29 +323,23 @@ const ReservationPage: React.FC = () => {
         .rp-phone-prefix { padding:12px 14px; background:#f5f6fa; border:1.5px solid #e5e7eb; border-right:none; border-radius:10px 0 0 10px; font-family:'Inter',sans-serif; font-size:0.8rem; font-weight:500; color:#6b7280; white-space:nowrap; }
         .rp-phone-wrap input { border-radius:0 10px 10px 0; }
 
-        /* Payment method tabs */
-        .pm-tabs { display:flex; gap:0; border:1.5px solid #e5e7eb; border-radius:12px; overflow:hidden; margin-bottom:24px; background:#f5f6fa; }
-        .pm-tab { flex:1; padding:14px; background:transparent; border:none; font-family:'Inter',sans-serif; font-size:0.72rem; font-weight:600; letter-spacing:0.04em; text-transform:uppercase; cursor:pointer; transition:all 0.18s; display:flex; align-items:center; justify-content:center; gap:8px; color:#9098a9; }
-        .pm-tab:first-child { border-right:1.5px solid #e5e7eb; }
-        .pm-tab.active { background:#1a1a2e; color:#fff; border-radius:10px; margin:3px; }
-        .pm-tab img { height:18px; object-fit:contain; }
+        /* PesaPal payment */
+        .pesapal-note { font-family:'Inter',sans-serif; font-size:0.88rem; color:#6b7280; margin-bottom:20px; line-height:1.6; }
+        .pesapal-methods { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px; }
+        .pesapal-method-pill { display:flex; align-items:center; gap:6px; padding:6px 12px; background:#f5f6fa; border:1px solid #e5e7eb; border-radius:20px; font-family:'Inter',sans-serif; font-size:0.72rem; font-weight:500; color:#6b7280; }
 
-        /* M-Pesa section */
-        .mpesa-note { font-size:0.92rem; color:#6b7280; margin-bottom:18px; line-height:1.6; }
-        .mpesa-status { padding:13px 16px; border-radius:10px; font-family:'Inter',sans-serif; font-size:0.75rem; font-weight:500; margin-top:16px; display:flex; align-items:center; gap:10px; }
-        .mpesa-status.pending, .mpesa-status.polling { background:#fef3c7; color:#92400e; border:1px solid #fde68a; }
-        .mpesa-status.success { background:#d1fae5; color:#065f46; border:1px solid #a7f3d0; }
-        .mpesa-status.failed  { background:#fee2e2; color:#991b1b; border:1px solid #fca5a5; }
-        .mpesa-spinner { width:14px; height:14px; border:2px solid currentColor; border-top-color:transparent; border-radius:50%; animation:spin 0.8s linear infinite; flex-shrink:0; }
+        .pesapal-status { padding:13px 16px; border-radius:10px; font-family:'Inter',sans-serif; font-size:0.78rem; font-weight:500; margin-bottom:16px; display:flex; align-items:center; gap:10px; }
+        .pesapal-status.initiating { background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; }
+        .pesapal-status.checking   { background:#fef3c7; color:#92400e; border:1px solid #fde68a; }
+        .pesapal-status.success    { background:#d1fae5; color:#065f46; border:1px solid #a7f3d0; }
+        .pesapal-status.failed     { background:#fee2e2; color:#991b1b; border:1px solid #fca5a5; }
+        .pesapal-spinner { width:14px; height:14px; border:2px solid currentColor; border-top-color:transparent; border-radius:50%; animation:spin 0.8s linear infinite; flex-shrink:0; }
         @keyframes spin { to { transform:rotate(360deg); } }
 
-        .btn-mpesa { width:100%; padding:15px; background:#00a651; color:#fff; border:none; border-radius:10px; font-family:'Inter',sans-serif; font-size:0.78rem; font-weight:600; letter-spacing:0.04em; cursor:pointer; transition:opacity 0.18s, transform 0.12s; display:flex; align-items:center; justify-content:center; gap:10px; }
-        .btn-mpesa:hover { opacity:0.9; transform:translateY(-1px); }
-        .btn-mpesa:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
-
-        /* PayPal section */
-        .paypal-note { font-size:0.92rem; color:#6b7280; margin-bottom:18px; line-height:1.6; }
-        #paypal-container-68VNHVZRR95SU { min-height:45px; }
+        .btn-pesapal { width:100%; padding:16px; background:#1a1a2e; color:#fff; border:none; border-radius:10px; font-family:'Inter',sans-serif; font-size:0.82rem; font-weight:600; letter-spacing:0.04em; cursor:pointer; transition:opacity 0.18s, transform 0.12s; display:flex; align-items:center; justify-content:center; gap:10px; }
+        .btn-pesapal:hover { opacity:0.88; transform:translateY(-1px); }
+        .btn-pesapal:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+        .btn-pesapal-logo { font-size:1.1rem; }
 
         /* Summary */
         .rp-summary { position:sticky; top:110px; background:#fff; border:1px solid #eef0f4; border-radius:16px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,0.07); }
@@ -438,7 +384,6 @@ const ReservationPage: React.FC = () => {
                   min={new Date().toISOString().split("T")[0]}
                   onChange={(e) => {
                     setCheckin(e.target.value);
-                    // push checkout forward if it no longer satisfies minimum stay
                     if (checkout && nightsBetween(e.target.value, checkout) < minNights) {
                       setCheckout(minCheckout(e.target.value, villa.id));
                     }
@@ -457,60 +402,22 @@ const ReservationPage: React.FC = () => {
             </div>
             <div className="rp-field">
               <label>Guests</label>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  border: "1px solid rgba(0,0,0,0.15)",
-                  borderRadius: 6,
-                  overflow: "hidden",
-                  background: "#fafafa",
-                }}
-              >
+              <div style={{ display:"flex", alignItems:"center", border:"1px solid rgba(0,0,0,0.15)", borderRadius:6, overflow:"hidden", background:"#fafafa" }}>
                 <button
                   type="button"
                   onClick={() => setGuestCount((g) => Math.max(1, g - 1))}
                   disabled={guestCount <= 1}
-                  style={{
-                    width: 44,
-                    height: 44,
-                    background: "none",
-                    border: "none",
-                    fontSize: "1.2rem",
-                    cursor: "pointer",
-                    color: "#0a0a0a",
-                  }}
-                >
-                  −
-                </button>
-                <span
-                  style={{
-                    flex: 1,
-                    textAlign: "center",
-                    fontFamily: "'Cormorant Garamond', serif",
-                    fontSize: "1rem",
-                  }}
-                >
+                  style={{ width:44, height:44, background:"none", border:"none", fontSize:"1.2rem", cursor:"pointer", color:"#0a0a0a" }}
+                >−</button>
+                <span style={{ flex:1, textAlign:"center", fontFamily:"'Cormorant Garamond', serif", fontSize:"1rem" }}>
                   {guestCount} guest{guestCount !== 1 ? "s" : ""}
                 </span>
                 <button
                   type="button"
-                  onClick={() =>
-                    setGuestCount((g) => Math.min(villa.maxGuests, g + 1))
-                  }
+                  onClick={() => setGuestCount((g) => Math.min(villa.maxGuests, g + 1))}
                   disabled={guestCount >= villa.maxGuests}
-                  style={{
-                    width: 44,
-                    height: 44,
-                    background: "none",
-                    border: "none",
-                    fontSize: "1.2rem",
-                    cursor: "pointer",
-                    color: "#0a0a0a",
-                  }}
-                >
-                  +
-                </button>
+                  style={{ width:44, height:44, background:"none", border:"none", fontSize:"1.2rem", cursor:"pointer", color:"#0a0a0a" }}
+                >+</button>
               </div>
             </div>
           </div>
@@ -521,133 +428,71 @@ const ReservationPage: React.FC = () => {
             <div className="rp-row">
               <div className="rp-field">
                 <label>First name</label>
-                <input
-                  name="firstName"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  placeholder="First name"
-                />
+                <input name="firstName" value={formData.firstName} onChange={handleChange} placeholder="First name" />
               </div>
               <div className="rp-field">
                 <label>Last name</label>
-                <input
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  placeholder="Last name"
-                />
+                <input name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Last name" />
               </div>
             </div>
             <div className="rp-field">
               <label>Email</label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="your@email.com"
-              />
+              <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="your@email.com" />
             </div>
             <div className="rp-field">
               <label>Phone number</label>
               <div className="rp-phone-wrap">
                 <span className="rp-phone-prefix">+254</span>
-                <input
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  placeholder="712 345 678"
-                />
+                <input name="phone" value={formData.phone} onChange={handleChange} placeholder="712 345 678" />
               </div>
             </div>
           </div>
 
           {/* Payment */}
           <div className="rp-section">
-            <div className="rp-section-title">Payment method</div>
+            <div className="rp-section-title">Payment</div>
 
-            <div className="pm-tabs">
-              <button
-                type="button"
-                className={`pm-tab${paymentMethod === "mpesa" ? " active" : ""}`}
-                onClick={() => {
-                  setPaymentMethod("mpesa");
-                  setMpesaStatus("idle");
-                  setMpesaMessage("");
-                }}
-              >
-                📱 M-Pesa
-              </button>
-              <button
-                type="button"
-                className={`pm-tab${paymentMethod === "paypal" ? " active" : ""}`}
-                onClick={() => setPaymentMethod("paypal")}
-              >
-                🅿 PayPal
-              </button>
+            <p className="pesapal-note">
+              Pay securely via PesaPal — accepts M-Pesa, Visa, Mastercard, and more.
+              You'll be redirected to complete payment of <strong>{formatPrice(total)}</strong>.
+            </p>
+
+            <div className="pesapal-methods">
+              <span className="pesapal-method-pill">📱 M-Pesa</span>
+              <span className="pesapal-method-pill">💳 Visa</span>
+              <span className="pesapal-method-pill">💳 Mastercard</span>
+              <span className="pesapal-method-pill">🏦 Airtel Money</span>
             </div>
 
-            {paymentMethod === "mpesa" && (
-              <>
-                <p className="mpesa-note">
-                  You'll receive an M-Pesa STK Push prompt on your phone. Enter
-                  your PIN to complete payment of{" "}
-                  <strong>{formatPrice(total)}</strong>.
-                </p>
-                <div className="rp-field">
-                  <label>M-Pesa phone (leave blank to use phone above)</label>
-                  <div className="rp-phone-wrap">
-                    <span className="rp-phone-prefix">+254</span>
-                    <input
-                      value={mpesaPhone}
-                      onChange={(e) => setMpesaPhone(e.target.value)}
-                      placeholder="712 345 678"
-                      disabled={
-                        mpesaStatus === "polling" || mpesaStatus === "pending"
-                      }
-                    />
-                  </div>
-                </div>
-
-                {mpesaStatus !== "idle" && (
-                  <div className={`mpesa-status ${mpesaStatus}`}>
-                    {(mpesaStatus === "pending" ||
-                      mpesaStatus === "polling") && (
-                      <span className="mpesa-spinner" />
-                    )}
-                    {mpesaStatus === "success" && "✓"}
-                    {mpesaStatus === "failed" && "✗"}
-                    <span>{mpesaMessage}</span>
-                  </div>
+            {pesapalStatus !== "idle" && (
+              <div className={`pesapal-status ${pesapalStatus}`}>
+                {(pesapalStatus === "initiating" || pesapalStatus === "checking") && (
+                  <span className="pesapal-spinner" />
                 )}
-
-                <button
-                  type="button"
-                  className="btn-mpesa"
-                  style={{ marginTop: 16 }}
-                  onClick={handleMpesaPay}
-                  disabled={
-                    mpesaStatus === "pending" ||
-                    mpesaStatus === "polling" ||
-                    mpesaStatus === "success" ||
-                    total <= 0
-                  }
-                >
-                  {mpesaStatus === "pending" || mpesaStatus === "polling"
-                    ? "Waiting for payment..."
-                    : `Pay ${formatPrice(total)} via M-Pesa`}
-                </button>
-              </>
+                {pesapalStatus === "success" && "✓"}
+                {pesapalStatus === "failed"  && "✗"}
+                <span>{pesapalMessage}</span>
+              </div>
             )}
 
-            {paymentMethod === "paypal" && (
-              <>
-                <p className="paypal-note">
-                  Complete your payment securely via PayPal in EUR.
-                </p>
-                <div id="paypal-container-68VNHVZRR95SU" />
-              </>
-            )}
+            <button
+              type="button"
+              className="btn-pesapal"
+              onClick={handlePesapalPay}
+              disabled={
+                pesapalStatus === "initiating" ||
+                pesapalStatus === "checking"   ||
+                pesapalStatus === "success"    ||
+                total <= 0
+              }
+            >
+              <span className="btn-pesapal-logo">🔒</span>
+              {pesapalStatus === "initiating"
+                ? "Connecting to PesaPal..."
+                : pesapalStatus === "checking"
+                ? "Verifying payment..."
+                : `Pay ${formatPrice(total)} with PesaPal`}
+            </button>
           </div>
         </div>
 
@@ -667,36 +512,24 @@ const ReservationPage: React.FC = () => {
                 </span>
               </div>
               <div className="rp-trip-row">
-                <span>
-                  {guestCount} guest{guestCount !== 1 ? "s" : ""}
-                </span>
+                <span>{guestCount} guest{guestCount !== 1 ? "s" : ""}</span>
               </div>
             </div>
 
             <div>
               <div className="rp-price-title">Price details</div>
               <div className="rp-price-row">
-                <span>
-                  {formatPrice(pricePerNight)} × {nights} night
-                  {nights !== 1 ? "s" : ""}
-                </span>
+                <span>{formatPrice(pricePerNight)} × {nights} night{nights !== 1 ? "s" : ""}</span>
                 <span>{formatPrice(accommodationTotal)}</span>
               </div>
               {nights > 0 && (
                 <>
                   <div className="rp-price-row">
-                    <span>
-                      Laundry ({Math.ceil(nights / 3)} week
-                      {Math.ceil(nights / 3) !== 1 ? "s" : ""})
-                    </span>
+                    <span>Laundry ({Math.ceil(nights / 3)} week{Math.ceil(nights / 3) !== 1 ? "s" : ""})</span>
                     <span>{formatPrice(laundryFee)}</span>
                   </div>
                   <div className="rp-price-row">
-                    <span>
-                      AC ({villa.bedrooms ?? 1} room
-                      {(villa.bedrooms ?? 1) > 1 ? "s" : ""} × {nights} night
-                      {nights !== 1 ? "s" : ""})
-                    </span>
+                    <span>AC ({villa.bedrooms ?? 1} room{(villa.bedrooms ?? 1) > 1 ? "s" : ""} × {nights} night{nights !== 1 ? "s" : ""})</span>
                     <span>{formatPrice(acFee)}</span>
                   </div>
                 </>
@@ -712,20 +545,11 @@ const ReservationPage: React.FC = () => {
             </div>
 
             <div className="rp-secure">
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="3" y="11" width="18" height="11" rx="2" />
                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
               </svg>
-              <p>Payments processed securely via M-Pesa or PayPal</p>
+              <p>Payments processed securely via PesaPal</p>
             </div>
           </div>
         </div>
