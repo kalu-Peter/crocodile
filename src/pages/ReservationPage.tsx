@@ -1,14 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { VILLAS, getVillaPrice } from "../types";
 import { useCurrency } from "../context/CurrencyContext";
 
 function nightsBetween(a: string, b: string) {
   if (!a || !b) return 0;
-  return Math.max(
-    0,
-    Math.round((new Date(b).getTime() - new Date(a).getTime()) / 86400000),
-  );
+  return Math.max(0, Math.round((new Date(b).getTime() - new Date(a).getTime()) / 86400000));
 }
 
 const MIN_NIGHTS: Record<string, number> = {
@@ -20,9 +17,7 @@ const MIN_NIGHTS: Record<string, number> = {
   "mango-park-1st-floor": 5,
 };
 
-function getMinNights(villaId: string) {
-  return MIN_NIGHTS[villaId] ?? 1;
-}
+function getMinNights(villaId: string) { return MIN_NIGHTS[villaId] ?? 1; }
 
 function minCheckout(checkin: string, villaId: string) {
   if (!checkin) return "";
@@ -33,126 +28,75 @@ function minCheckout(checkin: string, villaId: string) {
 
 function formatDate(d: string) {
   if (!d) return "";
-  return new Date(d + "T00:00:00").toLocaleDateString("en-GB", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
+  return new Date(d + "T00:00:00").toLocaleDateString("en-GB", { month: "short", day: "numeric", year: "numeric" });
 }
 
-type PesapalStatus = "idle" | "initiating" | "checking" | "success" | "failed";
-
-const STORAGE_KEY = "pesapal_pending_booking";
+type ModalStatus = "idle" | "initiating" | "open" | "checking" | "success" | "failed";
 
 const ReservationPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const { formatPrice } = useCurrency();
+  const { formatPrice, currency, rates } = useCurrency();
+  const rate = rates[currency.code] ?? 1;
+  const toDisplay = (kes: number) => Math.round(kes * rate * 100) / 100;
+  const toKES = (display: number) => Math.round(display / rate);
 
   const villaId = queryParams.get("villaId") ?? "";
   const villa = VILLAS.find((v) => v.id === villaId);
 
-  const [checkin, setCheckin] = useState(
-    queryParams.get("checkin") ?? queryParams.get("checkIn") ?? "",
-  );
-  const [checkout, setCheckout] = useState(
-    queryParams.get("checkout") ?? queryParams.get("checkOut") ?? "",
-  );
-  const [guestCount, setGuestCount] = useState(
-    Number(queryParams.get("guestCount") ?? 1),
-  );
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-  });
+  const [checkin, setCheckin] = useState(queryParams.get("checkin") ?? queryParams.get("checkIn") ?? "");
+  const [checkout, setCheckout] = useState(queryParams.get("checkout") ?? queryParams.get("checkOut") ?? "");
+  const [guestCount, setGuestCount] = useState(Number(queryParams.get("guestCount") ?? 1));
+  const [formData, setFormData] = useState({ firstName: "", lastName: "", email: "", phone: "" });
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
   const [confirmationId, setConfirmationId] = useState("");
 
-  // PesaPal state
-  const [pesapalStatus, setPesapalStatus] = useState<PesapalStatus>("idle");
-  const [pesapalMessage, setPesapalMessage] = useState("");
+  // Partial payment
+  const [payAmount, setPayAmount] = useState<number>(0);
+  const [payAmountInput, setPayAmountInput] = useState<string>("");
+
+  // Modal / PesaPal iframe
+  const [modalStatus, setModalStatus] = useState<ModalStatus>("idle");
+  const [modalMessage, setModalMessage] = useState("");
+  const [iframeUrl, setIframeUrl] = useState("");
+  const [, setOrderTrackingId] = useState("");
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Seasonal price
   const [seasonalPrice, setSeasonalPrice] = useState<number | null>(null);
 
-  useEffect(() => {
-    if (!villaId) navigate("/");
-  }, [villaId, navigate]);
+  useEffect(() => { if (!villaId) navigate("/"); }, [villaId, navigate]);
 
   if (!villa) return null;
 
-  const minNights = getMinNights(villa.id);
-  const basePricePerNight = getVillaPrice(villa.id, guestCount) ?? 0;
-  const pricePerNight = seasonalPrice ?? basePricePerNight;
-  const nights = nightsBetween(checkin, checkout);
+  const minNights   = getMinNights(villa.id);
+  const pricePerNight = seasonalPrice ?? (getVillaPrice(villa.id, guestCount) ?? 0);
+  const nights      = nightsBetween(checkin, checkout);
   const accommodationTotal = pricePerNight * nights;
-  const laundryFee = nights > 0 ? Math.ceil(nights / 3) * 600 : 0;
-  const acFee = nights > 0 ? nights * 1000 * (villa.bedrooms ?? 1) : 0;
-  const total = accommodationTotal + laundryFee + acFee;
+  const laundryFee  = nights > 0 ? Math.ceil(nights / 3) * 600 : 0;
+  const acFee       = nights > 0 ? nights * 1000 * (villa.bedrooms ?? 1) : 0;
+  const total       = accommodationTotal + laundryFee + acFee;
+  const minPay      = Math.ceil(total * 0.3);  // 30% minimum
+
+  // Sync payAmount when total or currency changes
+  useEffect(() => {
+    if (total > 0) {
+      setPayAmount(total);
+      setPayAmountInput(String(toDisplay(total)));
+    }
+  }, [total, currency.code]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (!checkin || !villa) {
-      setSeasonalPrice(null);
-      return;
-    }
+    if (!checkin || !villa) { setSeasonalPrice(null); return; }
     fetch(`/api/seasonal-price?villaId=${encodeURIComponent(villa.id)}&checkin=${checkin}`)
       .then((r) => r.json())
       .then((data) => setSeasonalPrice(data.price ?? null))
       .catch(() => setSeasonalPrice(null));
   }, [checkin, villa]);
 
-  // On mount: check if returning from PesaPal callback
-  useEffect(() => {
-    const orderTrackingId = queryParams.get("OrderTrackingId");
-    if (!orderTrackingId) return;
-
-    const pending = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || "{}") as {
-      firstName?: string; lastName?: string; email?: string; phone?: string;
-    };
-    if (pending.firstName) {
-      setFormData({
-        firstName: pending.firstName ?? "",
-        lastName:  pending.lastName  ?? "",
-        email:     pending.email     ?? "",
-        phone:     pending.phone     ?? "",
-      });
-    }
-
-    setPesapalStatus("checking");
-    setPesapalMessage("Verifying your payment, please wait...");
-
-    fetch("/api/payments", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "pesapal-status", orderTrackingId }),
-    })
-      .then((r) => r.json())
-      .then(async (data: { status: string; transactionId?: string }) => {
-        if (data.status === "success") {
-          setPesapalStatus("success");
-          setPesapalMessage("Payment confirmed!");
-          sessionStorage.removeItem(STORAGE_KEY);
-          await createReservation(
-            "pesapal",
-            data.transactionId ?? orderTrackingId,
-            pending,
-          );
-        } else if (data.status === "failed") {
-          setPesapalStatus("failed");
-          setPesapalMessage("Payment was not successful. Please try again.");
-        } else {
-          setPesapalStatus("failed");
-          setPesapalMessage("Payment could not be verified. Please contact us if your money was deducted.");
-        }
-      })
-      .catch(() => {
-        setPesapalStatus("failed");
-        setPesapalMessage("Network error while verifying payment. Please contact us.");
-      });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  // Cleanup poll on unmount
+  useEffect(() => () => { if (pollRef.current) clearInterval(pollRef.current); }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -160,35 +104,17 @@ const ReservationPage: React.FC = () => {
   };
 
   const validateForm = () => {
-    if (!checkin || !checkout || nights <= 0) {
-      alert("Please select valid check-in and check-out dates.");
-      return false;
-    }
-    if (nights < minNights) {
-      alert(`${villa.name} requires a minimum stay of ${minNights} nights.`);
-      return false;
-    }
-    if (!formData.firstName.trim() || !formData.lastName.trim()) {
-      alert("Please enter your full name.");
-      return false;
-    }
-    if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      alert("Please enter a valid email.");
-      return false;
-    }
-    if (!formData.phone.trim()) {
-      alert("Please enter your phone number.");
-      return false;
-    }
+    if (!checkin || !checkout || nights <= 0) { alert("Please select valid check-in and check-out dates."); return false; }
+    if (nights < minNights) { alert(`${villa.name} requires a minimum stay of ${minNights} nights.`); return false; }
+    if (!formData.firstName.trim() || !formData.lastName.trim()) { alert("Please enter your full name."); return false; }
+    if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) { alert("Please enter a valid email."); return false; }
+    if (!formData.phone.trim()) { alert("Please enter your phone number."); return false; }
+    if (payAmount < minPay) { alert(`Minimum payment is ${formatPrice(minPay)} (30% of total).`); return false; }
+    if (payAmount > total) { alert(`Amount cannot exceed total of ${formatPrice(total)}.`); return false; }
     return true;
   };
 
-  const createReservation = async (
-    method: string,
-    transactionId?: string,
-    overrideForm?: { firstName?: string; lastName?: string; email?: string; phone?: string },
-  ) => {
-    const fd = overrideForm ?? formData;
+  const createReservation = async (transactionId: string) => {
     const res = await fetch("/api/reservations", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -197,14 +123,15 @@ const ReservationPage: React.FC = () => {
         guests: guestCount,
         checkin,
         checkout,
-        name: `${fd.firstName} ${fd.lastName}`,
-        phone: fd.phone,
-        email: fd.email,
+        name: `${formData.firstName} ${formData.lastName}`,
+        phone: formData.phone,
+        email: formData.email,
         total_price: total,
         laundry_fee: laundryFee,
         ac_fee: acFee,
-        payment_method: method,
-        payment_transaction_id: transactionId ?? null,
+        payment_method: "pesapal",
+        payment_transaction_id: transactionId,
+        amount_paid: payAmount,
       }),
     });
     const data = (await res.json()) as { reservation?: { id: string }; error?: string };
@@ -213,17 +140,45 @@ const ReservationPage: React.FC = () => {
     setBookingConfirmed(true);
   };
 
-  const handlePesapalPay = async () => {
+  const startPolling = (trackingId: string) => {
+    let polls = 0;
+    pollRef.current = setInterval(async () => {
+      polls++;
+      if (polls > 36) { // 3 minutes
+        clearInterval(pollRef.current!);
+        setModalStatus("failed");
+        setModalMessage("Payment timed out. Please try again.");
+        return;
+      }
+      try {
+        const r = await fetch("/api/payments", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "pesapal-status", orderTrackingId: trackingId }),
+        });
+        const d = (await r.json()) as { status: string; transactionId?: string };
+        if (d.status === "success") {
+          clearInterval(pollRef.current!);
+          setModalStatus("success");
+          setModalMessage("Payment confirmed!");
+          setIframeUrl("");
+          await createReservation(d.transactionId ?? trackingId);
+        } else if (d.status === "failed") {
+          clearInterval(pollRef.current!);
+          setModalStatus("failed");
+          setModalMessage("Payment failed. Please try again.");
+          setIframeUrl("");
+        }
+      } catch { /* keep polling */ }
+    }, 5000);
+  };
+
+  const handlePay = async () => {
     if (!validateForm()) return;
+    setModalStatus("initiating");
+    setModalMessage("Opening payment window...");
 
-    setPesapalStatus("initiating");
-    setPesapalMessage("Connecting to PesaPal...");
-
-    // Save form data to sessionStorage before redirect
-    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
-
-    // Build callback URL (current page URL — PesaPal appends its params)
-    const callbackUrl = `${window.location.origin}${window.location.pathname}${window.location.search}`;
+    const callbackUrl = `${window.location.origin}/payment-callback`;
 
     try {
       const res = await fetch("/api/payments", {
@@ -231,8 +186,8 @@ const ReservationPage: React.FC = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "pesapal-initiate",
-          amount: total,
-          description: `${villa.name} – ${nights} night${nights !== 1 ? "s" : ""}`,
+          amount: payAmount,
+          description: `${villa.name} – ${nights} night${nights !== 1 ? "s" : ""}${payAmount < total ? " (partial)" : ""}`,
           email: formData.email,
           phone: `+254${formData.phone.replace(/\D/g, "")}`,
           firstName: formData.firstName,
@@ -241,20 +196,32 @@ const ReservationPage: React.FC = () => {
         }),
       });
 
-      const data = (await res.json()) as { redirectUrl?: string; error?: string };
+      const data = (await res.json()) as { redirectUrl?: string; orderTrackingId?: string; error?: string };
       if (!res.ok || !data.redirectUrl) {
-        setPesapalStatus("failed");
-        setPesapalMessage(data.error ?? "Failed to connect to PesaPal. Please try again.");
+        setModalStatus("failed");
+        setModalMessage(data.error ?? "Failed to connect to PesaPal. Please try again.");
         return;
       }
 
-      // Redirect to PesaPal hosted payment page
-      window.location.href = data.redirectUrl;
+      setIframeUrl(data.redirectUrl);
+      setOrderTrackingId(data.orderTrackingId ?? "");
+      setModalStatus("open");
+      startPolling(data.orderTrackingId ?? "");
     } catch {
-      setPesapalStatus("failed");
-      setPesapalMessage("Network error. Please try again.");
+      setModalStatus("failed");
+      setModalMessage("Network error. Please try again.");
     }
   };
+
+  const closeModal = () => {
+    if (pollRef.current) clearInterval(pollRef.current);
+    setModalStatus("idle");
+    setModalMessage("");
+    setIframeUrl("");
+    setOrderTrackingId("");
+  };
+
+  const isPartial = payAmount > 0 && payAmount < total;
 
   if (bookingConfirmed) {
     return (
@@ -275,19 +242,9 @@ const ReservationPage: React.FC = () => {
           <div className="confirm-box">
             <div className="confirm-icon">✓</div>
             <h1>Booking Confirmed</h1>
-            <p>
-              Thank you, <strong>{formData.firstName}</strong>! Your reservation
-              at <strong>{villa.name}</strong> has been received. We'll be in
-              touch shortly.
-            </p>
-            {confirmationId && (
-              <div className="confirm-id">
-                Confirmation # RES-{confirmationId.substring(0, 8).toUpperCase()}
-              </div>
-            )}
-            <button className="btn-home" onClick={() => navigate("/")}>
-              Back to Home
-            </button>
+            <p>Thank you, <strong>{formData.firstName}</strong>! Your reservation at <strong>{villa.name}</strong> has been received. We'll be in touch shortly.</p>
+            {confirmationId && <div className="confirm-id">Confirmation # RES-{confirmationId.substring(0, 8).toUpperCase()}</div>}
+            <button className="btn-home" onClick={() => navigate("/")}>Back to Home</button>
           </div>
         </div>
       </>
@@ -304,8 +261,6 @@ const ReservationPage: React.FC = () => {
         .rp-nav { position:fixed; top:0; left:0; right:0; z-index:100; padding:22px 60px; display:flex; align-items:center; gap:20px; background:rgba(201,168,76,0.95); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border-bottom:1px solid rgba(255,255,255,0.18); box-shadow:0 2px 16px rgba(0,0,0,0.08); }
         .rp-nav-logo { font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:700; color:#fff; text-decoration:none; }
         .rp-nav-logo span { color:rgba(255,255,255,0.65); }
-        .rp-nav-back { font-family:'Inter',sans-serif; font-size:0.72rem; font-weight:500; color:rgba(255,255,255,0.6); text-decoration:none; display:flex; align-items:center; gap:6px; transition:color 0.2s; margin-left:auto; }
-        .rp-nav-back:hover { color:#fff; }
 
         .rp-wrap { max-width:1140px; margin:0 auto; padding:110px 40px 80px; display:grid; grid-template-columns:1fr 400px; gap:64px; align-items:start; }
 
@@ -317,17 +272,29 @@ const ReservationPage: React.FC = () => {
         .rp-field { margin-bottom:14px; }
         .rp-field label { display:block; font-family:'Inter',sans-serif; font-size:0.65rem; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:#9098a9; margin-bottom:7px; }
         .rp-field input { width:100%; padding:12px 14px; background:#fff; border:1.5px solid #e5e7eb; border-radius:10px; font-family:'Cormorant Garamond',serif; font-size:1rem; color:#1a1a2e; outline:none; transition:border-color 0.18s, box-shadow 0.18s; }
-        .rp-field input:focus { border-color:#c9a84c; box-shadow:0 0 0 3px rgba(201,168,76,0.12); background:#fff; }
+        .rp-field input:focus { border-color:#c9a84c; box-shadow:0 0 0 3px rgba(201,168,76,0.12); }
         .rp-field input::placeholder { color:#c4c9d4; }
         .rp-phone-wrap { display:flex; }
         .rp-phone-prefix { padding:12px 14px; background:#f5f6fa; border:1.5px solid #e5e7eb; border-right:none; border-radius:10px 0 0 10px; font-family:'Inter',sans-serif; font-size:0.8rem; font-weight:500; color:#6b7280; white-space:nowrap; }
         .rp-phone-wrap input { border-radius:0 10px 10px 0; }
 
-        /* PesaPal payment */
-        .pesapal-note { font-family:'Inter',sans-serif; font-size:0.88rem; color:#6b7280; margin-bottom:20px; line-height:1.6; }
-        .pesapal-methods { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px; }
-        .pesapal-method-pill { display:flex; align-items:center; gap:6px; padding:6px 12px; background:#f5f6fa; border:1px solid #e5e7eb; border-radius:20px; font-family:'Inter',sans-serif; font-size:0.72rem; font-weight:500; color:#6b7280; }
+        /* Partial payment */
+        .pay-amount-card { background:#fff; border:1.5px solid #e5e7eb; border-radius:12px; padding:20px; margin-bottom:20px; }
+        .pay-amount-card .label { font-family:'Inter',sans-serif; font-size:0.65rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#9098a9; margin-bottom:12px; }
+        .pay-amount-row { display:flex; align-items:center; gap:12px; }
+        .pay-amount-prefix { padding:12px 14px; background:#f5f6fa; border:1.5px solid #e5e7eb; border-right:none; border-radius:10px 0 0 10px; font-family:'Inter',sans-serif; font-size:0.82rem; font-weight:600; color:#1a1a2e; white-space:nowrap; }
+        .pay-amount-input { flex:1; padding:12px 14px; background:#fff; border:1.5px solid #e5e7eb; border-left:none; border-radius:0 10px 10px 0; font-family:'Inter',sans-serif; font-size:1rem; font-weight:600; color:#1a1a2e; outline:none; transition:border-color 0.18s, box-shadow 0.18s; }
+        .pay-amount-input:focus { border-color:#c9a84c; box-shadow:0 0 0 3px rgba(201,168,76,0.12); }
+        .pay-amount-hints { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+        .pay-hint-btn { padding:5px 12px; border-radius:20px; border:1.5px solid #e5e7eb; background:#f5f6fa; font-family:'Inter',sans-serif; font-size:0.72rem; font-weight:500; color:#6b7280; cursor:pointer; transition:all 0.15s; }
+        .pay-hint-btn:hover, .pay-hint-btn.active { border-color:#c9a84c; background:#fffbf0; color:#c9a84c; }
+        .pay-amount-note { font-family:'Inter',sans-serif; font-size:0.72rem; color:#6b7280; margin-top:10px; line-height:1.5; }
+        .pay-amount-note.partial { color:#c9a84c; font-weight:500; }
 
+        /* PesaPal */
+        .pesapal-note { font-family:'Inter',sans-serif; font-size:0.88rem; color:#6b7280; margin-bottom:16px; line-height:1.6; }
+        .pesapal-methods { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+        .pesapal-method-pill { display:flex; align-items:center; gap:6px; padding:5px 12px; background:#f5f6fa; border:1px solid #e5e7eb; border-radius:20px; font-family:'Inter',sans-serif; font-size:0.72rem; font-weight:500; color:#6b7280; }
         .pesapal-status { padding:13px 16px; border-radius:10px; font-family:'Inter',sans-serif; font-size:0.78rem; font-weight:500; margin-bottom:16px; display:flex; align-items:center; gap:10px; }
         .pesapal-status.initiating { background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; }
         .pesapal-status.checking   { background:#fef3c7; color:#92400e; border:1px solid #fde68a; }
@@ -339,7 +306,20 @@ const ReservationPage: React.FC = () => {
         .btn-pesapal { width:100%; padding:16px; background:#1a1a2e; color:#fff; border:none; border-radius:10px; font-family:'Inter',sans-serif; font-size:0.82rem; font-weight:600; letter-spacing:0.04em; cursor:pointer; transition:opacity 0.18s, transform 0.12s; display:flex; align-items:center; justify-content:center; gap:10px; }
         .btn-pesapal:hover { opacity:0.88; transform:translateY(-1px); }
         .btn-pesapal:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
-        .btn-pesapal-logo { font-size:1.1rem; }
+
+        /* PesaPal iframe modal */
+        .pp-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:1000; display:flex; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(4px); }
+        .pp-modal { background:#fff; border-radius:16px; overflow:hidden; width:100%; max-width:560px; max-height:90vh; display:flex; flex-direction:column; box-shadow:0 24px 64px rgba(0,0,0,0.3); }
+        .pp-modal-head { padding:16px 20px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #eef0f4; }
+        .pp-modal-title { font-family:'Inter',sans-serif; font-size:0.82rem; font-weight:600; color:#1a1a2e; display:flex; align-items:center; gap:8px; }
+        .pp-modal-close { width:32px; height:32px; border-radius:50%; border:none; background:#f5f6fa; cursor:pointer; font-size:1rem; color:#6b7280; display:flex; align-items:center; justify-content:center; transition:background 0.15s; }
+        .pp-modal-close:hover { background:#eef0f4; }
+        .pp-modal-body { flex:1; overflow:hidden; min-height:480px; position:relative; }
+        .pp-iframe { width:100%; height:100%; min-height:480px; border:none; display:block; }
+        .pp-modal-checking { position:absolute; inset:0; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; }
+        .pp-modal-checking p { font-family:'Inter',sans-serif; font-size:0.88rem; color:#6b7280; }
+        .pp-big-spinner { width:40px; height:40px; border:3px solid #e5e7eb; border-top-color:#c9a84c; border-radius:50%; animation:spin 0.9s linear infinite; }
+        .pp-modal-note { padding:12px 20px; background:#f5f6fa; border-top:1px solid #eef0f4; font-family:'Inter',sans-serif; font-size:0.72rem; color:#9098a9; text-align:center; }
 
         /* Summary */
         .rp-summary { position:sticky; top:110px; background:#fff; border:1px solid #eef0f4; border-radius:16px; overflow:hidden; box-shadow:0 4px 24px rgba(0,0,0,0.07); }
@@ -354,6 +334,7 @@ const ReservationPage: React.FC = () => {
         .rp-price-row { display:flex; justify-content:space-between; margin-bottom:8px; font-size:0.92rem; color:#6b7280; font-family:'Inter',sans-serif; }
         .rp-price-total { display:flex; justify-content:space-between; margin-top:14px; padding-top:14px; border-top:1px solid #eef0f4; font-family:'Inter',sans-serif; font-size:0.75rem; font-weight:600; color:#374151; }
         .rp-due { display:flex; justify-content:space-between; margin-top:8px; font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; color:#1a1a2e; }
+        .rp-due-partial { display:flex; justify-content:space-between; margin-top:4px; font-family:'Inter',sans-serif; font-size:0.75rem; color:#9098a9; }
         .rp-secure { margin-top:18px; display:flex; align-items:center; gap:8px; background:#f5f6fa; border-radius:8px; padding:10px 12px; }
         .rp-secure svg { flex-shrink:0; color:#9098a9; }
         .rp-secure p { font-size:0.75rem; font-family:'Inter',sans-serif; color:#9098a9; line-height:1.5; }
@@ -362,10 +343,35 @@ const ReservationPage: React.FC = () => {
         @media(max-width:600px) { .rp-row { grid-template-columns:1fr; } .rp-nav { padding:18px 20px; } }
       `}</style>
 
+      {/* PesaPal iframe modal */}
+      {(modalStatus === "open" || modalStatus === "checking") && (
+        <div className="pp-overlay">
+          <div className="pp-modal">
+            <div className="pp-modal-head">
+              <div className="pp-modal-title">
+                🔒 Secure Payment via PesaPal
+                {isPartial && <span style={{ color: "#c9a84c", fontSize: "0.72rem" }}>— Partial ({formatPrice(payAmount)})</span>}
+              </div>
+              <button className="pp-modal-close" onClick={closeModal} title="Close">✕</button>
+            </div>
+            <div className="pp-modal-body">
+              {modalStatus === "open" && iframeUrl && (
+                <iframe className="pp-iframe" src={iframeUrl} title="PesaPal Payment" allow="payment" />
+              )}
+              {modalStatus === "checking" && (
+                <div className="pp-modal-checking">
+                  <div className="pp-big-spinner" />
+                  <p>Verifying your payment, please wait…</p>
+                </div>
+              )}
+            </div>
+            <div className="pp-modal-note">Complete your payment in the window above. Do not close this page.</div>
+          </div>
+        </div>
+      )}
+
       <nav className="rp-nav">
-        <Link to="/" className="rp-nav-logo">
-          Croc<span>odile</span> Lodge
-        </Link>
+        <Link to="/" className="rp-nav-logo">Croc<span>odile</span> Lodge</Link>
       </nav>
 
       <div className="rp-wrap">
@@ -378,46 +384,28 @@ const ReservationPage: React.FC = () => {
             <div className="rp-row">
               <div className="rp-field">
                 <label>Check In</label>
-                <input
-                  type="date"
-                  value={checkin}
-                  min={new Date().toISOString().split("T")[0]}
+                <input type="date" value={checkin} min={new Date().toISOString().split("T")[0]}
                   onChange={(e) => {
                     setCheckin(e.target.value);
-                    if (checkout && nightsBetween(e.target.value, checkout) < minNights) {
+                    if (checkout && nightsBetween(e.target.value, checkout) < minNights)
                       setCheckout(minCheckout(e.target.value, villa.id));
-                    }
-                  }}
-                />
+                  }} />
               </div>
               <div className="rp-field">
-                <label>Check Out {minNights > 1 && <span style={{ color: "#888", fontSize: "0.75em" }}>({minNights}-night min)</span>}</label>
-                <input
-                  type="date"
-                  value={checkout}
-                  min={minCheckout(checkin, villa.id)}
-                  onChange={(e) => setCheckout(e.target.value)}
-                />
+                <label>Check Out {minNights > 1 && <span style={{ color:"#888", fontSize:"0.75em" }}>({minNights}-night min)</span>}</label>
+                <input type="date" value={checkout} min={minCheckout(checkin, villa.id)} onChange={(e) => setCheckout(e.target.value)} />
               </div>
             </div>
             <div className="rp-field">
               <label>Guests</label>
               <div style={{ display:"flex", alignItems:"center", border:"1px solid rgba(0,0,0,0.15)", borderRadius:6, overflow:"hidden", background:"#fafafa" }}>
-                <button
-                  type="button"
-                  onClick={() => setGuestCount((g) => Math.max(1, g - 1))}
-                  disabled={guestCount <= 1}
-                  style={{ width:44, height:44, background:"none", border:"none", fontSize:"1.2rem", cursor:"pointer", color:"#0a0a0a" }}
-                >−</button>
+                <button type="button" onClick={() => setGuestCount((g) => Math.max(1, g - 1))} disabled={guestCount <= 1}
+                  style={{ width:44, height:44, background:"none", border:"none", fontSize:"1.2rem", cursor:"pointer", color:"#0a0a0a" }}>−</button>
                 <span style={{ flex:1, textAlign:"center", fontFamily:"'Cormorant Garamond', serif", fontSize:"1rem" }}>
                   {guestCount} guest{guestCount !== 1 ? "s" : ""}
                 </span>
-                <button
-                  type="button"
-                  onClick={() => setGuestCount((g) => Math.min(villa.maxGuests, g + 1))}
-                  disabled={guestCount >= villa.maxGuests}
-                  style={{ width:44, height:44, background:"none", border:"none", fontSize:"1.2rem", cursor:"pointer", color:"#0a0a0a" }}
-                >+</button>
+                <button type="button" onClick={() => setGuestCount((g) => Math.min(villa.maxGuests, g + 1))} disabled={guestCount >= villa.maxGuests}
+                  style={{ width:44, height:44, background:"none", border:"none", fontSize:"1.2rem", cursor:"pointer", color:"#0a0a0a" }}>+</button>
               </div>
             </div>
           </div>
@@ -452,11 +440,51 @@ const ReservationPage: React.FC = () => {
           <div className="rp-section">
             <div className="rp-section-title">Payment</div>
 
+            {/* Amount to pay */}
+            {total > 0 && (
+              <div className="pay-amount-card">
+                <div className="label">Amount to pay now</div>
+                <div className="pay-amount-row">
+                  <span className="pay-amount-prefix">{currency.symbol}</span>
+                  <input
+                    className="pay-amount-input"
+                    type="number"
+                    min={toDisplay(minPay)}
+                    max={toDisplay(total)}
+                    step="any"
+                    value={payAmountInput}
+                    onChange={(e) => {
+                      setPayAmountInput(e.target.value);
+                      const v = Number(e.target.value);
+                      if (!isNaN(v) && v > 0) setPayAmount(toKES(v));
+                    }}
+                  />
+                </div>
+                <div className="pay-amount-hints">
+                  {[
+                    { label: "30% deposit", val: minPay },
+                    { label: "50%", val: Math.ceil(total * 0.5) },
+                    { label: "Full amount", val: total },
+                  ].map(({ label, val }) => (
+                    <button
+                      key={label}
+                      type="button"
+                      className={`pay-hint-btn${payAmount === val ? " active" : ""}`}
+                      onClick={() => { setPayAmount(val); setPayAmountInput(String(toDisplay(val))); }}
+                    >{label}</button>
+                  ))}
+                </div>
+                <p className={`pay-amount-note${isPartial ? " partial" : ""}`}>
+                  {isPartial
+                    ? `Partial payment — remaining balance of ${formatPrice(total - payAmount)} due on arrival.`
+                    : `Minimum deposit: ${formatPrice(minPay)} (30% of total).`}
+                </p>
+              </div>
+            )}
+
             <p className="pesapal-note">
               Pay securely via PesaPal — accepts M-Pesa, Visa, Mastercard, and more.
-              You'll be redirected to complete payment of <strong>{formatPrice(total)}</strong>.
             </p>
-
             <div className="pesapal-methods">
               <span className="pesapal-method-pill">📱 M-Pesa</span>
               <span className="pesapal-method-pill">💳 Visa</span>
@@ -464,34 +492,23 @@ const ReservationPage: React.FC = () => {
               <span className="pesapal-method-pill">🏦 Airtel Money</span>
             </div>
 
-            {pesapalStatus !== "idle" && (
-              <div className={`pesapal-status ${pesapalStatus}`}>
-                {(pesapalStatus === "initiating" || pesapalStatus === "checking") && (
-                  <span className="pesapal-spinner" />
-                )}
-                {pesapalStatus === "success" && "✓"}
-                {pesapalStatus === "failed"  && "✗"}
-                <span>{pesapalMessage}</span>
+            {(modalStatus === "failed" || modalStatus === "success") && (
+              <div className={`pesapal-status ${modalStatus}`}>
+                {modalStatus === "success" ? "✓" : "✗"}
+                <span>{modalMessage}</span>
               </div>
             )}
 
             <button
               type="button"
               className="btn-pesapal"
-              onClick={handlePesapalPay}
-              disabled={
-                pesapalStatus === "initiating" ||
-                pesapalStatus === "checking"   ||
-                pesapalStatus === "success"    ||
-                total <= 0
-              }
+              onClick={handlePay}
+              disabled={modalStatus === "initiating" || modalStatus === "open" || modalStatus === "checking" || modalStatus === "success" || total <= 0}
             >
-              <span className="btn-pesapal-logo">🔒</span>
-              {pesapalStatus === "initiating"
-                ? "Connecting to PesaPal..."
-                : pesapalStatus === "checking"
-                ? "Verifying payment..."
-                : `Pay ${formatPrice(total)} with PesaPal`}
+              🔒{" "}
+              {modalStatus === "initiating"
+                ? "Opening payment window..."
+                : `Pay ${payAmount > 0 ? formatPrice(payAmount) : "…"} with PesaPal`}
             </button>
           </div>
         </div>
@@ -501,21 +518,15 @@ const ReservationPage: React.FC = () => {
           <img src={villa.image} alt={villa.name} className="rp-summary-img" />
           <div className="rp-summary-body">
             <div className="rp-summary-name">{villa.name}</div>
-
             <div className="rp-trip">
               <div className="rp-trip-title">Trip details</div>
               <div className="rp-trip-row">
-                <span>
-                  {checkin && checkout
-                    ? `${formatDate(checkin)} – ${formatDate(checkout)}`
-                    : "—"}
-                </span>
+                <span>{checkin && checkout ? `${formatDate(checkin)} – ${formatDate(checkout)}` : "—"}</span>
               </div>
               <div className="rp-trip-row">
                 <span>{guestCount} guest{guestCount !== 1 ? "s" : ""}</span>
               </div>
             </div>
-
             <div>
               <div className="rp-price-title">Price details</div>
               <div className="rp-price-row">
@@ -539,15 +550,19 @@ const ReservationPage: React.FC = () => {
                 <span>{formatPrice(total)}</span>
               </div>
               <div className="rp-due">
-                <span>Due today</span>
-                <span>{formatPrice(total)}</span>
+                <span>Due now</span>
+                <span>{payAmount > 0 ? formatPrice(payAmount) : formatPrice(total)}</span>
               </div>
+              {isPartial && (
+                <div className="rp-due-partial">
+                  <span>Balance on arrival</span>
+                  <span>{formatPrice(total - payAmount)}</span>
+                </div>
+              )}
             </div>
-
             <div className="rp-secure">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="11" width="18" height="11" rx="2" />
-                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                <rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
               </svg>
               <p>Payments processed securely via PesaPal</p>
             </div>
