@@ -1408,15 +1408,12 @@ const CrocodileLodge: React.FC = () => {
 
         /* Section tag overrides for light-background sections */
         .amenities-section .section-tag,
-        .villas-section .section-tag,
         .testimonials-section .section-tag,
         .experience-section .section-tag,
         .booking-widget .section-tag { color: var(--croc-sage); }
 
         .amenities-section .section-tag::before,
         .amenities-section .section-tag::after,
-        .villas-section .section-tag::before,
-        .villas-section .section-tag::after,
         .testimonials-section .section-tag::before,
         .testimonials-section .section-tag::after { background: var(--croc-sage); opacity: 0.6; }
 
@@ -1704,6 +1701,153 @@ const CrocodileLodge: React.FC = () => {
           margin-bottom: 14px;
         }
 
+        /* REVIEWS */
+        .reviews-section {
+          background: #f5f6fa;
+          padding: 120px 60px;
+          position: relative;
+          overflow: hidden;
+        }
+        .reviews-section::before {
+          content: '"';
+          position: absolute;
+          top: -40px;
+          left: 4%;
+          font-family: 'Playfair Display', serif;
+          font-size: 28rem;
+          color: rgba(0,0,0,0.03);
+          line-height: 1;
+          pointer-events: none;
+        }
+        .reviews-header {
+          text-align: center;
+          margin-bottom: 70px;
+        }
+        .reviews-tag {
+          font-family: 'Inter', sans-serif;
+          font-size: 0.62rem;
+          letter-spacing: 0.3em;
+          text-transform: uppercase;
+          color: #c9a84c;
+          margin-bottom: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 16px;
+        }
+        .reviews-tag::before, .reviews-tag::after {
+          content: '';
+          display: block;
+          width: 40px;
+          height: 1px;
+          background: #c9a84c;
+          opacity: 0.5;
+        }
+        .reviews-title {
+          font-family: 'Playfair Display', serif;
+          font-size: clamp(2rem, 3.5vw, 3rem);
+          font-weight: 700;
+          color: #1a1a2e;
+          line-height: 1.15;
+        }
+        .reviews-title em { font-style: italic; color: #c9a84c; }
+        .reviews-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 28px;
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+        .review-card {
+          background: #ffffff;
+          border: 1px solid #eef0f4;
+          border-radius: 16px;
+          padding: 36px 32px;
+          display: flex;
+          flex-direction: column;
+          gap: 24px;
+          box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+          transition: box-shadow 0.3s, border-color 0.3s, transform 0.3s;
+        }
+        .review-card:hover {
+          box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+          border-color: rgba(201,168,76,0.3);
+          transform: translateY(-3px);
+        }
+        .review-stars {
+          display: flex;
+          gap: 4px;
+          color: #c9a84c;
+          font-size: 0.9rem;
+        }
+        .review-text {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 1.08rem;
+          font-style: italic;
+          color: #4b5563;
+          line-height: 1.75;
+          flex: 1;
+        }
+        .review-author {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          padding-top: 20px;
+          border-top: 1px solid #eef0f4;
+        }
+        .review-avatar {
+          width: 42px;
+          height: 42px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #c9a84c, #8b6914);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-family: 'Inter', sans-serif;
+          font-size: 0.85rem;
+          font-weight: 700;
+          color: #fff;
+          flex-shrink: 0;
+        }
+        .review-name {
+          font-family: 'Inter', sans-serif;
+          font-size: 0.78rem;
+          font-weight: 600;
+          color: #1a1a2e;
+        }
+        .review-platform {
+          font-family: 'Inter', sans-serif;
+          font-size: 0.62rem;
+          color: #9098a9;
+          letter-spacing: 0.04em;
+          margin-top: 2px;
+        }
+        .reviews-cta {
+          text-align: center;
+          margin-top: 56px;
+        }
+        .reviews-cta a {
+          font-family: 'Inter', sans-serif;
+          font-size: 0.7rem;
+          font-weight: 500;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          color: #c9a84c;
+          text-decoration: none;
+          border-bottom: 1px solid rgba(201,168,76,0.4);
+          padding-bottom: 3px;
+          transition: border-color 0.2s;
+        }
+        .reviews-cta a:hover { border-color: #c9a84c; }
+        @media (max-width: 900px) {
+          .reviews-section { padding: 80px 30px; }
+          .reviews-grid { grid-template-columns: 1fr; gap: 20px; }
+        }
+        @media (max-width: 600px) {
+          .reviews-section { padding: 60px 20px; }
+          .review-card { padding: 28px 22px; }
+        }
+
         /* LOCATION MAP */
         .location-section {
           background: var(--croc-cream);
@@ -1970,7 +2114,11 @@ const CrocodileLodge: React.FC = () => {
         className={`${navScrolled ? "nav-scrolled" : ""} ${!navVisible ? "nav-hidden" : ""}`}
       >
         <Link to="/" className="nav-logo">
-          <img src="/favicon/logo.jpeg" alt="Crocodile Lodge" className="nav-logo-img" />
+          <img
+            src="/favicon/logo.jpeg"
+            alt="Crocodile Lodge"
+            className="nav-logo-img"
+          />
           Croc<span>odile</span> Lodge
         </Link>
         <ul className="nav-links">
@@ -2069,10 +2217,22 @@ const CrocodileLodge: React.FC = () => {
 
           {/* HERO TAGLINE */}
           <div className="hero-tagline">
-            <p>The Indian Ocean is calling you, just steps from Diani Beach in Kenya...</p>
-            <p>The Lodge, a dreamy oasis just minutes from the sea, invites you to experience an unforgettable vacation.</p>
-            <p>Kite surfing, scuba diving, safaris... Adventure awaits, set to the rhythm of the savannah and turquoise waves.</p>
-            <p>Send me a message, and I'll reveal the secrets of this little corner of paradise.</p>
+            <p>
+              The Indian Ocean is calling you, just steps from Diani Beach in
+              Kenya...
+            </p>
+            <p>
+              The Lodge, a dreamy oasis just minutes from the sea, invites you
+              to experience an unforgettable vacation.
+            </p>
+            <p>
+              Kite surfing, scuba diving, safaris... Adventure awaits, set to
+              the rhythm of the savannah and turquoise waves.
+            </p>
+            <p>
+              Send me a message, and I'll reveal the secrets of this little
+              corner of paradise.
+            </p>
           </div>
         </div>
       </section>
@@ -2080,7 +2240,8 @@ const CrocodileLodge: React.FC = () => {
       {/* VILLAS */}
       <section className="villas-section" id="villas">
         <div className="section-header reveal" style={{ marginBottom: "40px" }}>
-          <h2 className="section-title">Crocodile Stay</h2>
+          <div className="section-tag">Accommodation</div>
+          <h2 className="section-title">Crocodile <em style={{color:"#c9a84c",fontStyle:"italic"}}>Stay</em></h2>
         </div>
 
         <div className="villas-grid">
@@ -2089,6 +2250,53 @@ const CrocodileLodge: React.FC = () => {
               <VillaCard villa={villa} onSelectVilla={handleSelectVilla} />
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* REVIEWS */}
+      <section className="reviews-section">
+        <div className="reviews-header reveal">
+          <div className="reviews-tag">Guest Reviews</div>
+          <h2 className="reviews-title">
+            What Our Guests <em>Say</em>
+          </h2>
+        </div>
+        <div className="reviews-grid">
+          {[
+            {
+              name: "Mitchelle Waiyaki",
+              text: "This villa is nothing short of Amazing. The house has ample space it's clean. We enjoyed all the amenities. The pool table was a good idea. Jacy (the host) was so amazing and helpful. Looking forward to coming back for sure.",
+            },
+            {
+              name: "Molline Dove",
+              text: "Beautiful place. Quiet and serene. Wonderful, friendly hosts. Definitely worth many return visits ❣️🤩🎊",
+            },
+            {
+              name: "Philip Kiganjo",
+              text: "Crocodile Villa lodge is an amazing place to stay as you stay in Diani. My team of 17 friends enjoyed our stay at the villa, which is conveniently located 15 mins from the beach. The rooms were clean and well organized, all amenities were available for use and in good condition, and the swimming pool was absolutely divine 🤗",
+            },
+          ].map((review) => (
+            <div key={review.name} className="review-card reveal">
+              <div className="review-stars">★★★★★</div>
+              <p className="review-text">"{review.text}"</p>
+              <div className="review-author">
+                <div className="review-avatar">{review.name.charAt(0)}</div>
+                <div>
+                  <div className="review-name">{review.name}</div>
+                  <div className="review-platform">Verified Guest</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="reviews-cta">
+          <a
+            href="https://maps.app.goo.gl/SshmqRxQdQEuLnTB7"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Read more reviews →
+          </a>
         </div>
       </section>
 
@@ -2139,7 +2347,11 @@ const CrocodileLodge: React.FC = () => {
       <footer id="contact">
         <div className="footer-main">
           <div className="footer-logo">
-            <img src="/favicon/logo.jpeg" alt="Crocodile Lodge" className="footer-logo-img" />
+            <img
+              src="/favicon/logo.jpeg"
+              alt="Crocodile Lodge"
+              className="footer-logo-img"
+            />
             Croc<span>odile</span> Villas
           </div>
           <div className="social-links">
