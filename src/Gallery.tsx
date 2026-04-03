@@ -25,6 +25,15 @@ const Gallery: React.FC = () => {
 
   const galleryData = {
     general: [
+      { src: "/images/WhatsApp Image 2026-04-03 at 13.21.35.jpeg", alt: "Crocodile Lodge" },
+      { src: "/images/WhatsApp Image 2026-04-03 at 13.21.35 (1).jpeg", alt: "Lodge Grounds" },
+      { src: "/images/WhatsApp Image 2026-04-03 at 13.21.35 (2).jpeg", alt: "Outdoor Area" },
+      { src: "/images/WhatsApp Image 2026-04-03 at 13.21.36.jpeg", alt: "Property" },
+      { src: "/images/WhatsApp Image 2026-04-03 at 13.21.36 (1).jpeg", alt: "Lodge Exterior" },
+      { src: "/images/WhatsApp Image 2026-04-03 at 13.21.36 (2).jpeg", alt: "Garden" },
+      { src: "/images/WhatsApp Image 2026-04-03 at 13.21.36 (3).jpeg", alt: "Tropical Setting" },
+      { src: "/images/WhatsApp Image 2026-04-03 at 13.21.36 (4).jpeg", alt: "Lodge Area" },
+      { src: "/images/IMG_20240814_134945.jpg", alt: "Lodge View" },
       {
         src: "/images/crocodile/Maisons Diani-photos-Pierre_Rich-2.jpg",
         alt: "Crocodile Lodge",
@@ -78,15 +87,6 @@ const Gallery: React.FC = () => {
       { src: "/images/gate.jpg", alt: "Main Gate" },
       { src: "/images/poolview.jpeg", alt: "Pool View" },
       { src: "/images/IMG-20250728-WA0039.jpg", alt: "General View" },
-      { src: "/images/IMG_20240814_134945.jpg", alt: "Lodge View" },
-      { src: "/images/WhatsApp Image 2026-04-03 at 13.21.35.jpeg", alt: "Crocodile Lodge" },
-      { src: "/images/WhatsApp Image 2026-04-03 at 13.21.35 (1).jpeg", alt: "Lodge Grounds" },
-      { src: "/images/WhatsApp Image 2026-04-03 at 13.21.35 (2).jpeg", alt: "Outdoor Area" },
-      { src: "/images/WhatsApp Image 2026-04-03 at 13.21.36.jpeg", alt: "Property" },
-      { src: "/images/WhatsApp Image 2026-04-03 at 13.21.36 (1).jpeg", alt: "Lodge Exterior" },
-      { src: "/images/WhatsApp Image 2026-04-03 at 13.21.36 (2).jpeg", alt: "Garden" },
-      { src: "/images/WhatsApp Image 2026-04-03 at 13.21.36 (3).jpeg", alt: "Tropical Setting" },
-      { src: "/images/WhatsApp Image 2026-04-03 at 13.21.36 (4).jpeg", alt: "Lodge Area" },
     ],
     blue: [
       {
@@ -142,10 +142,6 @@ const Gallery: React.FC = () => {
       {
         src: "/images/crocodile/green/Maisons Diani-photos-Pierre_Rich-42.jpg",
         alt: "Green Villa Interior",
-      },
-      {
-        src: "/images/crocodile/green/20250803_162422.jpg",
-        alt: "Green Villa Room",
       },
       {
         src: "/images/crocodile/green/IMG-20250728-WA0038.jpg",
