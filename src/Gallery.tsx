@@ -78,6 +78,15 @@ const Gallery: React.FC = () => {
       { src: "/images/gate.jpg", alt: "Main Gate" },
       { src: "/images/poolview.jpeg", alt: "Pool View" },
       { src: "/images/IMG-20250728-WA0039.jpg", alt: "General View" },
+      { src: "/images/IMG_20240814_134945.jpg", alt: "Lodge View" },
+      { src: "/images/WhatsApp Image 2026-04-03 at 13.21.35.jpeg", alt: "Crocodile Lodge" },
+      { src: "/images/WhatsApp Image 2026-04-03 at 13.21.35 (1).jpeg", alt: "Lodge Grounds" },
+      { src: "/images/WhatsApp Image 2026-04-03 at 13.21.35 (2).jpeg", alt: "Outdoor Area" },
+      { src: "/images/WhatsApp Image 2026-04-03 at 13.21.36.jpeg", alt: "Property" },
+      { src: "/images/WhatsApp Image 2026-04-03 at 13.21.36 (1).jpeg", alt: "Lodge Exterior" },
+      { src: "/images/WhatsApp Image 2026-04-03 at 13.21.36 (2).jpeg", alt: "Garden" },
+      { src: "/images/WhatsApp Image 2026-04-03 at 13.21.36 (3).jpeg", alt: "Tropical Setting" },
+      { src: "/images/WhatsApp Image 2026-04-03 at 13.21.36 (4).jpeg", alt: "Lodge Area" },
     ],
     blue: [
       {
@@ -435,6 +444,17 @@ const Gallery: React.FC = () => {
           border: none;
           cursor: pointer;
           padding: 0;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        .nav-logo-img {
+          height: 40px;
+          width: 40px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 2px solid rgba(255,255,255,0.3);
+          flex-shrink: 0;
         }
         .nav-logo span { color: rgba(255,255,255,0.65); }
 
@@ -811,6 +831,7 @@ const Gallery: React.FC = () => {
       {/* NAV */}
       <nav>
         <Link to="/" className="nav-logo">
+          <img src="/favicon/logo.jpeg" alt="Crocodile Lodge" className="nav-logo-img" />
           Croc<span>odile</span> Lodge
         </Link>
         <ul className="nav-links">
