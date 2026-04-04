@@ -5,7 +5,7 @@ export default async function handler(req, res) {
   if (cors(req, res)) return;
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  const { property_name, guests, checkin, checkout, name, phone, email, total_price } = req.body;
+  const { property_name, guests, checkin, checkout, name, phone, email, total_price, amount_paid, payment_transaction_id } = req.body;
 
   if (!property_name || !guests || !checkin || !checkout || !name || !phone || !email || total_price === undefined) {
     return res.status(400).json({ error: "All fields are required" });
@@ -54,6 +54,8 @@ export default async function handler(req, res) {
         phone: phone.trim(),
         email: email.trim().toLowerCase(),
         total_price: parseFloat(total_price),
+        amount_paid: amount_paid ? parseFloat(amount_paid) : null,
+        payment_transaction_id: payment_transaction_id || null,
         payment_status: "pending",
         confirmed: false,
         cancelled: false,
@@ -97,6 +99,15 @@ export default async function handler(req, res) {
                   <td style="padding:12px 0 6px;color:#888;">Total</td>
                   <td style="padding:12px 0 6px;font-weight:bold;font-size:1.1rem;">Ksh ${Number(total_price).toLocaleString()}</td>
                 </tr>
+                ${amount_paid && Number(amount_paid) < Number(total_price) ? `
+                <tr>
+                  <td style="padding:4px 0;color:#059669;">Deposit Paid</td>
+                  <td style="color:#059669;font-weight:bold;">Ksh ${Number(amount_paid).toLocaleString()}</td>
+                </tr>
+                <tr>
+                  <td style="padding:4px 0;color:#888;">Balance Due</td>
+                  <td style="font-weight:bold;">Ksh ${(Number(total_price) - Number(amount_paid)).toLocaleString()} on arrival</td>
+                </tr>` : ''}
               </table>
             </div>
             <p style="color:#555;font-size:0.85rem;line-height:1.7;">
@@ -135,6 +146,11 @@ export default async function handler(req, res) {
                   <td style="padding:12px 0 6px;color:#888;">Total</td>
                   <td style="padding:12px 0 6px;font-weight:bold;font-size:1.1rem;">Ksh ${Number(total_price).toLocaleString()}</td>
                 </tr>
+                ${amount_paid ? `
+                <tr>
+                  <td style="padding:4px 0;color:#059669;">Deposit Paid</td>
+                  <td style="color:#059669;font-weight:bold;">Ksh ${Number(amount_paid).toLocaleString()}</td>
+                </tr>` : ''}
               </table>
               <a href="https://crocodilelodge.co.ke/crocodile-admin/dashboard" style="display:inline-block;margin-top:24px;background:#0a0a0a;color:#fff;padding:12px 28px;text-decoration:none;font-size:0.75rem;letter-spacing:0.15em;text-transform:uppercase;">
                 View in Dashboard →

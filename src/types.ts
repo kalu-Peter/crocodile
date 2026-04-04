@@ -294,6 +294,8 @@ export interface AdminReservation {
   phone: string;
   email: string;
   total_price: number;
+  amount_paid: number | null;
+  payment_transaction_id: string | null;
   payment_status: string;
   confirmed: boolean;
   cancelled: boolean;

@@ -67,7 +67,7 @@ export async function deleteUser(req, res) {
 export async function getAllReservations(req, res) {
   const { data, error } = await supabase
     .from("reservations")
-    .select("id, property_name, guests, checkin, checkout, name, email, phone, total_price, confirmed, cancelled, created_at")
+    .select("id, property_name, guests, checkin, checkout, name, email, phone, total_price, amount_paid, payment_transaction_id, payment_status, confirmed, cancelled, created_at")
     .order("created_at", { ascending: false });
 
   if (error) return res.status(500).json({ error: error.message });

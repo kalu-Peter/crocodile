@@ -803,6 +803,11 @@ const AdminDashboardPage: React.FC = () => {
                               <span className={`badge badge-${r.payment_status === "paid" ? "paid" : r.payment_status === "failed" ? "failed" : "default"}`}>
                                 {r.payment_status}
                               </span>
+                              {r.amount_paid != null && (
+                                <div style={{ fontSize: "0.7rem", color: "#059669", marginTop: 3, fontWeight: 600 }}>
+                                  Ksh {Number(r.amount_paid).toLocaleString()} deposited
+                                </div>
+                              )}
                             </td>
                             <td>
                               <span className={`badge badge-${status}`}>{status}</span>

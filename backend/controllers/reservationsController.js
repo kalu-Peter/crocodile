@@ -2,7 +2,7 @@ import supabase from "../db/supabase.js";
 import { isPropertyAvailable } from "./availabilityController.js";
 
 export async function createReservation(req, res) {
-  const { property_name, guests, checkin, checkout, name, phone, email, total_price } =
+  const { property_name, guests, checkin, checkout, name, phone, email, total_price, amount_paid, payment_transaction_id } =
     req.body;
 
   // --- Validation ---
@@ -55,6 +55,8 @@ export async function createReservation(req, res) {
       phone: phone.trim(),
       email: email.trim().toLowerCase(),
       total_price: parseFloat(total_price),
+      amount_paid: amount_paid ? parseFloat(amount_paid) : null,
+      payment_transaction_id: payment_transaction_id || null,
       payment_status: "pending",
       confirmed: false,
       cancelled: false,
