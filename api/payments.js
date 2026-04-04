@@ -25,7 +25,7 @@ async function getOrRegisterIPN(token) {
   if (!ipnUrl) return "";
 
   try {
-    const res = await fetch(`${PESAPAL_BASE}/api/Transactions/RegisterIPN`, {
+    const res = await fetch(`${PESAPAL_BASE}/api/URLSetup/RegisterIPN`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -112,7 +112,7 @@ export default async function handler(req, res) {
       const desc = (data.payment_status_description || "").toLowerCase();
       const status =
         desc === "completed" ? "success" :
-        desc === "failed" || desc === "invalid" || desc === "reversed" ? "failed" :
+        desc === "failed" || desc === "reversed" ? "failed" :
         "pending";
 
       return res.json({

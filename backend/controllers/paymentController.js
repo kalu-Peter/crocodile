@@ -23,7 +23,7 @@ async function getOrRegisterIPN(token) {
   const ipnUrl = process.env.PESAPAL_IPN_URL;
   if (!ipnUrl) return "";
   try {
-    const res = await fetch(`${PESAPAL_BASE}/api/Transactions/RegisterIPN`, {
+    const res = await fetch(`${PESAPAL_BASE}/api/URLSetup/RegisterIPN`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Accept": "application/json", "Authorization": `Bearer ${token}` },
       body: JSON.stringify({ url: ipnUrl, ipn_notification_type: "GET" }),
@@ -102,7 +102,7 @@ export async function checkPesapalStatus(req, res) {
     const desc = (data.payment_status_description || "").toLowerCase();
     const status =
       desc === "completed" ? "success" :
-      desc === "failed" || desc === "invalid" || desc === "reversed" ? "failed" :
+      desc === "failed" || desc === "reversed" ? "failed" :
       "pending";
 
     return res.json({
@@ -125,7 +125,7 @@ export async function registerIPNEndpoint(_req, res) {
   try {
     const token = await getPesapalToken();
     const ipnUrl = process.env.PESAPAL_IPN_URL || `${process.env.FRONTEND_URL}/api/payments`;
-    const r = await fetch(`${PESAPAL_BASE}/api/Transactions/RegisterIPN`, {
+    const r = await fetch(`${PESAPAL_BASE}/api/URLSetup/RegisterIPN`, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Accept": "application/json", "Authorization": `Bearer ${token}` },
       body: JSON.stringify({ url: ipnUrl, ipn_notification_type: "GET" }),

@@ -77,7 +77,7 @@ const ReservationPage: React.FC = () => {
   const laundryFee  = nights > 0 ? Math.ceil(nights / 3) * 600 : 0;
   const acFee       = nights > 0 ? nights * 1000 * (villa.bedrooms ?? 1) : 0;
   const total       = accommodationTotal + laundryFee + acFee;
-  const minPay      = Math.ceil(total * 0.3);  // 30% minimum
+  const minPay      = 1;  // no minimum enforced
 
   // Sync payAmount when total or currency changes
   useEffect(() => {
@@ -109,7 +109,7 @@ const ReservationPage: React.FC = () => {
     if (!formData.firstName.trim() || !formData.lastName.trim()) { alert("Please enter your full name."); return false; }
     if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) { alert("Please enter a valid email."); return false; }
     if (!formData.phone.trim()) { alert("Please enter your phone number."); return false; }
-    if (payAmount < minPay) { alert(`Minimum payment is ${formatPrice(minPay)} (30% of total).`); return false; }
+    if (payAmount < 1) { alert(`Please enter a valid payment amount.`); return false; }
     if (payAmount > total) { alert(`Amount cannot exceed total of ${formatPrice(total)}.`); return false; }
     return true;
   };
@@ -462,7 +462,7 @@ const ReservationPage: React.FC = () => {
                 </div>
                 <div className="pay-amount-hints">
                   {[
-                    { label: "30% deposit", val: minPay },
+                    { label: "30%", val: Math.ceil(total * 0.3) },
                     { label: "50%", val: Math.ceil(total * 0.5) },
                     { label: "Full amount", val: total },
                   ].map(({ label, val }) => (
@@ -477,7 +477,7 @@ const ReservationPage: React.FC = () => {
                 <p className={`pay-amount-note${isPartial ? " partial" : ""}`}>
                   {isPartial
                     ? `Partial payment — remaining balance of ${formatPrice(total - payAmount)} due on arrival.`
-                    : `Minimum deposit: ${formatPrice(minPay)} (30% of total).`}
+                    : `You can pay any amount now and settle the balance on arrival.`}
                 </p>
               </div>
             )}
