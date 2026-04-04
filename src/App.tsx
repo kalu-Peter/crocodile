@@ -11,8 +11,9 @@ const Gallery            = lazy(() => import("./Gallery"));
 const VillaDetailsPage   = lazy(() => import("./pages/VillaDetailsPage"));
 const SearchResultsPage  = lazy(() => import("./pages/SearchResultsPage"));
 const ReservationPage    = lazy(() => import("./pages/ReservationPage"));
-const AdminLoginPage     = lazy(() => import("./pages/AdminLoginPage"));
-const AdminDashboardPage = lazy(() => import("./pages/AdminDashboardPage"));
+const AdminLoginPage        = lazy(() => import("./pages/AdminLoginPage"));
+const AdminDashboardPage    = lazy(() => import("./pages/AdminDashboardPage"));
+const PaymentCallbackPage   = lazy(() => import("./pages/PaymentCallbackPage"));
 
 function App() {
   return (
@@ -27,8 +28,9 @@ function App() {
               <Route path="/villa/:villaId"            element={<VillaDetailsPage />} />
               <Route path="/search"                    element={<SearchResultsPage />} />
               <Route path="/reservation"               element={<ReservationPage />} />
-              <Route path="/admin"           element={<AdminLoginPage />} />
-              <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+              <Route path="/admin"              element={<AdminLoginPage />} />
+              <Route path="/admin/dashboard"   element={<AdminDashboardPage />} />
+              <Route path="/payment-callback"  element={<PaymentCallbackPage />} />
             </Routes>
           </PageTransition>
         </Suspense>
