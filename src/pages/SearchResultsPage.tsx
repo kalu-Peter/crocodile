@@ -6,12 +6,19 @@ import { useCurrency } from "../context/CurrencyContext";
 
 function nightsBetween(a: string, b: string) {
   if (!a || !b) return 0;
-  return Math.max(0, Math.round((new Date(b).getTime() - new Date(a).getTime()) / 86400000));
+  return Math.max(
+    0,
+    Math.round((new Date(b).getTime() - new Date(a).getTime()) / 86400000),
+  );
 }
 
 function fmtDate(d: string) {
   if (!d) return "";
-  return new Date(d + "T00:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+  return new Date(d + "T00:00:00").toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 }
 
 interface VillaStatus {
@@ -25,17 +32,20 @@ const SearchResultsPage: React.FC = () => {
   const navigate = useNavigate();
   const { formatPrice } = useCurrency();
 
-  const checkin  = searchParams.get("checkin")  ?? "";
+  const checkin = searchParams.get("checkin") ?? "";
   const checkout = searchParams.get("checkout") ?? "";
-  const guests   = Number(searchParams.get("guests") ?? 1);
-  const nights   = nightsBetween(checkin, checkout);
+  const guests = Number(searchParams.get("guests") ?? 1);
+  const nights = nightsBetween(checkin, checkout);
 
-  const [statuses, setStatuses]         = useState<Record<string, VillaStatus>>({});
-  const [loading, setLoading]           = useState(true);
+  const [statuses, setStatuses] = useState<Record<string, VillaStatus>>({});
+  const [loading, setLoading] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    if (!checkin || !checkout) { setLoading(false); return; }
+    if (!checkin || !checkout) {
+      setLoading(false);
+      return;
+    }
 
     const checkAll = async () => {
       setLoading(true);
@@ -46,17 +56,33 @@ const SearchResultsPage: React.FC = () => {
           let available = villa.isAvailable !== false;
           if (available) {
             try {
-              const params = new URLSearchParams({ property: villa.name, checkin, checkout });
+              const params = new URLSearchParams({
+                property: villa.name,
+                checkin,
+                checkout,
+              });
               const res = await fetch(`/api/availability?${params}`);
-              if (res.ok) { const data = await res.json(); available = !!data.available; }
-            } catch { /* keep available=true on network error */ }
+              if (res.ok) {
+                const data = await res.json();
+                available = !!data.available;
+              }
+            } catch {
+              /* keep available=true on network error */
+            }
           }
 
           let price: number | null = null;
           try {
-            const res = await fetch(`/api/seasonal-price?villaId=${encodeURIComponent(villa.id)}&checkin=${checkin}`);
-            if (res.ok) { const data = await res.json(); price = data.price ?? null; }
-          } catch { /* fallback to base */ }
+            const res = await fetch(
+              `/api/seasonal-price?villaId=${encodeURIComponent(villa.id)}&checkin=${checkin}`,
+            );
+            if (res.ok) {
+              const data = await res.json();
+              price = data.price ?? null;
+            }
+          } catch {
+            /* fallback to base */
+          }
 
           results[villa.id] = { villaId: villa.id, available, price };
         }),
@@ -70,7 +96,9 @@ const SearchResultsPage: React.FC = () => {
   }, [checkin, checkout]);
 
   const handleReserve = (villaId: string) => {
-    navigate(`/reservation?villaId=${villaId}&guestCount=${guests}&checkin=${checkin}&checkout=${checkout}`);
+    navigate(
+      `/reservation?villaId=${villaId}&guestCount=${guests}&checkin=${checkin}&checkout=${checkout}`,
+    );
   };
 
   // Only show villas that are available and not opening soon
@@ -130,9 +158,8 @@ const SearchResultsPage: React.FC = () => {
         .sr-card-amenities { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:20px; }
         .sr-card-amenity { background:#f5f6fa; border:1px solid #eef0f4; border-radius:20px; padding:4px 12px; font-family:'Inter',sans-serif; font-size:0.68rem; font-weight:500; color:#6b7280; }
         .sr-card-price { margin-bottom:18px; }
-        .sr-card-price-main { font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:700; color:#1a1a2e; }
-        .sr-card-price-sub { font-family:'Inter',sans-serif; font-size:0.65rem; font-weight:500; color:#9098a9; margin-top:2px; }
-        .sr-card-price-total { font-family:'Inter',sans-serif; font-size:0.75rem; font-weight:600; color:#1a1a2e; margin-top:4px; }
+        .sr-card-price-total { font-family:'Playfair Display',serif; font-size:1.6rem; font-weight:700; color:#1a1a2e; }
+        .sr-card-price-sub { font-family:'Inter',sans-serif; font-size:0.65rem; font-weight:500; color:#9098a9; margin-top:3px; }
 
         .sr-btn-reserve { width:100%; padding:13px; background:#1a1a2e; color:#fff; border:none; border-radius:10px; font-family:'Inter',sans-serif; font-size:0.78rem; font-weight:600; letter-spacing:0.04em; cursor:pointer; transition:background 0.18s, transform 0.12s; }
         .sr-btn-reserve:hover { background:#c9a84c; transform:translateY(-1px); }
@@ -151,31 +178,55 @@ const SearchResultsPage: React.FC = () => {
       {/* NAV */}
       <nav className="sr-nav">
         <Link to="/" className="sr-nav-logo">
-          <img src="/favicon/logo.jpeg" alt="Crocodile Lodge" className="sr-nav-logo-img" />
+          <img
+            src="/favicon/logo.jpeg"
+            alt="Crocodile Lodge"
+            className="sr-nav-logo-img"
+          />
           Croc<span>odile</span> Lodge
         </Link>
         <ul className="sr-nav-links">
-          <li><a href="/#villas">Villas</a></li>
-          <li><Link to="/gallery">Gallery</Link></li>
-          <li><a href="/#contact">Contact</a></li>
+          <li>
+            <a href="/#villas">Villas</a>
+          </li>
+          <li>
+            <Link to="/gallery">Gallery</Link>
+          </li>
+          <li>
+            <a href="/#contact">Contact</a>
+          </li>
         </ul>
         <CurrencySelector />
-        <button className="hamburger" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label="Menu">
-          <span /><span /><span />
+        <button
+          className="hamburger"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Menu"
+        >
+          <span />
+          <span />
+          <span />
         </button>
       </nav>
 
       <div className={`mobile-menu${mobileMenuOpen ? " open" : ""}`}>
-        <a href="/#villas" onClick={() => setMobileMenuOpen(false)}>Villas</a>
-        <Link to="/gallery" onClick={() => setMobileMenuOpen(false)}>Gallery</Link>
-        <a href="/#contact" onClick={() => setMobileMenuOpen(false)}>Contact</a>
+        <a href="/#villas" onClick={() => setMobileMenuOpen(false)}>
+          Villas
+        </a>
+        <Link to="/gallery" onClick={() => setMobileMenuOpen(false)}>
+          Gallery
+        </Link>
+        <a href="/#contact" onClick={() => setMobileMenuOpen(false)}>
+          Contact
+        </a>
       </div>
 
       <div className="sr-wrap">
         <div className="sr-header">
           <h1 className="sr-title">Available Villas</h1>
           <div className="sr-subtitle">
-            {fmtDate(checkin)} — {fmtDate(checkout)} &nbsp;·&nbsp; {nights} night{nights !== 1 ? "s" : ""} &nbsp;·&nbsp; {guests} guest{guests !== 1 ? "s" : ""}
+            {fmtDate(checkin)} — {fmtDate(checkout)} &nbsp;·&nbsp; {nights}{" "}
+            night{nights !== 1 ? "s" : ""} &nbsp;·&nbsp; {guests} guest
+            {guests !== 1 ? "s" : ""}
           </div>
         </div>
 
@@ -184,25 +235,38 @@ const SearchResultsPage: React.FC = () => {
         ) : visibleVillas.length === 0 ? (
           <div className="sr-loading">
             No villas available for the selected dates. Try different dates or{" "}
-            <a href="https://wa.me/254715510119" style={{ color: "#c9a84c" }}>contact us</a>.
+            <a href="https://wa.me/254715510119" style={{ color: "#c9a84c" }}>
+              contact us
+            </a>
+            .
           </div>
         ) : (
           <div className="sr-grid">
             {visibleVillas.map((villa) => {
               const status = statuses[villa.id];
-              const pricePerNight = status?.price ?? villa.pricing[0]?.basePrice ?? 0;
+              const pricePerNight =
+                status?.price ?? villa.pricing[0]?.basePrice ?? 0;
               const totalBase = pricePerNight * nights;
               return (
                 <div key={villa.id} className="sr-card">
                   <div className="sr-card-img">
-                    <img src={villa.image} alt={villa.name} loading="lazy" decoding="async" />
+                    <img
+                      src={villa.image}
+                      alt={villa.name}
+                      loading="lazy"
+                      decoding="async"
+                    />
                     <span className="sr-card-badge available">Available</span>
                   </div>
                   <div className="sr-card-body">
                     <div className="sr-card-type">{villa.type}</div>
                     <div className="sr-card-name">{villa.name}</div>
                     <div className="sr-card-meta">
-                      {villa.bedrooms && <span>{villa.bedrooms} Bed{villa.bedrooms > 1 ? "s" : ""}</span>}
+                      {villa.bedrooms && (
+                        <span>
+                          {villa.bedrooms} Bed{villa.bedrooms > 1 ? "s" : ""}
+                        </span>
+                      )}
                       <span>Up to {villa.maxGuests} guests</span>
                     </div>
                     <div className="sr-card-amenities">
@@ -213,31 +277,58 @@ const SearchResultsPage: React.FC = () => {
                       <span className="sr-card-amenity">Laundry</span>
                     </div>
                     <div className="sr-card-price">
-                      <div className="sr-card-price-main">{formatPrice(pricePerNight)}</div>
-                      <div className="sr-card-price-sub">per night</div>
-                      {nights > 0 && (
-                        <div className="sr-card-price-total">{formatPrice(totalBase)} for {nights} night{nights !== 1 ? "s" : ""}</div>
-                      )}
+                      <div className="sr-card-price-total">{formatPrice(totalBase)}</div>
+                      <div className="sr-card-price-sub">{formatPrice(pricePerNight)} / night</div>
                     </div>
-                    <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginTop:4 }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        marginTop: 4,
+                      }}
+                    >
                       <Link
                         to={`/villa/${villa.id}`}
-                        style={{ fontFamily:"'Inter',sans-serif", fontSize:"0.65rem", letterSpacing:"0.12em", textTransform:"uppercase", color: villa.color ?? "#0a0a0a", textDecoration:"underline", textUnderlineOffset:3 }}
+                        style={{
+                          fontFamily: "'Inter',sans-serif",
+                          fontSize: "0.65rem",
+                          letterSpacing: "0.12em",
+                          textTransform: "uppercase",
+                          color: villa.color ?? "#0a0a0a",
+                          textDecoration: "underline",
+                          textUnderlineOffset: 3,
+                        }}
                       >
                         View Details
                       </Link>
                       {villa.contactOnly ? (
                         <a
                           href={`https://wa.me/254715510119?text=${encodeURIComponent(`Hi, I'd like to book ${villa.name} from ${checkin} to ${checkout} for ${guests} guest${guests !== 1 ? "s" : ""}.`)}`}
-                          target="_blank" rel="noopener noreferrer"
-                          style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"10px 16px", background:"#25d366", color:"#fff", borderRadius:6, fontFamily:"'Inter',sans-serif", fontSize:"0.65rem", letterSpacing:"0.12em", textTransform:"uppercase", textDecoration:"none", whiteSpace:"nowrap" }}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 6,
+                            padding: "10px 16px",
+                            background: "#25d366",
+                            color: "#fff",
+                            borderRadius: 6,
+                            fontFamily: "'Inter',sans-serif",
+                            fontSize: "0.65rem",
+                            letterSpacing: "0.12em",
+                            textTransform: "uppercase",
+                            textDecoration: "none",
+                            whiteSpace: "nowrap",
+                          }}
                         >
                           WhatsApp
                         </a>
                       ) : (
                         <button
                           className="sr-btn-reserve"
-                          style={{ width:"auto", padding:"10px 20px" }}
+                          style={{ width: "auto", padding: "10px 20px" }}
                           onClick={() => handleReserve(villa.id)}
                         >
                           Reserve
