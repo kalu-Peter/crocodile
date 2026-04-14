@@ -74,36 +74,35 @@ export async function getAllReservations(req, res) {
   res.json(data);
 }
 
-export async function confirmReservation(req, res) {
+export async function updateReservation(req, res) {
   const { id } = req.params;
+  const { action } = req.body;
 
-  const { data, error } = await supabase
-    .from("reservations")
-    .update({ confirmed: true })
-    .eq("id", id)
-    .select("id, confirmed, property_name, checkin, checkout")
-    .single();
+  if (action === "confirm") {
+    const { data, error } = await supabase
+      .from("reservations")
+      .update({ confirmed: true })
+      .eq("id", id)
+      .select("id, confirmed, property_name, checkin, checkout")
+      .single();
+    if (error) return res.status(500).json({ error: error.message });
+    if (!data) return res.status(404).json({ error: "Reservation not found" });
+    return res.json({ message: "Reservation confirmed", reservation: data });
+  }
 
-  if (error) return res.status(500).json({ error: error.message });
-  if (!data) return res.status(404).json({ error: "Reservation not found" });
+  if (action === "cancel") {
+    const { data, error } = await supabase
+      .from("reservations")
+      .update({ cancelled: true, confirmed: false })
+      .eq("id", id)
+      .select("id, cancelled, property_name, checkin, checkout")
+      .single();
+    if (error) return res.status(500).json({ error: error.message });
+    if (!data) return res.status(404).json({ error: "Reservation not found" });
+    return res.json({ message: "Reservation cancelled", reservation: data });
+  }
 
-  res.json({ message: "Reservation confirmed", reservation: data });
-}
-
-export async function cancelReservation(req, res) {
-  const { id } = req.params;
-
-  const { data, error } = await supabase
-    .from("reservations")
-    .update({ cancelled: true, confirmed: false })
-    .eq("id", id)
-    .select("id, cancelled, property_name, checkin, checkout")
-    .single();
-
-  if (error) return res.status(500).json({ error: error.message });
-  if (!data) return res.status(404).json({ error: "Reservation not found" });
-
-  res.json({ message: "Reservation cancelled", reservation: data });
+  return res.status(400).json({ error: "action must be 'confirm' or 'cancel'" });
 }
 
 // ─── Blocked Dates ───────────────────────────────────────────

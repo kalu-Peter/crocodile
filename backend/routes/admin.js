@@ -6,8 +6,7 @@ import {
   createUser,
   deleteUser,
   getAllReservations,
-  confirmReservation,
-  cancelReservation,
+  updateReservation,
   blockDate,
   getBlockedDates,
   unblockDate,
@@ -33,9 +32,8 @@ router.post("/users",       createUser);
 router.delete("/users/:id", deleteUser);
 
 // Reservations
-router.get("/reservations",            getAllReservations);
-router.put("/reservations/:id/confirm", confirmReservation);
-router.put("/reservations/:id/cancel",  cancelReservation);
+router.get("/reservations",        getAllReservations);
+router.put("/reservations/:id",    updateReservation);
 
 // Blocked dates
 router.get("/blocked-dates",       getBlockedDates);
