@@ -35,7 +35,7 @@ const ReservationPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const { formatPrice, rates, currency } = useCurrency();
+  const { formatPrice } = useCurrency();
 
   const villaId = queryParams.get("villaId") ?? "";
   const villa = VILLAS.find((v) => v.id === villaId);
