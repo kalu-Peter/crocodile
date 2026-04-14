@@ -2,14 +2,16 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { VILLAS } from "../types";
 import type { AdminReservation, BlockedDate, SeasonalPricingRule } from "../types";
+import { useCurrency, SUPPORTED_CURRENCIES } from "../context/CurrencyContext";
 
-type Tab = "reservations" | "blocked-dates" | "seasonal-pricing" | "users";
+type Tab = "reservations" | "blocked-dates" | "seasonal-pricing" | "currencies" | "users";
 type ResFilter = "all" | "pending" | "confirmed" | "cancelled";
 
 const PROPERTY_NAMES = VILLAS.map((v) => v.name);
 
 const AdminDashboardPage: React.FC = () => {
   const navigate = useNavigate();
+  const { formatPrice, currency, setCurrency } = useCurrency();
   const secret = sessionStorage.getItem("adminSecret") ?? "";
   const adminUser = sessionStorage.getItem("adminUser") ?? "Admin";
 
@@ -362,6 +364,25 @@ const AdminDashboardPage: React.FC = () => {
           font-family: 'Inter', sans-serif;
         }
         .adm-logout:hover { background: #f9fafb; border-color: #d1d5db; color: #374151; }
+        .adm-currency-select {
+          font-family: 'Inter', sans-serif;
+          font-size: 0.75rem;
+          font-weight: 500;
+          color: #1a1a2e;
+          background: #f5f6fa;
+          border: 1.5px solid #e5e7eb;
+          border-radius: 8px;
+          padding: 7px 28px 7px 10px;
+          cursor: pointer;
+          outline: none;
+          appearance: none;
+          -webkit-appearance: none;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239098a9' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+          background-repeat: no-repeat;
+          background-position: right 10px center;
+          transition: border-color 0.18s;
+        }
+        .adm-currency-select:hover { border-color: #c9a84c; }
 
         /* ── Stats ── */
         .adm-stats {
@@ -675,6 +696,19 @@ const AdminDashboardPage: React.FC = () => {
             <div className="adm-topbar-user">
               Signed in as <strong>{adminUser}</strong>
             </div>
+            <select
+              className="adm-currency-select"
+              value={currency.code}
+              onChange={(e) => {
+                const found = SUPPORTED_CURRENCIES.find((c) => c.code === e.target.value);
+                if (found) setCurrency(found);
+              }}
+              aria-label="Select currency"
+            >
+              {SUPPORTED_CURRENCIES.map((c) => (
+                <option key={c.code} value={c.code}>{c.symbol} {c.code}</option>
+              ))}
+            </select>
             <button className="adm-logout" onClick={logout}>Sign Out</button>
           </div>
         </div>
@@ -700,7 +734,7 @@ const AdminDashboardPage: React.FC = () => {
           <div className="adm-stat">
             <div className="adm-stat-label">Confirmed Revenue</div>
             <div className="adm-stat-value accent">
-              Ksh {stats.revenue.toLocaleString()}
+              {formatPrice(stats.revenue)}
             </div>
           </div>
         </div>
@@ -774,7 +808,7 @@ const AdminDashboardPage: React.FC = () => {
                         <th>Guests</th>
                         <th>Check-In</th>
                         <th>Check-Out</th>
-                        <th>Total (Ksh)</th>
+                        <th>Total ({currency.code})</th>
                         <th>Payment</th>
                         <th>Status</th>
                         <th>Booked</th>
@@ -798,14 +832,14 @@ const AdminDashboardPage: React.FC = () => {
                             <td style={{ textAlign: "center" }}>{r.guests}</td>
                             <td>{fmt(r.checkin)}</td>
                             <td>{fmt(r.checkout)}</td>
-                            <td>Ksh {Number(r.total_price).toLocaleString()}</td>
+                            <td>{formatPrice(Number(r.total_price))}</td>
                             <td>
                               <span className={`badge badge-${r.payment_status === "paid" ? "paid" : r.payment_status === "failed" ? "failed" : "default"}`}>
                                 {r.payment_status}
                               </span>
                               {r.amount_paid != null && (
                                 <div style={{ fontSize: "0.7rem", color: "#059669", marginTop: 3, fontWeight: 600 }}>
-                                  Ksh {Number(r.amount_paid).toLocaleString()} deposited
+                                  {formatPrice(Number(r.amount_paid))} deposited
                                 </div>
                               )}
                             </td>
@@ -1053,7 +1087,7 @@ const AdminDashboardPage: React.FC = () => {
                       />
                     </div>
                     <div className="adm-form-field">
-                      <label>Price / Night (Ksh)</label>
+                      <label>Price / Night ({currency.code})</label>
                       <input
                         type="number"
                         min="1"
@@ -1101,7 +1135,7 @@ const AdminDashboardPage: React.FC = () => {
                         <th>Label</th>
                         <th>Start Date</th>
                         <th>End Date</th>
-                        <th>Price / Night (Ksh)</th>
+                        <th>Price / Night ({currency.code})</th>
                         <th>Created</th>
                         <th>Action</th>
                       </tr>
@@ -1112,7 +1146,7 @@ const AdminDashboardPage: React.FC = () => {
                           <td>{r.label}</td>
                           <td>{fmt(r.start_date)}</td>
                           <td>{fmt(r.end_date)}</td>
-                          <td style={{ color: "#0a0a0a", fontFamily: "monospace" }}>Ksh {Number(r.price_per_night).toLocaleString()}</td>
+                          <td style={{ color: "#0a0a0a", fontFamily: "monospace" }}>{formatPrice(Number(r.price_per_night))}</td>
                           <td style={{ fontSize: "0.68rem", color: "#aaaaaa" }}>{fmt(r.created_at)}</td>
                           <td>
                             <button className="adm-btn adm-btn-remove" onClick={() => deleteSeasonalRule(r.id)}>
