@@ -83,6 +83,38 @@ const AdminDashboardPage: React.FC = () => {
   const [blockError, setBlockError] = useState("");
   const [blockSuccess, setBlockSuccess] = useState("");
 
+  // ── iCal Sync ─────────────────────────────────────────────────────────────
+  const [icalUrls, setIcalUrls] = useState<Record<string, string>>({});
+  const [icalForm, setIcalForm] = useState({ property_name: PROPERTY_NAMES[0] ?? "", ical_url: "" });
+  const [icalSyncing, setIcalSyncing] = useState(false);
+  const [icalError, setIcalError] = useState("");
+  const [icalSuccess, setIcalSuccess] = useState("");
+
+  const fetchIcalUrls = useCallback(async () => {
+    const res = await api("/blocked-dates?action=ical-urls");
+    if (res.ok) setIcalUrls(await res.json());
+  }, [api]);
+
+  const syncIcal = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIcalError(""); setIcalSuccess("");
+    if (!icalForm.ical_url.trim()) { setIcalError("Please enter an iCal URL."); return; }
+    setIcalSyncing(true);
+    try {
+      const res = await api("/blocked-dates", {
+        method: "POST",
+        body: JSON.stringify({ action: "sync-ical", property_name: icalForm.property_name, ical_url: icalForm.ical_url.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setIcalError(data.error ?? "Sync failed."); return; }
+      setIcalSuccess(data.message ?? "Sync complete.");
+      await fetchIcalUrls();
+      await fetchBlockedDates();
+    } finally {
+      setIcalSyncing(false);
+    }
+  };
+
   const fetchBlockedDates = useCallback(async () => {
     setBlockLoading(true);
     try {
@@ -187,10 +219,10 @@ const AdminDashboardPage: React.FC = () => {
   // ── Load on tab switch ────────────────────────────────────────────────────
   useEffect(() => {
     if (activeTab === "reservations") fetchReservations(true);
-    if (activeTab === "blocked-dates") fetchBlockedDates();
+    if (activeTab === "blocked-dates") { fetchBlockedDates(); fetchIcalUrls(); }
     if (activeTab === "seasonal-pricing") fetchSeasonalPricing(seasonalVilla);
     if (activeTab === "users") fetchUsers();
-  }, [activeTab, fetchReservations, fetchBlockedDates, fetchSeasonalPricing, fetchUsers, seasonalVilla]);
+  }, [activeTab, fetchReservations, fetchBlockedDates, fetchIcalUrls, fetchSeasonalPricing, fetchUsers, seasonalVilla]);
 
   useEffect(() => {
     if (activeTab === "blocked-dates") fetchBlockedDates();
@@ -989,6 +1021,86 @@ const AdminDashboardPage: React.FC = () => {
                   {blockError   && <div className="adm-form-msg error">{blockError}</div>}
                   {blockSuccess && <div className="adm-form-msg success">{blockSuccess}</div>}
                 </form>
+              </div>
+
+              {/* Airbnb iCal Sync */}
+              <div className="adm-form-card">
+                <h3>Airbnb iCal Sync</h3>
+                <form onSubmit={syncIcal}>
+                  <div className="adm-form-row">
+                    <div className="adm-form-field">
+                      <label>Property</label>
+                      <select
+                        className="adm-select"
+                        value={icalForm.property_name}
+                        onChange={(e) => setIcalForm((f) => ({ ...f, property_name: e.target.value }))}
+                      >
+                        {PROPERTY_NAMES.map((n) => <option key={n} value={n}>{n}</option>)}
+                      </select>
+                    </div>
+                    <div className="adm-form-field" style={{ flex: 1, minWidth: 280 }}>
+                      <label>Airbnb iCal URL (.ics)</label>
+                      <input
+                        type="url"
+                        placeholder="https://www.airbnb.com/calendar/ical/…"
+                        value={icalForm.ical_url}
+                        onChange={(e) => setIcalForm((f) => ({ ...f, ical_url: e.target.value }))}
+                        style={{ width: "100%" }}
+                      />
+                    </div>
+                    <button
+                      className="adm-btn adm-btn-save"
+                      type="submit"
+                      disabled={icalSyncing}
+                      style={{ padding: "10px 24px", alignSelf: "flex-end", background: "#c9a84c", color: "#fff" }}
+                    >
+                      {icalSyncing ? "Syncing…" : "Sync Now"}
+                    </button>
+                  </div>
+                  {icalError   && <div className="adm-form-msg error">{icalError}</div>}
+                  {icalSuccess && <div className="adm-form-msg success">{icalSuccess}</div>}
+                </form>
+
+                {/* Saved iCal URLs */}
+                {Object.keys(icalUrls).length > 0 && (
+                  <div style={{ marginTop: 20 }}>
+                    <div style={{ fontSize: "0.65rem", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "#9098a9", marginBottom: 10 }}>
+                      Saved iCal URLs
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                      {Object.entries(icalUrls).map(([prop, url]) => (
+                        <div key={prop} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: "#f9fafb", borderRadius: 8, border: "1px solid #eef0f4" }}>
+                          <span style={{ fontSize: "0.75rem", fontWeight: 600, color: "#1a1a2e", minWidth: 140 }}>{prop}</span>
+                          <span style={{ fontSize: "0.7rem", color: "#6b7280", wordBreak: "break-all", flex: 1 }}>{url}</span>
+                          <button
+                            type="button"
+                            className="adm-btn adm-btn-save"
+                            style={{ padding: "6px 16px", whiteSpace: "nowrap", background: "#c9a84c" }}
+                            disabled={icalSyncing}
+                            onClick={async () => {
+                              setIcalError(""); setIcalSuccess("");
+                              setIcalSyncing(true);
+                              try {
+                                const r = await api("/blocked-dates", {
+                                  method: "POST",
+                                  body: JSON.stringify({ action: "sync-ical", property_name: prop, ical_url: url }),
+                                });
+                                const d = await r.json();
+                                if (!r.ok) { setIcalError(d.error ?? "Sync failed."); return; }
+                                setIcalSuccess(d.message ?? "Sync complete.");
+                                await fetchBlockedDates();
+                              } finally {
+                                setIcalSyncing(false);
+                              }
+                            }}
+                          >
+                            Re-sync
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="adm-section-head">

@@ -118,8 +118,74 @@ function datesInRange(start, end) {
   return dates;
 }
 
+function parseIcal(text) {
+  const events = [];
+  const blocks = text.split("BEGIN:VEVENT");
+  for (let i = 1; i < blocks.length; i++) {
+    const block = blocks[i];
+    const startMatch = block.match(/DTSTART(?:;[^:]*)?:(\d{8})/);
+    const endMatch   = block.match(/DTEND(?:;[^:]*)?:(\d{8})/);
+    if (!startMatch) continue;
+    const toDate = (s) => `${s.slice(0,4)}-${s.slice(4,6)}-${s.slice(6,8)}`;
+    const start = toDate(startMatch[1]);
+    let end = start;
+    if (endMatch) {
+      const d = new Date(toDate(endMatch[1]));
+      d.setDate(d.getDate() - 1);
+      end = d.toISOString().split("T")[0];
+    }
+    if (end >= start) events.push({ start, end });
+  }
+  return events;
+}
+
 export async function blockDate(req, res) {
-  const { property_name, blocked_date, start_date, end_date, reason } = req.body;
+  const { action, property_name, blocked_date, start_date, end_date, reason, ical_url } = req.body;
+
+  // ── Sync iCal URL
+  if (action === "sync-ical") {
+    if (!property_name || !ical_url) {
+      return res.status(400).json({ error: "property_name and ical_url are required" });
+    }
+
+    await supabase.from("site_settings").upsert(
+      { key: `ical_url_${property_name}`, value: ical_url },
+      { onConflict: "key" }
+    );
+
+    let icsText;
+    try {
+      const r = await fetch(ical_url);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      icsText = await r.text();
+    } catch (err) {
+      return res.status(502).json({ error: `Failed to fetch iCal: ${err.message}` });
+    }
+
+    const events = parseIcal(icsText);
+    if (events.length === 0) {
+      return res.json({ message: "No bookings found in iCal feed", count: 0 });
+    }
+
+    const rows = [];
+    for (const { start, end } of events) {
+      for (const date of datesInRange(start, end)) {
+        rows.push({ property_name, blocked_date: date, reason: "airbnb_sync" });
+      }
+    }
+
+    const { error } = await supabase
+      .from("blocked_dates")
+      .upsert(rows, { onConflict: "property_name,blocked_date", ignoreDuplicates: true });
+
+    if (error) return res.status(500).json({ error: error.message });
+
+    return res.json({
+      message: `Synced ${events.length} Airbnb booking(s) — ${rows.length} date(s) blocked`,
+      events: events.length,
+      count: rows.length,
+    });
+  }
 
   if (!property_name) {
     return res.status(400).json({ error: "property_name is required" });
@@ -157,7 +223,18 @@ export async function blockDate(req, res) {
 }
 
 export async function getBlockedDates(req, res) {
-  const { property } = req.query;
+  const { property, action } = req.query;
+
+  // Return saved iCal URLs from site_settings
+  if (action === "ical-urls") {
+    const { data, error } = await supabase
+      .from("site_settings")
+      .select("key, value")
+      .like("key", "ical_url_%");
+    if (error) return res.status(500).json({ error: error.message });
+    const urls = Object.fromEntries((data ?? []).map((r) => [r.key.replace("ical_url_", ""), r.value]));
+    return res.json(urls);
+  }
 
   let query = supabase
     .from("blocked_dates")
