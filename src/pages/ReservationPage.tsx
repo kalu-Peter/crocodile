@@ -126,7 +126,7 @@ const ReservationPage: React.FC = () => {
       `Check-out: ${formatDate(checkout)}\n` +
       `Guests: ${guestCount}\n` +
       `Name: ${formData.firstName} ${formData.lastName}\n` +
-      `Total: Ksh ${total.toLocaleString()}\n\n` +
+      `Total: ${formatPrice(total)}\n\n` +
       `Please confirm my reservation. Thank you!`
     );
 
