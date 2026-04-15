@@ -129,7 +129,7 @@ const AdminDashboardPage: React.FC = () => {
 
   // ── Seasonal Pricing ──────────────────────────────────────────────────────
   const [seasonalRules, setSeasonalRules] = useState<SeasonalPricingRule[]>([]);
-  const [seasonalLoading, setSeasonalLoading] = useState(false);
+
   const [seasonalVilla, setSeasonalVilla] = useState(VILLAS[0].id);
   const [calEditRule, setCalEditRule] = useState<SeasonalPricingRule | null>(null);
 
@@ -320,13 +320,8 @@ const AdminDashboardPage: React.FC = () => {
   };
 
   const fetchSeasonalPricing = useCallback(async (villaId: string) => {
-    setSeasonalLoading(true);
-    try {
-      const res = await api(`/seasonal-pricing?villa_id=${encodeURIComponent(villaId)}`);
-      if (res.ok) setSeasonalRules(await res.json());
-    } finally {
-      setSeasonalLoading(false);
-    }
+    const res = await api(`/seasonal-pricing?villa_id=${encodeURIComponent(villaId)}`);
+    if (res.ok) setSeasonalRules(await res.json());
   }, [api]);
 
   // ── Users ─────────────────────────────────────────────────────────────────
