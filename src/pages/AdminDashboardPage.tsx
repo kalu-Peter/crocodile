@@ -131,10 +131,124 @@ const AdminDashboardPage: React.FC = () => {
   const [seasonalRules, setSeasonalRules] = useState<SeasonalPricingRule[]>([]);
   const [seasonalLoading, setSeasonalLoading] = useState(false);
   const [seasonalVilla, setSeasonalVilla] = useState(VILLAS[0].id);
-  const [seasonalForm, setSeasonalForm] = useState({ label: "", start_date: "", end_date: "", price_per_night: "" });
-  const [seasonalError, setSeasonalError] = useState("");
-  const [seasonalSuccess, setSeasonalSuccess] = useState("");
-  const [seasonalSaving, setSeasonalSaving] = useState(false);
+
+  // ── Calendar pricing UI ───────────────────────────────────────────────────
+  const now = new Date();
+  const [calYear,  setCalYear]  = useState(now.getFullYear());
+  const [calMonth, setCalMonth] = useState(now.getMonth()); // 0-indexed
+  type CalMode = "single" | "range" | "weekends" | "fullmonth";
+  const [calMode,       setCalMode]       = useState<CalMode>("range");
+  const [calRangeStart, setCalRangeStart] = useState<string | null>(null);
+  const [calRangeEnd,   setCalRangeEnd]   = useState<string | null>(null);
+  const [calHover,      setCalHover]      = useState<string | null>(null);
+  const [calLabel,      setCalLabel]      = useState("");
+  const [calPrice,      setCalPrice]      = useState("");
+  const [calSaving,     setCalSaving]     = useState(false);
+  const [calError,      setCalError]      = useState("");
+  const [calSuccess,    setCalSuccess]    = useState("");
+
+  const calDateStr = (y: number, m: number, d: number) =>
+    `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+
+  const calPriceForDate = (dateStr: string): SeasonalPricingRule | null =>
+    seasonalRules.find(r => dateStr >= r.start_date && dateStr <= r.end_date) ?? null;
+
+  const isInCalSelection = (dateStr: string): boolean => {
+    if (!calRangeStart) return false;
+    const tentativeEnd = calRangeEnd ?? (calMode === "range" && !calRangeEnd ? calHover : null) ?? calRangeStart;
+    const [s, e] = calRangeStart <= tentativeEnd ? [calRangeStart, tentativeEnd] : [tentativeEnd, calRangeStart];
+    return dateStr >= s && dateStr <= e;
+  };
+
+  const getWeekendsInMonth = (y: number, m: number) => {
+    const weekends: Array<{ start: string; end: string }> = [];
+    const days = new Date(y, m + 1, 0).getDate();
+    for (let d = 1; d <= days; d++) {
+      const dow = new Date(y, m, d).getDay(); // 0=Sun, 6=Sat
+      if (dow === 6) {
+        const sat = calDateStr(y, m, d);
+        const sun = calDateStr(y, m, d + 1 <= days ? d + 1 : d);
+        weekends.push({ start: sat, end: d + 1 <= days ? sun : sat });
+      } else if (dow === 0 && d === 1) {
+        // Month starts on Sunday — lone Sunday
+        weekends.push({ start: calDateStr(y, m, d), end: calDateStr(y, m, d) });
+      }
+    }
+    return weekends;
+  };
+
+  const weekendDatesInMonth = (y: number, m: number): string[] => {
+    const days = new Date(y, m + 1, 0).getDate();
+    const result: string[] = [];
+    for (let d = 1; d <= days; d++) {
+      const dow = new Date(y, m, d).getDay();
+      if (dow === 0 || dow === 6) result.push(calDateStr(y, m, d));
+    }
+    return result;
+  };
+
+  const isWeekendSelected = (dateStr: string) =>
+    calMode === "weekends" && weekendDatesInMonth(calYear, calMonth).includes(dateStr);
+
+  const isFullMonthSelected = (dateStr: string) => {
+    if (calMode !== "fullmonth") return false;
+    const start = calDateStr(calYear, calMonth, 1);
+    const end   = calDateStr(calYear, calMonth, new Date(calYear, calMonth + 1, 0).getDate());
+    return dateStr >= start && dateStr <= end;
+  };
+
+  const handleCalDayClick = (dateStr: string) => {
+    setCalError(""); setCalSuccess("");
+    if (calMode === "single") {
+      setCalRangeStart(dateStr); setCalRangeEnd(dateStr);
+    } else if (calMode === "range") {
+      if (!calRangeStart || calRangeEnd) {
+        setCalRangeStart(dateStr); setCalRangeEnd(null);
+      } else {
+        const [s, e] = dateStr >= calRangeStart ? [calRangeStart, dateStr] : [dateStr, calRangeStart];
+        setCalRangeStart(s); setCalRangeEnd(e);
+      }
+    }
+  };
+
+  const panelVisible =
+    (calMode === "single"    && calRangeStart !== null) ||
+    (calMode === "range"     && calRangeStart !== null && calRangeEnd !== null) ||
+    (calMode === "weekends"  ) ||
+    (calMode === "fullmonth" );
+
+  const saveCalendarRule = async () => {
+    const price = parseFloat(calPrice);
+    if (isNaN(price) || price <= 0) { setCalError("Enter a valid price per night."); return; }
+    setCalSaving(true); setCalError(""); setCalSuccess("");
+    try {
+      if (calMode === "weekends") {
+        const weekends = getWeekendsInMonth(calYear, calMonth);
+        if (weekends.length === 0) { setCalError("No weekends found in this month."); return; }
+        for (const { start, end } of weekends) {
+          await api("/seasonal-pricing", { method: "POST", body: JSON.stringify({ villa_id: seasonalVilla, label: calLabel || "Weekend Rate", start_date: start, end_date: end, price_per_night: price }) });
+        }
+      } else if (calMode === "fullmonth") {
+        const start = calDateStr(calYear, calMonth, 1);
+        const end   = calDateStr(calYear, calMonth, new Date(calYear, calMonth + 1, 0).getDate());
+        const res   = await api("/seasonal-pricing", { method: "POST", body: JSON.stringify({ villa_id: seasonalVilla, label: calLabel || "Monthly Rate", start_date: start, end_date: end, price_per_night: price }) });
+        const data  = await res.json();
+        if (!res.ok) { setCalError(data.error ?? "Failed to save."); return; }
+      } else {
+        const end = calRangeEnd ?? calRangeStart!;
+        const res = await api("/seasonal-pricing", { method: "POST", body: JSON.stringify({ villa_id: seasonalVilla, label: calLabel || "Custom Rate", start_date: calRangeStart!, end_date: end, price_per_night: price }) });
+        const data = await res.json();
+        if (!res.ok) { setCalError(data.error ?? "Failed to save."); return; }
+      }
+      setCalSuccess("Pricing rule saved.");
+      setCalRangeStart(null); setCalRangeEnd(null); setCalPrice(""); setCalLabel("");
+      await fetchSeasonalPricing(seasonalVilla);
+    } finally {
+      setCalSaving(false);
+    }
+  };
+
+  const abbrevKes = (n: number) => n >= 1000 ? `${(n / 1000 % 1 === 0 ? (n / 1000).toFixed(0) : (n / 1000).toFixed(1))}k` : String(Math.round(n));
 
   const fetchSeasonalPricing = useCallback(async (villaId: string) => {
     setSeasonalLoading(true);
@@ -145,28 +259,6 @@ const AdminDashboardPage: React.FC = () => {
       setSeasonalLoading(false);
     }
   }, [api]);
-
-  const submitSeasonalRule = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSeasonalError(""); setSeasonalSuccess("");
-    if (!seasonalForm.start_date || !seasonalForm.end_date || !seasonalForm.price_per_night) {
-      setSeasonalError("Start date, end date and price are required."); return;
-    }
-    setSeasonalSaving(true);
-    try {
-      const res = await api("/seasonal-pricing", {
-        method: "POST",
-        body: JSON.stringify({ villa_id: seasonalVilla, ...seasonalForm, price_per_night: parseFloat(seasonalForm.price_per_night) }),
-      });
-      const data = await res.json();
-      if (!res.ok) { setSeasonalError(data.error ?? "Failed to create rule."); return; }
-      setSeasonalSuccess("Pricing rule added.");
-      setSeasonalForm({ label: "", start_date: "", end_date: "", price_per_night: "" });
-      await fetchSeasonalPricing(seasonalVilla);
-    } finally {
-      setSeasonalSaving(false);
-    }
-  };
 
   const deleteSeasonalRule = async (id: number) => {
     if (!window.confirm("Delete this pricing rule?")) return;
@@ -1162,117 +1254,262 @@ const AdminDashboardPage: React.FC = () => {
             </>
           )}
 
-          {/* ── SEASONAL PRICING ──────────────────────────── */}
-          {activeTab === "seasonal-pricing" && (
-            <>
-              {/* Add rule form */}
-              <div className="adm-form-card">
-                <h3>Add Pricing Rule — {VILLAS.find((v) => v.id === seasonalVilla)?.name}</h3>
-                <form onSubmit={submitSeasonalRule}>
-                  <div className="adm-form-row">
-                    <div className="adm-form-field">
-                      <label>Label (e.g. High Season)</label>
-                      <input
-                        type="text"
-                        placeholder="e.g. Easter Holiday"
-                        value={seasonalForm.label}
-                        onChange={(e) => setSeasonalForm((f) => ({ ...f, label: e.target.value }))}
-                      />
-                    </div>
-                    <div className="adm-form-field">
-                      <label>Start Date</label>
-                      <input
-                        type="date"
-                        value={seasonalForm.start_date}
-                        onChange={(e) => setSeasonalForm((f) => ({ ...f, start_date: e.target.value }))}
-                        required
-                      />
-                    </div>
-                    <div className="adm-form-field">
-                      <label>End Date</label>
-                      <input
-                        type="date"
-                        value={seasonalForm.end_date}
-                        min={seasonalForm.start_date}
-                        onChange={(e) => setSeasonalForm((f) => ({ ...f, end_date: e.target.value }))}
-                        required
-                      />
-                    </div>
-                    <div className="adm-form-field">
-                      <label>Price / Night ({currency.code})</label>
-                      <input
-                        type="number"
-                        min="1"
-                        placeholder="e.g. 9500"
-                        value={seasonalForm.price_per_night}
-                        onChange={(e) => setSeasonalForm((f) => ({ ...f, price_per_night: e.target.value }))}
-                        required
-                      />
-                    </div>
-                    <button className="adm-btn adm-btn-save" type="submit" disabled={seasonalSaving} style={{ padding: "10px 24px", alignSelf: "flex-end" }}>
-                      {seasonalSaving ? "…" : "Add Rule"}
-                    </button>
-                  </div>
-                  {seasonalError   && <div className="adm-form-msg error">{seasonalError}</div>}
-                  {seasonalSuccess && <div className="adm-form-msg success">{seasonalSuccess}</div>}
-                </form>
-              </div>
+          {/* ── SEASONAL PRICING CALENDAR ─────────────────── */}
+          {activeTab === "seasonal-pricing" && (() => {
+            const daysInMonth  = new Date(calYear, calMonth + 1, 0).getDate();
+            const firstDow     = new Date(calYear, calMonth, 1).getDay();
+            const firstDowMon  = firstDow === 0 ? 6 : firstDow - 1; // Mon=0
+            const monthLabel   = new Date(calYear, calMonth, 1).toLocaleString("en-GB", { month: "long", year: "numeric" });
+            const todayStr     = new Date().toISOString().split("T")[0];
+            const DAYS         = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
 
-              <div className="adm-section-head">
-                <div className="adm-section-title">Seasonal Pricing</div>
-                <div className="adm-filters">
-                  <select
-                    className="adm-select"
-                    value={seasonalVilla}
-                    onChange={(e) => { setSeasonalVilla(e.target.value); fetchSeasonalPricing(e.target.value); }}
-                  >
-                    {VILLAS.map((v) => <option key={v.id} value={v.id}>{v.name}</option>)}
-                  </select>
-                  <button className="adm-filter-btn" onClick={() => fetchSeasonalPricing(seasonalVilla)}>↺ Refresh</button>
-                </div>
-              </div>
-              <div style={{ fontSize: "0.65rem", color: "#505050", letterSpacing: "0.05em", marginBottom: 20 }}>
-                Set date-range prices per villa. When a guest's check-in falls within a range, the seasonal price overrides the base price.
-              </div>
+            const cells: Array<string | null> = [
+              ...Array(firstDowMon).fill(null),
+              ...Array.from({ length: daysInMonth }, (_, i) => calDateStr(calYear, calMonth, i + 1)),
+            ];
 
-              {seasonalLoading ? (
-                <div className="adm-loading">Loading rules…</div>
-              ) : seasonalRules.length === 0 ? (
-                <div className="adm-loading">No seasonal pricing rules for this villa.</div>
-              ) : (
-                <div className="adm-table-wrap">
-                  <table className="adm-table">
-                    <thead>
-                      <tr>
-                        <th>Label</th>
-                        <th>Start Date</th>
-                        <th>End Date</th>
-                        <th>Price / Night ({currency.code})</th>
-                        <th>Created</th>
-                        <th>Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {seasonalRules.map((r) => (
-                        <tr key={r.id}>
-                          <td>{r.label}</td>
-                          <td>{fmt(r.start_date)}</td>
-                          <td>{fmt(r.end_date)}</td>
-                          <td style={{ color: "#0a0a0a", fontFamily: "monospace" }}>{formatPrice(Number(r.price_per_night))}</td>
-                          <td style={{ fontSize: "0.68rem", color: "#aaaaaa" }}>{fmt(r.created_at)}</td>
-                          <td>
-                            <button className="adm-btn adm-btn-remove" onClick={() => deleteSeasonalRule(r.id)}>
-                              Delete
-                            </button>
-                          </td>
-                        </tr>
+            const prevMonth = () => { if (calMonth === 0) { setCalYear(y => y - 1); setCalMonth(11); } else setCalMonth(m => m - 1); };
+            const nextMonth = () => { if (calMonth === 11) { setCalYear(y => y + 1); setCalMonth(0); } else setCalMonth(m => m + 1); };
+
+            const getDayState = (dateStr: string) => {
+              const dow = new Date(dateStr).getDay();
+              const isWeekend = dow === 0 || dow === 6;
+              const rule = calPriceForDate(dateStr);
+              const selected =
+                (calMode === "single" || calMode === "range") ? isInCalSelection(dateStr) :
+                calMode === "weekends" ? isWeekendSelected(dateStr) :
+                isFullMonthSelected(dateStr);
+              return { isWeekend, rule, selected };
+            };
+
+            const selectionLabel = () => {
+              if (calMode === "weekends") return `All Weekends in ${new Date(calYear, calMonth).toLocaleString("en-GB", { month: "long", year: "numeric" })}`;
+              if (calMode === "fullmonth") return monthLabel;
+              if (!calRangeStart) return null;
+              const end = calRangeEnd ?? calRangeStart;
+              if (calRangeStart === end) return fmt(calRangeStart);
+              return `${fmt(calRangeStart)} – ${fmt(end)}`;
+            };
+
+            return (
+              <>
+                <style>{`
+                  .cal-wrap { background:#fff; border:1px solid #eef0f4; border-radius:16px; padding:28px; box-shadow:0 1px 4px rgba(0,0,0,0.06); margin-bottom:24px; }
+                  .cal-topbar { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; margin-bottom:22px; }
+                  .cal-nav { display:flex; align-items:center; gap:10px; }
+                  .cal-nav-btn { background:none; border:1.5px solid #e5e7eb; border-radius:8px; width:34px; height:34px; cursor:pointer; font-size:0.9rem; color:#6b7280; transition:all 0.15s; display:flex; align-items:center; justify-content:center; }
+                  .cal-nav-btn:hover { border-color:#c9a84c; color:#c9a84c; }
+                  .cal-month-label { font-family:'Playfair Display',serif; font-size:1.1rem; color:#1a1a2e; min-width:180px; text-align:center; }
+                  .cal-mode-bar { display:flex; gap:6px; flex-wrap:wrap; }
+                  .cal-mode-btn { padding:7px 16px; font-family:'Inter',sans-serif; font-size:0.7rem; font-weight:600; letter-spacing:0.04em; border:1.5px solid #e5e7eb; border-radius:8px; background:#fff; color:#9098a9; cursor:pointer; transition:all 0.15s; }
+                  .cal-mode-btn:hover { border-color:#c9a84c; color:#c9a84c; }
+                  .cal-mode-btn.active { background:#1a1a2e; color:#fff; border-color:#1a1a2e; }
+                  .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:5px; }
+                  .cal-header-cell { text-align:center; font-family:'Inter',sans-serif; font-size:0.6rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:#9098a9; padding:8px 0; }
+                  .cal-header-cell.weekend-col { color:#c9a84c; }
+                  .cal-day { min-height:56px; border-radius:10px; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer; border:1.5px solid transparent; transition:all 0.12s; background:#fafbfc; padding:4px 2px; user-select:none; }
+                  .cal-day:hover { border-color:#c9a84c; background:#fffbf0; }
+                  .cal-day.weekend-day { background:#fffdf5; }
+                  .cal-day.has-rule { background:#fef9ee; border-color:#f0d882; }
+                  .cal-day.in-range { background:#eef1ff; border-color:#c7cde8; }
+                  .cal-day.selected { background:#1a1a2e !important; border-color:#1a1a2e !important; }
+                  .cal-day.today .cal-day-num::after { content:''; display:block; width:4px; height:4px; background:#c9a84c; border-radius:50%; margin:2px auto 0; }
+                  .cal-day-num { font-family:'Inter',sans-serif; font-size:0.8rem; font-weight:600; color:#374151; line-height:1; }
+                  .cal-day.selected .cal-day-num { color:#fff; }
+                  .cal-day.in-range .cal-day-num { color:#3730a3; }
+                  .cal-day-price { font-size:0.58rem; font-weight:700; color:#c9a84c; margin-top:3px; letter-spacing:0.02em; }
+                  .cal-day.selected .cal-day-price { color:#c9a84c; }
+                  .cal-panel { background:#f5f6fa; border:1.5px solid #c9a84c; border-radius:12px; padding:20px 24px; margin-top:20px; }
+                  .cal-panel-title { font-family:'Inter',sans-serif; font-size:0.62rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:#9098a9; margin-bottom:14px; }
+                  .cal-panel-sel { font-family:'Playfair Display',serif; font-size:1rem; color:#1a1a2e; margin-bottom:16px; }
+                  .cal-panel-row { display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; }
+                  .cal-panel-field { display:flex; flex-direction:column; gap:5px; }
+                  .cal-panel-field label { font-family:'Inter',sans-serif; font-size:0.6rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#9098a9; }
+                  .cal-panel-field input { background:#fff; border:1.5px solid #e5e7eb; border-radius:8px; padding:9px 12px; font-family:'Inter',sans-serif; font-size:0.85rem; color:#1a1a2e; outline:none; transition:border-color 0.15s; min-width:140px; }
+                  .cal-panel-field input:focus { border-color:#c9a84c; }
+                  .cal-legend { display:flex; gap:16px; flex-wrap:wrap; margin-top:16px; }
+                  .cal-legend-item { display:flex; align-items:center; gap:6px; font-family:'Inter',sans-serif; font-size:0.68rem; color:#9098a9; }
+                  .cal-legend-dot { width:10px; height:10px; border-radius:3px; flex-shrink:0; }
+                `}</style>
+
+                {/* ── Toolbar ── */}
+                <div className="cal-wrap">
+                  <div className="cal-topbar">
+                    <div style={{ display:"flex", alignItems:"center", gap:16, flexWrap:"wrap" }}>
+                      <select
+                        className="adm-select"
+                        value={seasonalVilla}
+                        onChange={(e) => { setSeasonalVilla(e.target.value); fetchSeasonalPricing(e.target.value); setCalRangeStart(null); setCalRangeEnd(null); }}
+                      >
+                        {VILLAS.map((v) => <option key={v.id} value={v.id}>{v.name}</option>)}
+                      </select>
+                      <div className="cal-nav">
+                        <button className="cal-nav-btn" onClick={prevMonth}>‹</button>
+                        <div className="cal-month-label">{monthLabel}</div>
+                        <button className="cal-nav-btn" onClick={nextMonth}>›</button>
+                      </div>
+                    </div>
+                    <div className="cal-mode-bar">
+                      {([
+                        { key: "single",    label: "Single Day" },
+                        { key: "range",     label: "Date Range" },
+                        { key: "weekends",  label: "All Weekends" },
+                        { key: "fullmonth", label: "Full Month" },
+                      ] as const).map(({ key, label }) => (
+                        <button
+                          key={key}
+                          className={`cal-mode-btn${calMode === key ? " active" : ""}`}
+                          onClick={() => { setCalMode(key); setCalRangeStart(null); setCalRangeEnd(null); setCalError(""); setCalSuccess(""); }}
+                        >{label}</button>
                       ))}
-                    </tbody>
-                  </table>
+                    </div>
+                  </div>
+
+                  {/* ── Calendar grid ── */}
+                  <div className="cal-grid">
+                    {DAYS.map((d, i) => (
+                      <div key={d} className={`cal-header-cell${i >= 5 ? " weekend-col" : ""}`}>{d}</div>
+                    ))}
+                    {cells.map((dateStr, idx) => {
+                      if (!dateStr) return <div key={`blank-${idx}`} />;
+                      const { isWeekend, rule, selected } = getDayState(dateStr);
+                      const inRange = !selected && (
+                        (calMode === "range" && isInCalSelection(dateStr)) ||
+                        (calMode === "weekends" && isWeekendSelected(dateStr)) ||
+                        (calMode === "fullmonth" && isFullMonthSelected(dateStr))
+                      );
+                      const cls = [
+                        "cal-day",
+                        isWeekend        ? "weekend-day" : "",
+                        rule && !selected && !inRange ? "has-rule" : "",
+                        inRange          ? "in-range"   : "",
+                        selected         ? "selected"   : "",
+                        dateStr === todayStr ? "today" : "",
+                      ].filter(Boolean).join(" ");
+
+                      return (
+                        <div
+                          key={dateStr}
+                          className={cls}
+                          onClick={() => handleCalDayClick(dateStr)}
+                          onMouseEnter={() => calMode === "range" && calRangeStart && !calRangeEnd && setCalHover(dateStr)}
+                          onMouseLeave={() => setCalHover(null)}
+                          title={rule ? `${rule.label}: Ksh ${Number(rule.price_per_night).toLocaleString()}/night` : ""}
+                        >
+                          <span className="cal-day-num">{Number(dateStr.split("-")[2])}</span>
+                          {rule && <span className="cal-day-price">{abbrevKes(Number(rule.price_per_night))}</span>}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* ── Legend ── */}
+                  <div className="cal-legend">
+                    <div className="cal-legend-item"><div className="cal-legend-dot" style={{ background:"#fffdf5", border:"1.5px solid #f0d882" }} /> Weekend</div>
+                    <div className="cal-legend-item"><div className="cal-legend-dot" style={{ background:"#fef9ee", border:"1.5px solid #f0d882" }} /> Has price rule</div>
+                    <div className="cal-legend-item"><div className="cal-legend-dot" style={{ background:"#eef1ff", border:"1.5px solid #c7cde8" }} /> In selection</div>
+                    <div className="cal-legend-item"><div className="cal-legend-dot" style={{ background:"#1a1a2e" }} /> Selected</div>
+                  </div>
+
+                  {/* ── Price panel ── */}
+                  {panelVisible && (
+                    <div className="cal-panel">
+                      <div className="cal-panel-title">Set Price</div>
+                      <div className="cal-panel-sel">📅 {selectionLabel()}</div>
+                      <div className="cal-panel-row">
+                        <div className="cal-panel-field">
+                          <label>Label</label>
+                          <input
+                            type="text"
+                            placeholder={
+                              calMode === "weekends"  ? "Weekend Rate" :
+                              calMode === "fullmonth" ? "Monthly Rate" : "e.g. High Season"
+                            }
+                            value={calLabel}
+                            onChange={(e) => setCalLabel(e.target.value)}
+                          />
+                        </div>
+                        <div className="cal-panel-field">
+                          <label>Price / Night (KES)</label>
+                          <input
+                            type="number"
+                            min="1"
+                            placeholder="e.g. 12000"
+                            value={calPrice}
+                            onChange={(e) => setCalPrice(e.target.value)}
+                            autoFocus
+                          />
+                        </div>
+                        <button
+                          className="adm-btn adm-btn-save"
+                          style={{ padding:"10px 24px", alignSelf:"flex-end", background:"#c9a84c" }}
+                          disabled={calSaving}
+                          onClick={saveCalendarRule}
+                        >
+                          {calSaving ? "Saving…" : "Save Rule"}
+                        </button>
+                        <button
+                          className="adm-btn adm-btn-cancel"
+                          style={{ padding:"10px 18px", alignSelf:"flex-end" }}
+                          onClick={() => { setCalRangeStart(null); setCalRangeEnd(null); setCalPrice(""); setCalLabel(""); setCalError(""); setCalSuccess(""); }}
+                        >
+                          Clear
+                        </button>
+                      </div>
+                      {calError   && <div className="adm-form-msg error"   style={{ marginTop:12 }}>{calError}</div>}
+                      {calSuccess && <div className="adm-form-msg success" style={{ marginTop:12 }}>{calSuccess}</div>}
+                    </div>
+                  )}
                 </div>
-              )}
-            </>
-          )}
+
+                {/* ── Rules table ── */}
+                <div className="adm-section-head" style={{ marginTop:8 }}>
+                  <div className="adm-section-title">Pricing Rules — {VILLAS.find(v => v.id === seasonalVilla)?.name}</div>
+                  <div className="adm-filters">
+                    <button className="adm-filter-btn" onClick={() => fetchSeasonalPricing(seasonalVilla)}>↺ Refresh</button>
+                  </div>
+                </div>
+                <div style={{ fontSize:"0.65rem", color:"#9098a9", marginBottom:16 }}>
+                  Rules shown as gold badges on the calendar. A rule covering check-in date overrides the base price.
+                </div>
+
+                {seasonalLoading ? (
+                  <div className="adm-loading">Loading rules…</div>
+                ) : seasonalRules.length === 0 ? (
+                  <div className="adm-loading">No pricing rules yet — click dates on the calendar to add one.</div>
+                ) : (
+                  <div className="adm-table-wrap">
+                    <table className="adm-table">
+                      <thead>
+                        <tr>
+                          <th>Label</th>
+                          <th>Start</th>
+                          <th>End</th>
+                          <th>Price / Night ({currency.code})</th>
+                          <th>Added</th>
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {seasonalRules.map((r) => (
+                          <tr key={r.id}>
+                            <td><span className="badge badge-default">{r.label}</span></td>
+                            <td>{fmt(r.start_date)}</td>
+                            <td>{fmt(r.end_date)}</td>
+                            <td style={{ fontFamily:"monospace", color:"#c9a84c", fontWeight:700 }}>{formatPrice(Number(r.price_per_night))}</td>
+                            <td style={{ fontSize:"0.68rem", color:"#aaaaaa" }}>{fmt(r.created_at)}</td>
+                            <td>
+                              <button className="adm-btn adm-btn-remove" onClick={() => deleteSeasonalRule(r.id)}>Delete</button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </>
+            );
+          })()}
 
           {activeTab === "users" && (
             <>
