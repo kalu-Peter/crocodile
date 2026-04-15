@@ -210,7 +210,8 @@ const AdminDashboardPage: React.FC = () => {
       if (rule) {
         setCalEditRule(rule);
         setCalLabel(rule.label);
-        setCalPrice(String(rule.price_per_night));
+        const rate = rates[currency.code] ?? 1;
+        setCalPrice(String(Math.round(Number(rule.price_per_night) * rate * 100) / 100));
       } else {
         setCalEditRule(null);
         setCalLabel(""); setCalPrice("");
@@ -233,8 +234,11 @@ const AdminDashboardPage: React.FC = () => {
     (calMode === "fullmonth" );
 
   const saveCalendarRule = async () => {
-    const price = parseFloat(calPrice);
-    if (isNaN(price) || price <= 0) { setCalError("Enter a valid price per night."); return; }
+    const priceInCurrency = parseFloat(calPrice);
+    if (isNaN(priceInCurrency) || priceInCurrency <= 0) { setCalError("Enter a valid price per night."); return; }
+    // Always store in KES (base currency); convert from selected currency
+    const rate = rates[currency.code] ?? 1;
+    const price = Math.round(priceInCurrency / rate);
     setCalSaving(true); setCalError(""); setCalSuccess("");
     try {
       if (calMode === "single" && calEditRule) {
@@ -1424,14 +1428,21 @@ const AdminDashboardPage: React.FC = () => {
                             // Pre-fill price from first existing rule for weekends/fullmonth
                             if (key === "weekends") {
                               const wDates = weekendDatesInMonth(calYear, calMonth);
-                              const existing = seasonalRules.find(r => wDates.includes(r.start_date));
-                              if (existing) { setCalPrice(String(existing.price_per_night)); setCalLabel(existing.label); }
-                              else { setCalPrice(""); setCalLabel(""); }
+                              const existing = seasonalRules.find(r => wDates.includes(r.start_date.slice(0, 10)));
+                              if (existing) {
+                                const rate = rates[currency.code] ?? 1;
+                                setCalPrice(String(Math.round(Number(existing.price_per_night) * rate * 100) / 100));
+                                setCalLabel(existing.label);
+                              } else { setCalPrice(""); setCalLabel(""); }
                             } else if (key === "fullmonth") {
                               const start = calDateStr(calYear, calMonth, 1);
                               const end   = calDateStr(calYear, calMonth, new Date(calYear, calMonth + 1, 0).getDate());
-                              const existing = seasonalRules.find(r => r.start_date === start && r.end_date === end);
-                              if (existing) { setCalPrice(String(existing.price_per_night)); setCalLabel(existing.label); }
+                              const existing = seasonalRules.find(r => r.start_date.slice(0, 10) === start && r.end_date.slice(0, 10) === end);
+                              if (existing) {
+                                const rate = rates[currency.code] ?? 1;
+                                setCalPrice(String(Math.round(Number(existing.price_per_night) * rate * 100) / 100));
+                                setCalLabel(existing.label);
+                              }
                               else { setCalPrice(""); setCalLabel(""); }
                             } else {
                               setCalPrice(""); setCalLabel("");
