@@ -131,6 +131,11 @@ const AdminDashboardPage: React.FC = () => {
   const [seasonalRules, setSeasonalRules] = useState<SeasonalPricingRule[]>([]);
   const [seasonalLoading, setSeasonalLoading] = useState(false);
   const [seasonalVilla, setSeasonalVilla] = useState(VILLAS[0].id);
+  const [editRuleId, setEditRuleId] = useState<number | null>(null);
+  const [editLabel, setEditLabel] = useState("");
+  const [editPrice, setEditPrice] = useState("");
+  const [editSaving, setEditSaving] = useState(false);
+  const [editError, setEditError] = useState("");
 
   // ── Calendar pricing UI ───────────────────────────────────────────────────
   const now = new Date();
@@ -226,7 +231,9 @@ const AdminDashboardPage: React.FC = () => {
         const weekends = getWeekendsInMonth(calYear, calMonth);
         if (weekends.length === 0) { setCalError("No weekends found in this month."); return; }
         for (const { start, end } of weekends) {
-          await api("/seasonal-pricing", { method: "POST", body: JSON.stringify({ villa_id: seasonalVilla, label: calLabel || "Weekend Rate", start_date: start, end_date: end, price_per_night: price }) });
+          const res = await api("/seasonal-pricing", { method: "POST", body: JSON.stringify({ villa_id: seasonalVilla, label: calLabel || "Weekend Rate", start_date: start, end_date: end, price_per_night: price }) });
+          const data = await res.json();
+          if (!res.ok) { setCalError(data.error ?? "Failed to save weekend rule."); return; }
         }
       } else if (calMode === "fullmonth") {
         const start = calDateStr(calYear, calMonth, 1);
@@ -264,6 +271,40 @@ const AdminDashboardPage: React.FC = () => {
     if (!window.confirm("Delete this pricing rule?")) return;
     await api(`/seasonal-pricing/${id}`, { method: "DELETE" });
     await fetchSeasonalPricing(seasonalVilla);
+  };
+
+  const startEditRule = (r: SeasonalPricingRule) => {
+    setEditRuleId(r.id);
+    setEditLabel(r.label);
+    setEditPrice(String(r.price_per_night));
+    setEditError("");
+  };
+
+  const cancelEditRule = () => {
+    setEditRuleId(null);
+    setEditLabel("");
+    setEditPrice("");
+    setEditError("");
+  };
+
+  const saveEditRule = async (id: number) => {
+    const price = parseFloat(editPrice);
+    if (isNaN(price) || price <= 0) { setEditError("Enter a valid price."); return; }
+    setEditSaving(true); setEditError("");
+    try {
+      const res = await api(`/seasonal-pricing/${id}`, {
+        method: "PUT",
+        body: JSON.stringify({ label: editLabel, price_per_night: price }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setEditError(data.error ?? "Failed to update."); return; }
+      setSeasonalRules(prev =>
+        prev.map(r => r.id === id ? { ...r, label: data.label, price_per_night: data.price_per_night } : r)
+      );
+      setEditRuleId(null);
+    } finally {
+      setEditSaving(false);
+    }
   };
 
   // ── Users ─────────────────────────────────────────────────────────────────
@@ -1493,14 +1534,53 @@ const AdminDashboardPage: React.FC = () => {
                       <tbody>
                         {seasonalRules.map((r) => (
                           <tr key={r.id}>
-                            <td><span className="badge badge-default">{r.label}</span></td>
-                            <td>{fmt(r.start_date)}</td>
-                            <td>{fmt(r.end_date)}</td>
-                            <td style={{ fontFamily:"monospace", color:"#c9a84c", fontWeight:700 }}>{formatPrice(Number(r.price_per_night))}</td>
-                            <td style={{ fontSize:"0.68rem", color:"#aaaaaa" }}>{fmt(r.created_at)}</td>
-                            <td>
-                              <button className="adm-btn adm-btn-remove" onClick={() => deleteSeasonalRule(r.id)}>Delete</button>
-                            </td>
+                            {editRuleId === r.id ? (
+                              <>
+                                <td>
+                                  <input
+                                    type="text"
+                                    value={editLabel}
+                                    onChange={(e) => setEditLabel(e.target.value)}
+                                    style={{ width:"100%", padding:"4px 6px", borderRadius:6, border:"1.5px solid #c9a84c", fontFamily:"inherit", fontSize:"0.8rem" }}
+                                  />
+                                  {editError && <div style={{ color:"#e53e3e", fontSize:"0.65rem", marginTop:2 }}>{editError}</div>}
+                                </td>
+                                <td>{fmt(r.start_date)}</td>
+                                <td>{fmt(r.end_date)}</td>
+                                <td>
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    step="any"
+                                    value={editPrice}
+                                    onChange={(e) => setEditPrice(e.target.value)}
+                                    style={{ width:90, padding:"4px 6px", borderRadius:6, border:"1.5px solid #c9a84c", fontFamily:"monospace", fontSize:"0.8rem", color:"#c9a84c", fontWeight:700 }}
+                                  />
+                                </td>
+                                <td style={{ fontSize:"0.68rem", color:"#aaaaaa" }}>{fmt(r.created_at)}</td>
+                                <td style={{ display:"flex", gap:4 }}>
+                                  <button
+                                    className="adm-btn"
+                                    style={{ background:"#1a1a2e", color:"#fff", borderColor:"#1a1a2e" }}
+                                    onClick={() => saveEditRule(r.id)}
+                                    disabled={editSaving}
+                                  >{editSaving ? "Saving…" : "Save"}</button>
+                                  <button className="adm-btn" onClick={cancelEditRule}>Cancel</button>
+                                </td>
+                              </>
+                            ) : (
+                              <>
+                                <td><span className="badge badge-default">{r.label}</span></td>
+                                <td>{fmt(r.start_date)}</td>
+                                <td>{fmt(r.end_date)}</td>
+                                <td style={{ fontFamily:"monospace", color:"#c9a84c", fontWeight:700 }}>{formatPrice(Number(r.price_per_night))}</td>
+                                <td style={{ fontSize:"0.68rem", color:"#aaaaaa" }}>{fmt(r.created_at)}</td>
+                                <td style={{ display:"flex", gap:4 }}>
+                                  <button className="adm-btn" onClick={() => startEditRule(r)}>Edit</button>
+                                  <button className="adm-btn adm-btn-remove" onClick={() => deleteSeasonalRule(r.id)}>Delete</button>
+                                </td>
+                              </>
+                            )}
                           </tr>
                         ))}
                       </tbody>
